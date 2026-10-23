@@ -1,0 +1,62 @@
+{
+  "app": {
+    "title": "EduVerify",
+    "subtitle": "National APAAR Student Verification & Repository System",
+    "gov_portal": "Government of India · Ministry of Education · AICTE"
+  },
+  "nav": {
+    "institution": "Institution Portal",
+    "aicte": "AICTE Central Console",
+    "student": "Student Wallet",
+    "verifier": "Verifier Portal",
+    "reports": "Reports & Analytics",
+    "settings": "Settings",
+    "login": "Sign In",
+    "logout": "Sign Out",
+    "upload": "Upload Batch",
+    "review": "Review Workspace",
+    "transfers": "Transfers"
+  },
+  "roles": {
+    "AICTE_ADMIN": "AICTE Admin",
+    "AICTE_ANALYST": "AICTE Analyst",
+    "DAB_ADMIN": "Degree Awarding Body Admin",
+    "INSTITUTION_ADMIN": "Institution Admin",
+    "INSTITUTION_STAFF": "Institution Staff",
+    "VERIFIER": "Authorized Verifier",
+    "STUDENT": "Student"
+  },
+  "shell": {
+    "language": "Language",
+    "accessibility": "Accessibility Statement: WCAG 2.1 AA Compliant",
+    "copyright": "© 2026 EduVerify System. All rights reserved.",
+    "role": "Role",
+    "offline_warning": "You are currently offline. Actions will be queued."
+  },
+  "badges": {
+    "critical": "Critical",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "auto_flag": "Auto Flagged",
+    "human_review": "Human Review",
+    "info": "Informational"
+  },
+  "score": {
+    "label": "Data Quality Score",
+    "before": "Before Review",
+    "after": "After Corrections"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "no_data": "No records found",
+    "save": "Save",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "approve": "Approve",
+    "reject": "Reject",
+    "export": "Export"
+  }
+}
