@@ -67,6 +67,7 @@ def test_login_wrong_password(client, db_session: Session):
 
     # Verify failed logins incremented
     user = db_session.query(User).filter(User.email == "aicte.admin@demo.local").first()
+    assert user is not None
     assert user.failed_logins == 1
 
 
@@ -85,6 +86,7 @@ def test_login_nonexistent_user(client):
 def test_login_inactive_user(client, db_session: Session):
     """POST /v1/auth/login for deactivated user returns 401 ACCOUNT_INACTIVE."""
     user = db_session.query(User).filter(User.email == "inst.staff@demo.local").first()
+    assert user is not None
     user.is_active = False
     db_session.flush()
 
@@ -109,11 +111,12 @@ def test_account_lockout_after_5_failures(client, db_session: Session):
         assert resp.status_code == 401
 
     user = db_session.query(User).filter(User.email == email).first()
+    assert user is not None
     assert user.failed_logins >= 5
     assert user.locked_until is not None
-    locked_until = (
-        user.locked_until if user.locked_until.tzinfo else user.locked_until.replace(tzinfo=UTC)
-    )
+    raw_locked = user.locked_until
+    assert isinstance(raw_locked, datetime)
+    locked_until: datetime = raw_locked if raw_locked.tzinfo else raw_locked.replace(tzinfo=UTC)
     assert locked_until > datetime.now(UTC)
 
     # 6th attempt with CORRECT password must still fail due to lockout
@@ -153,11 +156,13 @@ def test_refresh_token_rotation(client, db_session: Session):
 
     # Verify old token record is revoked and replaced_by points to new jti
     old_record = db_session.query(RefreshToken).filter(RefreshToken.jti == first_jti).first()
+    assert old_record is not None
     assert old_record.revoked_at is not None
     assert old_record.replaced_by == second_jti
 
     # Verify new token record is active
     new_record = db_session.query(RefreshToken).filter(RefreshToken.jti == second_jti).first()
+    assert new_record is not None
     assert new_record.revoked_at is None
 
 
@@ -194,6 +199,7 @@ def test_refresh_token_reuse_detection(client, db_session: Session):
     assert len(active_tokens) == 0
 
     token_2 = db_session.query(RefreshToken).filter(RefreshToken.jti == jti_2).first()
+    assert token_2 is not None
     assert token_2.revoked_at is not None
 
 
@@ -235,12 +241,14 @@ def test_logout(client, db_session: Session):
 
     # Verify DB revoked
     rt = db_session.query(RefreshToken).filter(RefreshToken.jti == jti).first()
+    assert rt is not None
     assert rt.revoked_at is not None
 
 
 def test_get_me(client, db_session: Session):
     """GET /v1/auth/me returns the authenticated user's profile."""
     user = db_session.query(User).filter(User.email == "dab.admin@demo.local").first()
+    assert user is not None
     headers = make_auth_headers(user)
 
     resp = client.get("/v1/auth/me", headers=headers)
@@ -258,6 +266,7 @@ def test_get_me(client, db_session: Session):
 def test_change_password_success(client, db_session: Session):
     """POST /v1/auth/password changes password and revokes all active refresh tokens."""
     user = db_session.query(User).filter(User.email == "verifier@demo.local").first()
+    assert user is not None
     headers = make_auth_headers(user)
 
     # Issue a refresh token first
@@ -289,6 +298,7 @@ def test_change_password_success(client, db_session: Session):
 def test_change_password_weak_or_invalid(client, db_session: Session):
     """POST /v1/auth/password rejects wrong current password or weak new password."""
     user = db_session.query(User).filter(User.email == "verifier@demo.local").first()
+    assert user is not None
     headers = make_auth_headers(user)
 
     # Wrong current password
@@ -313,6 +323,7 @@ def test_change_password_weak_or_invalid(client, db_session: Session):
 def test_totp_mfa_for_admin(client, db_session: Session, monkeypatch):
     """TOTP MFA enforcement for AICTE_ADMIN when MFA_REQUIRED_FOR_ADMIN is True."""
     user = db_session.query(User).filter(User.email == "aicte.admin@demo.local").first()
+    assert user is not None
     secret = pyotp.random_base32()
     user.mfa_secret = secret
     db_session.flush()

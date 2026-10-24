@@ -119,26 +119,33 @@ def seed_database(if_empty: bool = False) -> None:
         password_hash = hash_password(settings.SEED_PASSWORD)
 
         for udata in DEMO_USERS:
-            existing = db.query(User).filter(User.email == udata["email"]).first()
+            email = str(udata["email"])
+            full_name = str(udata["full_name"])
+            role = str(udata["role"])
+            inst_id = udata["institution_aicte_id"]
+            dab_id = udata["dab_id"]
+            apaar_hash = udata["student_apaar_hash"]
+
+            existing = db.query(User).filter(User.email == email).first()
             if existing:
                 existing.password_hash = password_hash
-                existing.full_name = udata["full_name"]
-                existing.role = udata["role"]
-                existing.institution_aicte_id = udata["institution_aicte_id"]
-                existing.dab_id = udata["dab_id"]
-                existing.student_apaar_hash = udata["student_apaar_hash"]
+                existing.full_name = full_name
+                existing.role = role
+                existing.institution_aicte_id = inst_id
+                existing.dab_id = dab_id
+                existing.student_apaar_hash = apaar_hash
                 existing.is_active = True
                 existing.failed_logins = 0
                 existing.locked_until = None
             else:
                 new_user = User(
-                    email=udata["email"],
+                    email=email,
                     password_hash=password_hash,
-                    full_name=udata["full_name"],
-                    role=udata["role"],
-                    institution_aicte_id=udata["institution_aicte_id"],
-                    dab_id=udata["dab_id"],
-                    student_apaar_hash=udata["student_apaar_hash"],
+                    full_name=full_name,
+                    role=role,
+                    institution_aicte_id=inst_id,
+                    dab_id=dab_id,
+                    student_apaar_hash=apaar_hash,
                     is_active=True,
                     created_at=datetime.now(UTC),
                 )

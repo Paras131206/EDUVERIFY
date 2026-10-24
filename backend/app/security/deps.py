@@ -161,11 +161,15 @@ def require_scope(required_scope: str):
     return scope_checker
 
 
-def require_same_institution(principal: Principal, target_institution_id: str) -> None:
+def require_same_institution(principal: Principal, target_institution_id: str | None) -> None:
     """Helper verifying that principal belongs to the specified institution (or is AICTE_ADMIN)."""
     if principal.role == "AICTE_ADMIN":
         return
-    if principal.institution_aicte_id == target_institution_id:
+    if (
+        principal.institution_aicte_id is not None
+        and target_institution_id is not None
+        and principal.institution_aicte_id == target_institution_id
+    ):
         return
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
