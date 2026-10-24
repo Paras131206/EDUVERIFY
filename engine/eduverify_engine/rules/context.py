@@ -100,6 +100,8 @@ class RuleContext:
         registry: pd.DataFrame | None = None,
         central_snapshot: pd.DataFrame | None = None,
         history: pd.DataFrame | None = None,
+        previous_batch_profile: dict[str, Any] | None = None,
+        previous_year_records: pd.DataFrame | None = None,
         transfers: pd.DataFrame | None = None,
         academic_year: str = "2026-27",
         institution_aicte_id: str = "1-100010001",
@@ -118,6 +120,8 @@ class RuleContext:
         self.mapping = mapping or []
         self.raw_df = raw_df
         self.catalog = catalog or load_rule_catalog()
+        self.previous_batch_profile = previous_batch_profile
+        self.previous_year_records = previous_year_records
 
         # Load or use provided master tables
         self.master = master if master is not None else load_master_tables(self.repo_root)
