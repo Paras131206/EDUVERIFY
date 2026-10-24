@@ -2,82 +2,85 @@ openapi: 3.1.0
 info:
   title: EduVerify API
   version: 0.1.0
-  description: |
-    Central repository and verification trust layer for AICTE-approved institutions
+  description: 'Central repository and verification trust layer for AICTE-approved
+    institutions
+
     keyed by APAAR ID. Source of truth data contract per agents.md and requirements.md.
+
+    '
   contact:
     name: AICTE EduVerify Team
     url: https://eduverify.aicte-india.org
 servers:
-  - url: http://localhost:8000
-    description: Local development server
-  - url: https://eduverify-api.onrender.com
-    description: Render staging/production environment
-
+- url: http://localhost:8000
+  description: Local development server
+- url: https://eduverify-api.onrender.com
+  description: Render staging/production environment
 tags:
-  - name: Health
-    description: System liveness and diagnostic endpoints
-  - name: Auth
-    description: Authentication, token refresh, and user profile
-  - name: Users
-    description: User management and role assignment
-  - name: API Keys
-    description: Institution scoped API key management
-  - name: Master Data
-    description: Reference tables (LGD, institutions, programs, academic years, enums)
-  - name: Templates
-    description: Student bulk upload template generators
-  - name: Registry
-    description: Mock APAAR identity verification registry checks
-  - name: Batches
-    description: Ingestion pipeline, mapping confirmation, review, commit, and SSE stream
-  - name: Events
-    description: Real-time Server-Sent Events streams and ticketing
-  - name: Issues
-    description: Rule engine issue explanation and human review decision workflow
-  - name: Corrections
-    description: Audit-tracked record correction submissions
-  - name: Duplicates
-    description: Intra- and cross-institution duplicate clusters and resolution
-  - name: Students
-    description: Canonical student records and lifecycle state transitions
-  - name: Transfers
-    description: Inter-institution student transfer workflow and AICTE override
-  - name: Aggregates
-    description: Aggregate-only data submissions for non-onboarded institutions
-  - name: Declared Totals
-    description: Statistical intake totals from approval process
-  - name: Reconciliation
-    description: Program-level reconciliation between uploaded records and declared totals
-  - name: Rollover
-    description: Academic year progression and batch rollover automation
-  - name: Consent
-    description: DPDP Act student consent ledger and status management
-  - name: Credentials
-    description: SD-JWT Verifiable Credential issuance, key binding, and revocation
-  - name: Verification
-    description: Third-party authorized credential verification
-  - name: Decentralized Identifiers
-    description: did:web document and public key discovery
-  - name: Status Lists
-    description: Bitstring status lists for suspension and revocation
-  - name: Webhooks
-    description: HMAC-signed event notifications delivery
-  - name: Notifications
-    description: Outbox notifications monitoring
-  - name: Reports
-    description: Data quality before/after reports and accreditation exports
-  - name: Audit
-    description: Hash-chained tamper-evident audit trail
-  - name: Dashboards
-    description: Real-time analytics, coverage maps, and anomaly feeds
-
+- name: Health
+  description: System liveness and diagnostic endpoints
+- name: Auth
+  description: Authentication, token refresh, and user profile
+- name: Users
+  description: User management and role assignment
+- name: API Keys
+  description: Institution scoped API key management
+- name: Master Data
+  description: Reference tables (LGD, institutions, programs, academic years, enums)
+- name: Templates
+  description: Student bulk upload template generators
+- name: Registry
+  description: Mock APAAR identity verification registry checks
+- name: Batches
+  description: Ingestion pipeline, mapping confirmation, review, commit, and SSE stream
+- name: Events
+  description: Real-time Server-Sent Events streams and ticketing
+- name: Issues
+  description: Rule engine issue explanation and human review decision workflow
+- name: Corrections
+  description: Audit-tracked record correction submissions
+- name: Duplicates
+  description: Intra- and cross-institution duplicate clusters and resolution
+- name: Students
+  description: Canonical student records and lifecycle state transitions
+- name: Transfers
+  description: Inter-institution student transfer workflow and AICTE override
+- name: Aggregates
+  description: Aggregate-only data submissions for non-onboarded institutions
+- name: Declared Totals
+  description: Statistical intake totals from approval process
+- name: Reconciliation
+  description: Program-level reconciliation between uploaded records and declared
+    totals
+- name: Rollover
+  description: Academic year progression and batch rollover automation
+- name: Consent
+  description: DPDP Act student consent ledger and status management
+- name: Credentials
+  description: SD-JWT Verifiable Credential issuance, key binding, and revocation
+- name: Verification
+  description: Third-party authorized credential verification
+- name: Decentralized Identifiers
+  description: did:web document and public key discovery
+- name: Status Lists
+  description: Bitstring status lists for suspension and revocation
+- name: Webhooks
+  description: HMAC-signed event notifications delivery
+- name: Notifications
+  description: Outbox notifications monitoring
+- name: Reports
+  description: Data quality before/after reports and accreditation exports
+- name: Audit
+  description: Hash-chained tamper-evident audit trail
+- name: Dashboards
+  description: Real-time analytics, coverage maps, and anomaly feeds
 paths:
   /healthz:
     get:
-      tags: [Health]
+      tags:
+      - Health
       summary: Health and readiness check
-      operationId: getHealth
+      operationId: getHealthz
       responses:
         '200':
           description: Service is healthy
@@ -91,10 +94,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HealthResponse'
-
   /v1/auth/login:
     post:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Authenticate user credentials
       operationId: login
       requestBody:
@@ -119,10 +122,10 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '429':
           $ref: '#/components/responses/RateLimited'
-
   /v1/auth/refresh:
     post:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Rotate refresh token and issue new access token
       operationId: refreshToken
       requestBody:
@@ -140,25 +143,25 @@ paths:
                 $ref: '#/components/schemas/LoginResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
-
   /v1/auth/logout:
     post:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Revoke active session and refresh token
       operationId: logout
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       responses:
         '204':
           description: Successfully logged out
-
   /v1/auth/me:
     get:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Get authenticated user profile and roles
       operationId: getCurrentUser
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       responses:
         '200':
           description: Current user profile
@@ -168,14 +171,14 @@ paths:
                 $ref: '#/components/schemas/UserProfile'
         '401':
           $ref: '#/components/responses/Unauthorized'
-
   /v1/auth/password:
     post:
-      tags: [Auth]
+      tags:
+      - Auth
       summary: Change user password
       operationId: changePassword
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -187,23 +190,23 @@ paths:
           description: Password updated
         '400':
           $ref: '#/components/responses/BadRequest'
-
   /v1/users:
     get:
-      tags: [Users]
+      tags:
+      - Users
       summary: List users with role filter
       operationId: listUsers
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: role
-          in: query
-          schema:
-            $ref: '#/components/schemas/UserRole'
-        - name: institution_aicte_id
-          in: query
-          schema:
-            type: string
+      - name: role
+        in: query
+        schema:
+          $ref: '#/components/schemas/UserRole'
+      - name: institution_aicte_id
+        in: query
+        schema:
+          type: string
       responses:
         '200':
           description: List of users
@@ -214,11 +217,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/UserProfile'
     post:
-      tags: [Users]
+      tags:
+      - Users
       summary: Create new system user
       operationId: createUser
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -232,20 +236,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserProfile'
-
   /v1/users/{id}:
     get:
-      tags: [Users]
+      tags:
+      - Users
       summary: Get user details by ID
       operationId: getUserById
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: User details
@@ -254,17 +258,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserProfile'
     put:
-      tags: [Users]
+      tags:
+      - Users
       summary: Update user details or active status
       operationId: updateUser
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
@@ -278,14 +283,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserProfile'
-
   /v1/api-keys:
     get:
-      tags: [API Keys]
+      tags:
+      - API Keys
       summary: List active API keys for institution
       operationId: listApiKeys
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       responses:
         '200':
           description: API key list
@@ -296,11 +301,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/ApiKeyMetadata'
     post:
-      tags: [API Keys]
+      tags:
+      - API Keys
       summary: Generate scoped API key for institution
       operationId: createApiKey
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -314,27 +320,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiKeyCreatedResponse'
-
   /v1/api-keys/{id}:
     delete:
-      tags: [API Keys]
+      tags:
+      - API Keys
       summary: Revoke an API key
       operationId: revokeApiKey
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '204':
           description: API key revoked
-
   /v1/master/states:
     get:
-      tags: [Master Data]
+      tags:
+      - Master Data
       summary: List LGD state master records
       operationId: listStates
       responses:
@@ -346,17 +352,17 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/StateRecord'
-
   /v1/master/districts:
     get:
-      tags: [Master Data]
+      tags:
+      - Master Data
       summary: List LGD district master records
       operationId: listDistricts
       parameters:
-        - name: state_code
-          in: query
-          schema:
-            type: integer
+      - name: state_code
+        in: query
+        schema:
+          type: integer
       responses:
         '200':
           description: Districts list
@@ -366,21 +372,21 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DistrictRecord'
-
   /v1/master/institutions:
     get:
-      tags: [Master Data]
+      tags:
+      - Master Data
       summary: List AICTE-approved institutions
       operationId: listInstitutions
       parameters:
-        - name: state_code
-          in: query
-          schema:
-            type: integer
-        - name: search
-          in: query
-          schema:
-            type: string
+      - name: state_code
+        in: query
+        schema:
+          type: integer
+      - name: search
+        in: query
+        schema:
+          type: string
       responses:
         '200':
           description: Institutions list
@@ -390,17 +396,17 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/InstitutionRecord'
-
   /v1/master/programs:
     get:
-      tags: [Master Data]
+      tags:
+      - Master Data
       summary: List academic programs
       operationId: listPrograms
       parameters:
-        - name: course_level
-          in: query
-          schema:
-            $ref: '#/components/schemas/CourseLevel'
+      - name: course_level
+        in: query
+        schema:
+          $ref: '#/components/schemas/CourseLevel'
       responses:
         '200':
           description: Programs list
@@ -410,10 +416,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProgramRecord'
-
   /v1/master/academic-years:
     get:
-      tags: [Master Data]
+      tags:
+      - Master Data
       summary: List academic years with admission windows
       operationId: listAcademicYears
       responses:
@@ -425,19 +431,21 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AcademicYearRecord'
-
   /v1/master/enums:
     get:
-      tags: [Master Data]
+      tags:
+      - Master Data
       summary: Get localized enum options
       operationId: listEnums
       parameters:
-        - name: lang
-          in: query
-          schema:
-            type: string
-            enum: [en, hi]
-            default: en
+      - name: lang
+        in: query
+        schema:
+          type: string
+          enum:
+          - en
+          - hi
+          default: en
       responses:
         '200':
           description: Enum mappings
@@ -449,10 +457,10 @@ paths:
                   type: array
                   items:
                     $ref: '#/components/schemas/EnumItem'
-
   /v1/master/dabs:
     get:
-      tags: [Master Data]
+      tags:
+      - Master Data
       summary: List Degree Awarding Bodies (DAB)
       operationId: listDabs
       responses:
@@ -464,15 +472,16 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DabRecord'
-
   /v1/templates/student-upload.xlsx:
     get:
-      tags: [Templates]
-      summary: Download pre-formatted Excel template with APAAR text formatting and dropdowns
+      tags:
+      - Templates
+      summary: Download pre-formatted Excel template with APAAR text formatting and
+        dropdowns
       operationId: getUploadTemplate
       security:
-        - BearerAuth: []
-        - ApiKeyAuth: []
+      - BearerAuth: []
+      - ApiKeyAuth: []
       responses:
         '200':
           description: Excel template file
@@ -481,21 +490,21 @@ paths:
               schema:
                 type: string
                 format: binary
-
   /v1/registry/{apaar}/check:
     get:
-      tags: [Registry]
+      tags:
+      - Registry
       summary: Check APAAR ID existence and return masked demographic match
       operationId: checkApaarRegistry
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: apaar
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: '^\d{12}$'
+      - name: apaar
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^\d{12}$
       responses:
         '200':
           description: Registry check result
@@ -503,7 +512,9 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [exists, apaar_id]
+                required:
+                - exists
+                - apaar_id
                 properties:
                   exists:
                     type: boolean
@@ -519,34 +530,36 @@ paths:
                         type: string
                       gender:
                         type: string
-
   /v1/batches:
     post:
-      tags: [Batches]
+      tags:
+      - Batches
       summary: Upload student data batch (CSV/Excel)
       operationId: createBatch
       security:
-        - BearerAuth: []
-        - ApiKeyAuth: []
+      - BearerAuth: []
+      - ApiKeyAuth: []
       parameters:
-        - name: Idempotency-Key
-          in: header
-          schema:
-            type: string
+      - name: Idempotency-Key
+        in: header
+        schema:
+          type: string
       requestBody:
         required: true
         content:
           multipart/form-data:
             schema:
               type: object
-              required: [file, academic_year]
+              required:
+              - file
+              - academic_year
               properties:
                 file:
                   type: string
                   format: binary
                 academic_year:
                   type: string
-                  example: "2026-27"
+                  example: 2026-27
                 supersedes_batch_id:
                   type: string
       responses:
@@ -557,20 +570,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/BatchSummary'
     get:
-      tags: [Batches]
+      tags:
+      - Batches
       summary: List batches for uploader institution
       operationId: listBatches
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: academic_year
-          in: query
-          schema:
-            type: string
-        - name: status
-          in: query
-          schema:
-            $ref: '#/components/schemas/BatchStatus'
+      - name: academic_year
+        in: query
+        schema:
+          type: string
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/BatchStatus'
       responses:
         '200':
           description: Batches list
@@ -580,20 +594,20 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BatchSummary'
-
   /v1/batches/{id}:
     get:
-      tags: [Batches]
+      tags:
+      - Batches
       summary: Get batch status and progress
       operationId: getBatch
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Batch details
@@ -601,20 +615,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BatchSummary'
-
   /v1/batches/{id}/mapping:
     get:
-      tags: [Batches]
+      tags:
+      - Batches
       summary: Retrieve smart column mapping suggestions with confidence scores
       operationId: getBatchMapping
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Smart column mapping proposal
@@ -624,27 +638,28 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ColumnMapping'
-
   /v1/batches/{id}/mapping/confirm:
     post:
-      tags: [Batches]
+      tags:
+      - Batches
       summary: Confirm or adjust column mapping and trigger rule validation
       operationId: confirmBatchMapping
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [mappings]
+              required:
+              - mappings
               properties:
                 mappings:
                   type: array
@@ -657,20 +672,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BatchSummary'
-
   /v1/batches/{id}/report:
     get:
-      tags: [Batches]
+      tags:
+      - Batches
       summary: Retrieve full validation BatchReport
       operationId: getBatchReport
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Engine BatchReport
@@ -678,28 +693,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BatchReport'
-
   /v1/batches/{id}/issues:
     get:
-      tags: [Batches]
+      tags:
+      - Batches
       summary: List validation issues with priority and bucket filters
       operationId: getBatchIssues
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: bucket
-          in: query
-          schema:
-            $ref: '#/components/schemas/IssueBucket'
-        - name: priority
-          in: query
-          schema:
-            $ref: '#/components/schemas/IssuePriority'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: bucket
+        in: query
+        schema:
+          $ref: '#/components/schemas/IssueBucket'
+      - name: priority
+        in: query
+        schema:
+          $ref: '#/components/schemas/IssuePriority'
       responses:
         '200':
           description: Filtered issues
@@ -709,27 +724,28 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Issue'
-
   /v1/batches/{id}/commit:
     post:
-      tags: [Batches]
+      tags:
+      - Batches
       summary: Commit clean and approved records into AICTE Central Repository
       operationId: commitBatch
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [version]
+              required:
+              - version
               properties:
                 version:
                   type: integer
@@ -747,37 +763,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   /v1/batches/{id}/supersede:
     post:
-      tags: [Batches]
+      tags:
+      - Batches
       summary: Mark an active batch as superseded by a newer upload
       operationId: supersedeBatch
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Batch superseded
-
   /v1/batches/{id}/revalidate:
     post:
-      tags: [Batches]
+      tags:
+      - Batches
       summary: Re-runs validation engine on batch with approved corrections applied
       operationId: revalidateBatch
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Batch revalidation results
@@ -785,44 +801,46 @@ paths:
             application/json:
               schema:
                 type: object
-
   /v1/batches/{id}/dq-comparison:
     get:
-      tags: [Batches]
+      tags:
+      - Batches
       summary: Get before and after data quality comparison and score delta
       operationId: getDqComparison
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: format
-          in: query
-          schema:
-            type: string
-            enum: [json, xlsx, pdf]
-            default: json
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: format
+        in: query
+        schema:
+          type: string
+          enum:
+          - json
+          - xlsx
+          - pdf
+          default: json
       responses:
         '200':
           description: Quality comparison delta report
-
-
   /v1/batches/{id}/events:
     get:
-      tags: [Batches]
+      tags:
+      - Batches
       summary: Server-Sent Events stream for batch processing progress
       operationId: streamBatchEvents
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: SSE event stream
@@ -830,15 +848,15 @@ paths:
             text/event-stream:
               schema:
                 type: string
-
   /v1/events/ticket:
     post:
-      tags: [Events]
+      tags:
+      - Events
       summary: Obtain short-lived ticket for EventSource authorization
       operationId: getEventTicket
       security:
-        - BearerAuth: []
-        - ApiKeyAuth: []
+      - BearerAuth: []
+      - ApiKeyAuth: []
       responses:
         '200':
           description: Event ticket generated
@@ -846,24 +864,26 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [ticket, expires_in]
+                required:
+                - ticket
+                - expires_in
                 properties:
                   ticket:
                     type: string
                   expires_in:
                     type: integer
                     default: 60
-
   /v1/events:
     get:
-      tags: [Events]
+      tags:
+      - Events
       summary: Global Server-Sent Events stream
       operationId: streamGlobalEvents
       parameters:
-        - name: ticket
-          in: query
-          schema:
-            type: string
+      - name: ticket
+        in: query
+        schema:
+          type: string
       responses:
         '200':
           description: SSE event stream
@@ -871,20 +891,20 @@ paths:
             text/event-stream:
               schema:
                 type: string
-
   /v1/issues/{id}/decision:
     post:
-      tags: [Issues]
+      tags:
+      - Issues
       summary: Submit human review decision on an issue
       operationId: decideIssueDecision
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
@@ -898,21 +918,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Issue'
-
   /v1/issues/{id}/decide:
-
     post:
-      tags: [Issues]
+      tags:
+      - Issues
       summary: Submit human review decision on an issue
       operationId: decideIssue
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
@@ -926,19 +945,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Issue'
-
   /v1/corrections:
     get:
-      tags: [Corrections]
+      tags:
+      - Corrections
       summary: List audit trail of approved corrections
       operationId: listCorrections
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: batch_id
-          in: query
-          schema:
-            type: string
+      - name: batch_id
+        in: query
+        schema:
+          type: string
       responses:
         '200':
           description: Corrections list
@@ -949,11 +968,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/CorrectionRecord'
     post:
-      tags: [Corrections]
+      tags:
+      - Corrections
       summary: Propose or apply correction to an erroneous record
       operationId: submitCorrection
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -967,20 +987,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CorrectionRecord'
-
   /v1/duplicates:
     get:
-      tags: [Duplicates]
+      tags:
+      - Duplicates
       summary: List intra- and cross-institution duplicate clusters
       operationId: listDuplicates
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: scope
-          in: query
-          schema:
-            type: string
-            enum: [INTRA, CROSS_INSTITUTION]
+      - name: scope
+        in: query
+        schema:
+          type: string
+          enum:
+          - INTRA
+          - CROSS_INSTITUTION
       responses:
         '200':
           description: Duplicate clusters
@@ -990,20 +1012,20 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DuplicateCluster'
-
   /v1/duplicates/{id}/resolve:
     post:
-      tags: [Duplicates]
+      tags:
+      - Duplicates
       summary: Resolve a duplicate cluster decision
       operationId: resolveDuplicate
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
@@ -1013,21 +1035,21 @@ paths:
       responses:
         '200':
           description: Duplicate cluster resolved
-
   /v1/students/{apaar_id}:
     get:
-      tags: [Students]
+      tags:
+      - Students
       summary: Get student record from Central Repository
       operationId: getStudent
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: apaar_id
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: '^\d{12}$'
+      - name: apaar_id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^\d{12}$
       responses:
         '200':
           description: Student record
@@ -1038,17 +1060,18 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
     put:
-      tags: [Students]
+      tags:
+      - Students
       summary: Update student record (creates new record version and supersedes credentials)
       operationId: updateStudent
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: apaar_id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: apaar_id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
@@ -1062,20 +1085,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StudentRecord'
-
   /v1/students/{apaar_id}/transitions:
     post:
-      tags: [Students]
-      summary: Perform lifecycle transition (WITHDRAWN, DEFERRED, TRANSFERRED_OUT, GRADUATED)
+      tags:
+      - Students
+      summary: Perform lifecycle transition (WITHDRAWN, DEFERRED, TRANSFERRED_OUT,
+        GRADUATED)
       operationId: createStudentTransition
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: apaar_id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: apaar_id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
@@ -1089,19 +1113,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StudentRecord'
-
   /v1/transfers:
     get:
-      tags: [Transfers]
+      tags:
+      - Transfers
       summary: List student transfer requests
       operationId: listTransfers
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: status
-          in: query
-          schema:
-            $ref: '#/components/schemas/TransferStatus'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/TransferStatus'
       responses:
         '200':
           description: Transfers list
@@ -1112,11 +1136,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/TransferRecord'
     post:
-      tags: [Transfers]
+      tags:
+      - Transfers
       summary: Initiate student transfer request
       operationId: requestTransfer
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -1130,20 +1155,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransferRecord'
-
   /v1/transfers/{id}/approve:
     post:
-      tags: [Transfers]
+      tags:
+      - Transfers
       summary: Source institution approve transfer request
       operationId: approveTransfer
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Transfer approved and source record set to TRANSFERRED_OUT
@@ -1151,20 +1176,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransferRecord'
-
   /v1/transfers/{id}/reject:
     post:
-      tags: [Transfers]
+      tags:
+      - Transfers
       summary: Source institution reject transfer request
       operationId: rejectTransfer
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Transfer rejected
@@ -1172,32 +1197,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransferRecord'
-
   /v1/transfers/{id}/decide:
-
     post:
-      tags: [Transfers]
+      tags:
+      - Transfers
       summary: Source institution approve or reject transfer
       operationId: decideTransfer
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [decision]
+              required:
+              - decision
               properties:
                 decision:
                   type: string
-                  enum: [APPROVED, REJECTED]
+                  enum:
+                  - APPROVED
+                  - REJECTED
                 remarks:
                   type: string
       responses:
@@ -1207,31 +1234,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransferRecord'
-
   /v1/transfers/{id}/override:
     post:
-      tags: [Transfers]
+      tags:
+      - Transfers
       summary: AICTE Admin override for stale or disputed transfers
       operationId: overrideTransfer
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [decision, reason]
+              required:
+              - decision
+              - reason
               properties:
                 decision:
                   type: string
-                  enum: [APPROVED, REJECTED]
+                  enum:
+                  - APPROVED
+                  - REJECTED
                 reason:
                   type: string
       responses:
@@ -1241,14 +1272,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransferRecord'
-
   /v1/aggregates:
     get:
-      tags: [Aggregates]
+      tags:
+      - Aggregates
       summary: List aggregate enrollment submissions
       operationId: listAggregates
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       responses:
         '200':
           description: Aggregates list
@@ -1259,11 +1290,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/AggregateSubmission'
     post:
-      tags: [Aggregates]
+      tags:
+      - Aggregates
       summary: Submit statistical totals for aggregate-only institutions
       operationId: submitAggregates
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -1273,19 +1305,19 @@ paths:
       responses:
         '201':
           description: Aggregate totals recorded
-
   /v1/declared-totals:
     get:
-      tags: [Declared Totals]
+      tags:
+      - Declared Totals
       summary: Get approved statistical totals for institution programs
       operationId: getDeclaredTotals
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: academic_year
-          in: query
-          schema:
-            type: string
+      - name: academic_year
+        in: query
+        schema:
+          type: string
       responses:
         '200':
           description: Declared totals
@@ -1296,11 +1328,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/DeclaredTotalRecord'
     post:
-      tags: [Declared Totals]
+      tags:
+      - Declared Totals
       summary: Register declared intake and quota quotas
       operationId: createDeclaredTotals
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -1310,23 +1343,23 @@ paths:
       responses:
         '201':
           description: Declared totals saved
-
   /v1/reconciliation:
     get:
-      tags: [Reconciliation]
+      tags:
+      - Reconciliation
       summary: Get reconciliation status comparing uploaded records vs declared totals
       operationId: getReconciliation
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: institution_aicte_id
-          in: query
-          schema:
-            type: string
-        - name: academic_year
-          in: query
-          schema:
-            type: string
+      - name: institution_aicte_id
+        in: query
+        schema:
+          type: string
+      - name: academic_year
+        in: query
+        schema:
+          type: string
       responses:
         '200':
           description: Reconciliation results
@@ -1336,21 +1369,23 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ReconciliationItem'
-
   /v1/admin/rollover:
     post:
-      tags: [Rollover]
+      tags:
+      - Rollover
       summary: Trigger academic year rollover preview or execution
       operationId: triggerRollover
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [from_academic_year, to_academic_year]
+              required:
+              - from_academic_year
+              - to_academic_year
               properties:
                 from_academic_year:
                   type: string
@@ -1366,14 +1401,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RolloverSummary'
-
   /v1/consent:
     post:
-      tags: [Consent]
+      tags:
+      - Consent
       summary: Record or update student consent under DPDP Act
       operationId: recordConsent
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -1387,20 +1422,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConsentItemResponse'
-
   /v1/consent/me:
     get:
-      tags: [Consent]
+      tags:
+      - Consent
       summary: Get active consent summary and audit history
       operationId: getMyConsent
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: apaar_id
-          in: query
-          required: false
-          schema:
-            type: string
+      - name: apaar_id
+        in: query
+        required: false
+        schema:
+          type: string
       responses:
         '200':
           description: Student consent summary and history
@@ -1408,20 +1443,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StudentConsentSummaryResponse'
-
   /v1/consent/{apaar_id}:
     get:
-      tags: [Consent]
+      tags:
+      - Consent
       summary: Get active consent record for student
       operationId: getConsent
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: apaar_id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: apaar_id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Student consent details
@@ -1429,21 +1464,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConsentRecord'
-
   /v1/credentials/holder-key:
     post:
-      tags: [Credentials]
+      tags:
+      - Credentials
       summary: Register student browser WebCrypto public JWK
       operationId: registerHolderKey
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [jwk]
+              required:
+              - jwk
               properties:
                 jwk:
                   type: object
@@ -1454,7 +1490,10 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [status, apaar_id, jwk]
+                required:
+                - status
+                - apaar_id
+                - jwk
                 properties:
                   status:
                     type: string
@@ -1465,14 +1504,14 @@ paths:
                   registered_at:
                     type: string
                     format: date-time
-
   /v1/credentials/issue:
     post:
-      tags: [Credentials]
+      tags:
+      - Credentials
       summary: Issue signed SD-JWT Verifiable Credential bound to holder key
       operationId: issueCredential
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -1486,19 +1525,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IssuedCredentialResponse'
-
   /v1/credentials:
     get:
-      tags: [Credentials]
+      tags:
+      - Credentials
       summary: List issued credentials
       operationId: listCredentials
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: apaar_id
-          in: query
-          schema:
-            type: string
+      - name: apaar_id
+        in: query
+        schema:
+          type: string
       responses:
         '200':
           description: Credentials list
@@ -1508,14 +1547,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CredentialMetadata'
-
   /v1/credentials/me:
     get:
-      tags: [Credentials]
+      tags:
+      - Credentials
       summary: List credentials for current student
       operationId: listMyCredentials
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       responses:
         '200':
           description: Student credentials
@@ -1525,49 +1564,52 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CredentialMetadata'
-
   /v1/credentials/{id}/revoke:
     post:
-      tags: [Credentials]
+      tags:
+      - Credentials
       summary: Revoke or suspend a verifiable credential
       operationId: revokeCredential
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [reason]
+              required:
+              - reason
               properties:
                 reason:
                   type: string
                 status:
                   type: string
-                  enum: [REVOKED, SUSPENDED]
+                  enum:
+                  - REVOKED
+                  - SUSPENDED
                   default: REVOKED
       responses:
         '200':
           description: Credential status updated
-
   /v1/credentials/{id}/qr.png:
     get:
-      tags: [Credentials]
+      tags:
+      - Credentials
       summary: Retrieve PNG QR code
       operationId: getCredentialQr
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: PNG QR code image
@@ -1576,18 +1618,18 @@ paths:
               schema:
                 type: string
                 format: binary
-
   /v1/credentials/{id}/certificate.pdf:
     get:
-      tags: [Credentials]
+      tags:
+      - Credentials
       summary: Retrieve PDF certificate
       operationId: getCredentialCertificate
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: PDF certificate document
@@ -1596,10 +1638,10 @@ paths:
               schema:
                 type: string
                 format: binary
-
   /v1/credentials/presentation-nonce:
     post:
-      tags: [Credentials]
+      tags:
+      - Credentials
       summary: Generate fresh nonce for presentation verification
       operationId: generatePresentationNonce
       responses:
@@ -1609,25 +1651,27 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [nonce, expires_at]
+                required:
+                - nonce
+                - expires_at
                 properties:
                   nonce:
                     type: string
                   expires_at:
                     type: string
                     format: date-time
-
   /v1/verify/nonce:
     get:
-      tags: [Verification]
+      tags:
+      - Verification
       summary: Generate fresh challenge nonce for presentation verification
       operationId: getVerificationNonce
       parameters:
-        - name: aud
-          in: query
-          required: false
-          schema:
-            type: string
+      - name: aud
+        in: query
+        required: false
+        schema:
+          type: string
       responses:
         '200':
           description: Nonce generated
@@ -1635,17 +1679,19 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [nonce, expires_at]
+                required:
+                - nonce
+                - expires_at
                 properties:
                   nonce:
                     type: string
                   expires_at:
                     type: string
                     format: date-time
-
   /v1/verify:
     post:
-      tags: [Verification]
+      tags:
+      - Verification
       summary: Verify SD-JWT VC presentation with holder key binding
       operationId: verifyPresentation
       requestBody:
@@ -1661,10 +1707,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VerificationResult'
-
   /.well-known/did.json:
     get:
-      tags: [Decentralized Identifiers]
+      tags:
+      - Decentralized Identifiers
       summary: Discover AICTE Root Issuer did:web document
       operationId: getRootDidDocument
       responses:
@@ -1674,7 +1720,9 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [id, verificationMethod]
+                required:
+                - id
+                - verificationMethod
                 properties:
                   id:
                     type: string
@@ -1682,18 +1730,18 @@ paths:
                     type: array
                     items:
                       type: object
-
   /issuers/{issuer_id}/did.json:
     get:
-      tags: [Decentralized Identifiers]
+      tags:
+      - Decentralized Identifiers
       summary: Discover institution or DAB did:web document
       operationId: getIssuerDidDocument
       parameters:
-        - name: issuer_id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: issuer_id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: DID Document with Ed25519 public keys
@@ -1701,7 +1749,9 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [id, verificationMethod]
+                required:
+                - id
+                - verificationMethod
                 properties:
                   id:
                     type: string
@@ -1709,10 +1759,10 @@ paths:
                     type: array
                     items:
                       type: object
-
   /v1/trust-list:
     get:
-      tags: [Verification]
+      tags:
+      - Verification
       summary: Retrieve AICTE-signed list of authorized issuer DIDs
       operationId: getTrustList
       responses:
@@ -1722,7 +1772,11 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [issuer, issued_at, trust_list, jwt]
+                required:
+                - issuer
+                - issued_at
+                - trust_list
+                - jwt
                 properties:
                   issuer:
                     type: string
@@ -1735,18 +1789,18 @@ paths:
                     type: array
                     items:
                       type: object
-
   /v1/status-lists/{id}:
     get:
-      tags: [Status Lists]
+      tags:
+      - Status Lists
       summary: Retrieve W3C bitstring status list for revocation/suspension checks
       operationId: getStatusList
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Status list JWT or JSON
@@ -1754,7 +1808,10 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [id, type, statusList]
+                required:
+                - id
+                - type
+                - statusList
                 properties:
                   id:
                     type: string
@@ -1762,14 +1819,14 @@ paths:
                     type: string
                   statusList:
                     type: string
-
   /v1/webhooks:
     get:
-      tags: [Webhooks]
+      tags:
+      - Webhooks
       summary: List registered webhooks
       operationId: listWebhooks
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       responses:
         '200':
           description: Webhooks list
@@ -1780,11 +1837,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/WebhookConfig'
     post:
-      tags: [Webhooks]
+      tags:
+      - Webhooks
       summary: Register a new HMAC-authenticated webhook endpoint
       operationId: createWebhook
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -1798,48 +1856,65 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WebhookConfig'
-
   /v1/webhooks/{id}:
     delete:
-      tags: [Webhooks]
+      tags:
+      - Webhooks
       summary: Delete registered webhook
       operationId: deleteWebhook
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '204':
           description: Webhook deleted
-
   /v1/webhooks/{id}/test:
     post:
-      tags: [Webhooks]
+      tags:
+      - Webhooks
       summary: Send ping test delivery to webhook URL
       operationId: testWebhook
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Test ping dispatched
-
+  /v1/notifications/me:
+    get:
+      tags:
+      - Notifications
+      summary: List notifications for the calling user
+      operationId: listMyNotifications
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: List of notifications for current user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NotificationRecord'
   /v1/notifications/outbox:
     get:
-      tags: [Notifications]
+      tags:
+      - Notifications
       summary: Monitor notifications outbox queue
       operationId: listNotificationsOutbox
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       responses:
         '200':
           description: Notification outbox entries
@@ -1849,14 +1924,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/NotificationRecord'
-
   /v1/reports:
     post:
-      tags: [Reports]
+      tags:
+      - Reports
       summary: Generate accreditation or data quality comparison report
       operationId: generateReport
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -1870,20 +1945,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportMetadata'
-
   /v1/reports/{id}:
     get:
-      tags: [Reports]
+      tags:
+      - Reports
       summary: Get report status and metadata
       operationId: getReport
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Report details
@@ -1891,20 +1966,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportMetadata'
-
   /v1/reports/{id}/download:
     get:
-      tags: [Reports]
+      tags:
+      - Reports
       summary: Download generated report document (PDF or XLSX)
       operationId: downloadReport
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Binary report document
@@ -1917,47 +1992,47 @@ paths:
               schema:
                 type: string
                 format: binary
-
   /v1/audit:
     get:
-      tags: [Audit]
+      tags:
+      - Audit
       summary: Query immutable audit logs
       operationId: listAuditLogs
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: from_date
-          in: query
-          schema:
-            type: string
-            format: date-time
-        - name: to_date
-          in: query
-          schema:
-            type: string
-            format: date-time
-        - name: action
-          in: query
-          schema:
-            type: string
-        - name: actor_id
-          in: query
-          schema:
-            type: string
-        - name: resource
-          in: query
-          schema:
-            type: string
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 50
-        - name: offset
-          in: query
-          schema:
-            type: integer
-            default: 0
+      - name: from_date
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: to_date
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: action
+        in: query
+        schema:
+          type: string
+      - name: actor_id
+        in: query
+        schema:
+          type: string
+      - name: resource
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 50
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          default: 0
       responses:
         '200':
           description: Audit log records
@@ -1965,14 +2040,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuditListResponse'
-
   /v1/audit/verify-chain:
     get:
-      tags: [Audit]
+      tags:
+      - Audit
       summary: Mathematically verify cryptographic hash chain integrity of audit log
       operationId: verifyAuditChain
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       responses:
         '200':
           description: Verification verdict
@@ -1980,19 +2055,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuditChainVerifyResponse'
-
   /v1/admin/retention/purge:
     post:
-      tags: [Audit]
+      tags:
+      - Audit
       summary: Trigger data retention purge for expired raw batch upload files
       operationId: purgeRetentionBatchFiles
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: retention_days
-          in: query
-          schema:
-            type: integer
+      - name: retention_days
+        in: query
+        schema:
+          type: integer
       responses:
         '200':
           description: Purge outcome summary
@@ -2000,14 +2075,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RetentionPurgeResponse'
-
   /v1/dashboards/aicte:
     get:
-      tags: [Dashboards]
+      tags:
+      - Dashboards
       summary: AICTE leadership console summary metrics
       operationId: getAicteDashboard
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       responses:
         '200':
           description: AICTE summary metrics
@@ -2015,20 +2090,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AicteDashboardSummary'
-
   /v1/dashboards/institution/{institution_id}:
     get:
-      tags: [Dashboards]
+      tags:
+      - Dashboards
       summary: Institution specific data quality and upload stats
       operationId: getInstitutionDashboard
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       parameters:
-        - name: institution_id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: institution_id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Institution dashboard summary
@@ -2036,14 +2111,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InstitutionDashboardSummary'
-
   /v1/dashboards/map:
     get:
-      tags: [Dashboards]
-      summary: State and district level enrollment and coverage statistics for map visualization
+      tags:
+      - Dashboards
+      summary: State and district level enrollment and coverage statistics for map
+        visualization
       operationId: getMapData
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       responses:
         '200':
           description: Geospatial aggregation
@@ -2053,14 +2129,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GeoStatRecord'
-
   /v1/dashboards/leaderboards:
     get:
-      tags: [Dashboards]
+      tags:
+      - Dashboards
       summary: Institutional data quality and compliance ranking leaderboards
       operationId: getLeaderboards
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       responses:
         '200':
           description: Institutional rankings
@@ -2070,14 +2146,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/LeaderboardEntry'
-
   /v1/dashboards/anomalies:
     get:
-      tags: [Dashboards]
+      tags:
+      - Dashboards
       summary: Cross-institutional anomaly and drift live feed
       operationId: getAnomaliesFeed
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       responses:
         '200':
           description: Anomalies feed
@@ -2087,7 +2163,527 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AnomalyFeedItem'
+  /v1/notifications/me:
+    get:
+      tags:
+      - Notifications
+      summary: List notifications for the calling user
+      description: Returns alerts and emails dispatched or queued for the caller.
+      operationId: get_my_notifications_v1_notifications_me_get
+      parameters:
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: X-API-Key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Api-Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NotificationResponse'
+                title: Response Get My Notifications V1 Notifications Me Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/reports/jobs:
+    post:
+      tags:
+      - Reports
+      summary: Initiate report generation job (frontend alias)
+      description: Frontend-compatible alias for creating a report generation job.
+      operationId: create_report_job_v1_reports_jobs_post
+      parameters:
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: X-API-Key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Api-Key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReportRequest'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportJobResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/dashboards/institution/dq-trend:
+    get:
+      tags:
+      - Dashboards
+      summary: Get institution batch data quality score trend (cached 30s)
+      description: Returns batch-by-batch historical DQ progression and trend direction.
+      operationId: get_institution_dq_trend_v1_dashboards_institution_dq_trend_get
+      parameters:
+      - name: institution_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Optional AICTE ID (for AICTE_ADMIN inspection)
+          title: Institution Id
+        description: Optional AICTE ID (for AICTE_ADMIN inspection)
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: X-API-Key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Api-Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionDqTrend'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/exports/students:
+    get:
+      tags:
+      - Exports
+      summary: Stream bulk student records in CSV or Parquet format
+      description: 'Streams student records.
 
+        - Restricted to AICTE_ADMIN.
+
+        - Sensitive columns (APAAR, email, mobile) masked by default.
+
+        - If unmasked=true, statutory justification reason is required and audited.'
+      operationId: export_students_v1_exports_students_get
+      parameters:
+      - name: year
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filter by academic year e.g. 2026-27
+          title: Year
+        description: Filter by academic year e.g. 2026-27
+      - name: state
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filter by state name or LGD state code
+          title: State
+        description: Filter by state name or LGD state code
+      - name: format
+        in: query
+        required: false
+        schema:
+          type: string
+          description: 'Output format: csv or parquet'
+          default: csv
+          title: Format
+        description: 'Output format: csv or parquet'
+      - name: unmasked
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: Set true to export unmasked PII (requires reason parameter)
+          default: false
+          title: Unmasked
+        description: Set true to export unmasked PII (requires reason parameter)
+      - name: reason
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Statutory justification reason required when unmasked=true
+          title: Reason
+        description: Statutory justification reason required when unmasked=true
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: X-API-Key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Api-Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/dashboards/aicte/anomalies:
+    get:
+      tags:
+      - Dashboards
+      summary: Get real-time feed of detected batch anomalies (cached 30s)
+      description: Returns real-time feed of statistical and rule anomalies across
+        batches.
+      operationId: get_aicte_anomalies_v1_dashboards_aicte_anomalies_get
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 200
+          minimum: 1
+          description: Max feed items
+          default: 50
+          title: Limit
+        description: Max feed items
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AnomalyFeedItem'
+                title: Response Get Aicte Anomalies V1 Dashboards Aicte Anomalies
+                  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /health:
+    get:
+      tags:
+      - Health
+      summary: Health and readiness check
+      operationId: getHealth
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: Service unhealthy or database unreachable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /v1/dashboards/institution/summary:
+    get:
+      tags:
+      - Dashboards
+      summary: Get institution summary dashboard (cached 30s)
+      description: Returns own students, approved intake, fill rate, active batches,
+        and DQ score.
+      operationId: get_institution_summary_v1_dashboards_institution_summary_get
+      parameters:
+      - name: institution_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Optional AICTE ID (for AICTE_ADMIN inspection)
+          title: Institution Id
+        description: Optional AICTE ID (for AICTE_ADMIN inspection)
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: X-API-Key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Api-Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionSummaryDashboard'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/webhooks/{id}/deliveries:
+    get:
+      tags:
+      - Webhooks
+      summary: Get webhook delivery history and retry metrics
+      description: Returns chronological delivery attempt history for the webhook.
+      operationId: get_webhook_deliveries_v1_webhooks__id__deliveries_get
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: X-API-Key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Api-Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WebhookDeliveryResponse'
+                title: Response Get Webhook Deliveries V1 Webhooks  Id  Deliveries
+                  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/corrections/{id}/approve:
+    post:
+      tags:
+      - Issues
+      - Corrections
+      summary: Approve a pending correction proposed by staff
+      description: Approves a pending staff correction.
+      operationId: approve_correction_v1_corrections__id__approve_post
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: X-API-Key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Api-Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CorrectionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/dashboards/aicte/map:
+    get:
+      tags:
+      - Dashboards
+      summary: Get geographic state-by-state map breakdown (cached 30s)
+      description: Returns geographic metrics grouped by LGD state code.
+      operationId: get_aicte_map_v1_dashboards_aicte_map_get
+      parameters:
+      - name: metric
+        in: query
+        required: false
+        schema:
+          type: string
+          description: 'Metric to visualize: coverage, students, dq, fill, excess'
+          default: coverage
+          title: Metric
+        description: 'Metric to visualize: coverage, students, dq, fill, excess'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AicteMapMetricResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/duplicates/{id}:
+    get:
+      tags:
+      - Duplicates
+      summary: Get duplicate cluster with side-by-side masked records
+      description: Retrieves duplicate cluster side-by-side comparison.
+      operationId: get_duplicate_v1_duplicates__id__get
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      - name: X-API-Key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Api-Key
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DuplicateClusterResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/dashboards/aicte/leaderboards:
+    get:
+      tags:
+      - Dashboards
+      summary: Get national leaderboards for excess enrolment, low DQ, and cross-dupes
+        (cached 30s)
+      description: Returns top institutions exceeding sanctioned intake, lowest DQ,
+        and most duplicate flags.
+      operationId: get_aicte_leaderboards_v1_dashboards_aicte_leaderboards_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AicteLeaderboards'
+  /v1/dashboards/aicte/summary:
+    get:
+      tags:
+      - Dashboards
+      summary: Get national Apex AICTE summary metrics (cached 30s)
+      description: 'Returns total institutions, coverage %, students, fill %, excess
+        seats,
+
+        quota breakdown, and avg DQ.'
+      operationId: get_aicte_summary_v1_dashboards_aicte_summary_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AicteSummaryDashboard'
 components:
   securitySchemes:
     BearerAuth:
@@ -2102,7 +2698,6 @@ components:
       type: apiKey
       in: cookie
       name: refresh_token
-
   responses:
     Unauthorized:
       description: Authentication failed or token expired
@@ -2134,11 +2729,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
-
   schemas:
     HealthResponse:
       type: object
-      required: [status, version, engine_version, db]
+      required:
+      - status
+      - version
+      - engine_version
+      - db
       properties:
         status:
           type: string
@@ -2152,65 +2750,79 @@ components:
         db:
           type: string
           example: connected
-
     ErrorResponse:
       type: object
-      required: [detail]
+      required:
+      - detail
       properties:
         detail:
           type: string
-          example: "Invalid credentials"
+          example: Invalid credentials
         code:
           type: string
-          example: "AUTH_FAILED"
-
+          example: AUTH_FAILED
     UserRole:
       type: string
       enum:
-        - AICTE_ADMIN
-        - AICTE_ANALYST
-        - DAB_ADMIN
-        - INSTITUTION_ADMIN
-        - INSTITUTION_STAFF
-        - VERIFIER
-        - STUDENT
-
+      - AICTE_ADMIN
+      - AICTE_ANALYST
+      - DAB_ADMIN
+      - INSTITUTION_ADMIN
+      - INSTITUTION_STAFF
+      - VERIFIER
+      - STUDENT
     CourseLevel:
       type: string
-      enum: [DIPLOMA, UG, PG, PGDM, PHD]
-
+      enum:
+      - DIPLOMA
+      - UG
+      - PG
+      - PGDM
+      - PHD
     BatchStatus:
       type: string
       enum:
-        - UPLOADED
-        - MAPPING
-        - VALIDATING
-        - VALIDATED
-        - IN_REVIEW
-        - COMMITTED
-        - REJECTED
-        - SUPERSEDED
-        - FAILED
-
+      - UPLOADED
+      - MAPPING
+      - VALIDATING
+      - VALIDATED
+      - IN_REVIEW
+      - COMMITTED
+      - REJECTED
+      - SUPERSEDED
+      - FAILED
     IssueSeverity:
       type: string
-      enum: [ERROR, WARN, INFO]
-
+      enum:
+      - ERROR
+      - WARN
+      - INFO
     IssuePriority:
       type: string
-      enum: [CRITICAL, HIGH, MEDIUM, LOW]
-
+      enum:
+      - CRITICAL
+      - HIGH
+      - MEDIUM
+      - LOW
     IssueBucket:
       type: string
-      enum: [AUTO_FLAG, HUMAN_REVIEW, INFO]
-
+      enum:
+      - AUTO_FLAG
+      - HUMAN_REVIEW
+      - INFO
     TransferStatus:
       type: string
-      enum: [PENDING, APPROVED, REJECTED, CANCELLED, OVERRIDDEN]
-
+      enum:
+      - PENDING
+      - APPROVED
+      - REJECTED
+      - CANCELLED
+      - OVERRIDDEN
     LoginRequest:
       type: object
-      required: [email, password]
+      required:
+      - email
+      - password
       properties:
         email:
           type: string
@@ -2220,10 +2832,13 @@ components:
           minLength: 10
         mfa_code:
           type: string
-
     LoginResponse:
       type: object
-      required: [access_token, token_type, expires_in, user]
+      required:
+      - access_token
+      - token_type
+      - expires_in
+      - user
       properties:
         access_token:
           type: string
@@ -2237,16 +2852,19 @@ components:
           type: string
         user:
           $ref: '#/components/schemas/UserProfile'
-
     RefreshRequest:
       type: object
       properties:
         refresh_token:
           type: string
-
     UserProfile:
       type: object
-      required: [id, email, full_name, role, is_active]
+      required:
+      - id
+      - email
+      - full_name
+      - role
+      - is_active
       properties:
         id:
           type: string
@@ -2269,10 +2887,13 @@ components:
           type: string
           format: date-time
           nullable: true
-
     CreateUserRequest:
       type: object
-      required: [email, password, full_name, role]
+      required:
+      - email
+      - password
+      - full_name
+      - role
       properties:
         email:
           type: string
@@ -2288,7 +2909,6 @@ components:
           type: string
         dab_id:
           type: string
-
     UpdateUserRequest:
       type: object
       properties:
@@ -2298,20 +2918,26 @@ components:
           type: boolean
         role:
           $ref: '#/components/schemas/UserRole'
-
     ChangePasswordRequest:
       type: object
-      required: [current_password, new_password]
+      required:
+      - current_password
+      - new_password
       properties:
         current_password:
           type: string
         new_password:
           type: string
           minLength: 10
-
     ApiKeyMetadata:
       type: object
-      required: [id, institution_aicte_id, name, prefix, scopes, created_at]
+      required:
+      - id
+      - institution_aicte_id
+      - name
+      - prefix
+      - scopes
+      - created_at
       properties:
         id:
           type: string
@@ -2332,10 +2958,11 @@ components:
           type: string
           format: date-time
           nullable: true
-
     CreateApiKeyRequest:
       type: object
-      required: [name, scopes]
+      required:
+      - name
+      - scopes
       properties:
         name:
           type: string
@@ -2343,11 +2970,17 @@ components:
           type: array
           items:
             type: string
-            enum: [upload, read]
-
+            enum:
+            - upload
+            - read
     ApiKeyCreatedResponse:
       type: object
-      required: [id, name, prefix, raw_key, scopes]
+      required:
+      - id
+      - name
+      - prefix
+      - raw_key
+      - scopes
       properties:
         id:
           type: string
@@ -2362,10 +2995,12 @@ components:
           type: array
           items:
             type: string
-
     StateRecord:
       type: object
-      required: [lgd_state_code, name, name_hi]
+      required:
+      - lgd_state_code
+      - name
+      - name_hi
       properties:
         lgd_state_code:
           type: integer
@@ -2373,10 +3008,12 @@ components:
           type: string
         name_hi:
           type: string
-
     DistrictRecord:
       type: object
-      required: [lgd_district_code, lgd_state_code, name]
+      required:
+      - lgd_district_code
+      - lgd_state_code
+      - name
       properties:
         lgd_district_code:
           type: integer
@@ -2384,10 +3021,16 @@ components:
           type: integer
         name:
           type: string
-
     InstitutionRecord:
       type: object
-      required: [institution_aicte_id, name, state_code, district_code, type, affiliated_dab_id, onboarding_level]
+      required:
+      - institution_aicte_id
+      - name
+      - state_code
+      - district_code
+      - type
+      - affiliated_dab_id
+      - onboarding_level
       properties:
         institution_aicte_id:
           type: string
@@ -2403,13 +3046,20 @@ components:
           type: string
         onboarding_level:
           type: string
-          enum: [FULL, AGGREGATE_ONLY]
+          enum:
+          - FULL
+          - AGGREGATE_ONLY
         did:
           type: string
-
     ProgramRecord:
       type: object
-      required: [program_code, name, course_level, department, duration_years, lateral_allowed]
+      required:
+      - program_code
+      - name
+      - course_level
+      - department
+      - duration_years
+      - lateral_allowed
       properties:
         program_code:
           type: string
@@ -2423,10 +3073,15 @@ components:
           type: integer
         lateral_allowed:
           type: boolean
-
     AcademicYearRecord:
       type: object
-      required: [academic_year, start_date, end_date, admission_window_start, admission_window_end, is_current]
+      required:
+      - academic_year
+      - start_date
+      - end_date
+      - admission_window_start
+      - admission_window_end
+      - is_current
       properties:
         academic_year:
           type: string
@@ -2444,10 +3099,12 @@ components:
           format: date
         is_current:
           type: boolean
-
     EnumItem:
       type: object
-      required: [value, label_en, label_hi]
+      required:
+      - value
+      - label_en
+      - label_hi
       properties:
         value:
           type: string
@@ -2455,10 +3112,14 @@ components:
           type: string
         label_hi:
           type: string
-
     DabRecord:
       type: object
-      required: [dab_id, name, type, state_code, did]
+      required:
+      - dab_id
+      - name
+      - type
+      - state_code
+      - did
       properties:
         dab_id:
           type: string
@@ -2466,15 +3127,21 @@ components:
           type: string
         type:
           type: string
-          enum: [UNIVERSITY, DEEMED, AUTONOMOUS_INSTITUTION]
+          enum:
+          - UNIVERSITY
+          - DEEMED
+          - AUTONOMOUS_INSTITUTION
         state_code:
           type: integer
         did:
           type: string
-
     ColumnMapping:
       type: object
-      required: [source, target, confidence, method]
+      required:
+      - source
+      - target
+      - confidence
+      - method
       properties:
         source:
           type: string
@@ -2486,11 +3153,21 @@ components:
           maximum: 1.0
         method:
           type: string
-          enum: [synonym, fuzzy, user, sniffed, exact]
-
+          enum:
+          - synonym
+          - fuzzy
+          - user
+          - sniffed
+          - exact
     BatchSummary:
       type: object
-      required: [batch_id, institution_aicte_id, academic_year, status, version, created_at]
+      required:
+      - batch_id
+      - institution_aicte_id
+      - academic_year
+      - status
+      - version
+      - created_at
       properties:
         batch_id:
           type: string
@@ -2512,10 +3189,12 @@ components:
         created_at:
           type: string
           format: date-time
-
     SuggestedFix:
       type: object
-      required: [value, rationale, requires_approval]
+      required:
+      - value
+      - rationale
+      - requires_approval
       properties:
         value: {}
         rationale:
@@ -2523,10 +3202,18 @@ components:
         requires_approval:
           type: boolean
           default: true
-
     Issue:
       type: object
-      required: [issue_id, field, rule_id, severity, priority, confidence, bucket, message, reason]
+      required:
+      - issue_id
+      - field
+      - rule_id
+      - severity
+      - priority
+      - confidence
+      - bucket
+      - message
+      - reason
       properties:
         issue_id:
           type: string
@@ -2560,10 +3247,16 @@ components:
         value_masked:
           type: string
           nullable: true
-
     BatchReport:
       type: object
-      required: [batch_id, institution_aicte_id, engine_version, rule_catalog_version, rows_total, quality_score, issues]
+      required:
+      - batch_id
+      - institution_aicte_id
+      - engine_version
+      - rule_catalog_version
+      - rows_total
+      - quality_score
+      - issues
       properties:
         batch_id:
           type: string
@@ -2617,10 +3310,14 @@ components:
           type: array
           items:
             type: object
-
     CommitResponse:
       type: object
-      required: [batch_id, committed_records, quality_score_before, quality_score_after, committed_at]
+      required:
+      - batch_id
+      - committed_records
+      - quality_score_before
+      - quality_score_after
+      - committed_at
       properties:
         batch_id:
           type: string
@@ -2633,21 +3330,31 @@ components:
         committed_at:
           type: string
           format: date-time
-
     IssueDecisionRequest:
       type: object
-      required: [decision]
+      required:
+      - decision
       properties:
         decision:
           type: string
-          enum: [ACCEPT_SUGGESTION, OVERRIDE_VALUE, DISMISS, MARK_VERIFIED]
+          enum:
+          - ACCEPT_SUGGESTION
+          - OVERRIDE_VALUE
+          - DISMISS
+          - MARK_VERIFIED
         override_value: {}
         remarks:
           type: string
-
     CorrectionRecord:
       type: object
-      required: [correction_id, apaar_id, field, old_value, new_value, approved_by, approved_at]
+      required:
+      - correction_id
+      - apaar_id
+      - field
+      - old_value
+      - new_value
+      - approved_by
+      - approved_at
       properties:
         correction_id:
           type: string
@@ -2664,10 +3371,13 @@ components:
         approved_at:
           type: string
           format: date-time
-
     CorrectionRequest:
       type: object
-      required: [apaar_id, field, new_value, reason]
+      required:
+      - apaar_id
+      - field
+      - new_value
+      - reason
       properties:
         apaar_id:
           type: string
@@ -2676,10 +3386,14 @@ components:
         new_value: {}
         reason:
           type: string
-
     DuplicateCluster:
       type: object
-      required: [cluster_id, members, score, scope, bucket]
+      required:
+      - cluster_id
+      - members
+      - score
+      - scope
+      - bucket
       properties:
         cluster_id:
           type: string
@@ -2693,32 +3407,44 @@ components:
           type: object
         scope:
           type: string
-          enum: [INTRA, CROSS_INSTITUTION]
+          enum:
+          - INTRA
+          - CROSS_INSTITUTION
         bucket:
           $ref: '#/components/schemas/IssueBucket'
-
     DuplicateResolutionRequest:
       type: object
-      required: [resolution]
+      required:
+      - resolution
       properties:
         resolution:
           type: string
-          enum: [MERGE_CONFIRMED, FALSE_POSITIVE_DIFFERENT_PERSONS, TRANSFER_PENDING]
+          enum:
+          - MERGE_CONFIRMED
+          - FALSE_POSITIVE_DIFFERENT_PERSONS
+          - TRANSFER_PENDING
         primary_record_key:
           type: string
         remarks:
           type: string
-
     StudentRecord:
-      $ref: './schemas/student_record.json'
-
+      $ref: ./schemas/student_record.json
     LifecycleTransitionRequest:
       type: object
-      required: [to_status, effective_date, reason]
+      required:
+      - to_status
+      - effective_date
+      - reason
       properties:
         to_status:
           type: string
-          enum: [ACTIVE, WITHDRAWN, DEFERRED, TRANSFERRED_OUT, COMPLETED, GRADUATED]
+          enum:
+          - ACTIVE
+          - WITHDRAWN
+          - DEFERRED
+          - TRANSFERRED_OUT
+          - COMPLETED
+          - GRADUATED
         effective_date:
           type: string
           format: date
@@ -2726,10 +3452,15 @@ components:
           type: string
         evidence_ref:
           type: string
-
     TransferRecord:
       type: object
-      required: [transfer_id, apaar_id, from_institution_id, to_institution_id, status, requested_at]
+      required:
+      - transfer_id
+      - apaar_id
+      - from_institution_id
+      - to_institution_id
+      - status
+      - requested_at
       properties:
         transfer_id:
           type: string
@@ -2748,24 +3479,28 @@ components:
           type: string
           format: date-time
           nullable: true
-
     CreateTransferRequest:
       type: object
-      required: [apaar_id, from_institution_id, to_program_code]
+      required:
+      - apaar_id
+      - from_institution_id
+      - to_program_code
       properties:
         apaar_id:
           type: string
-          pattern: '^\d{12}$'
+          pattern: ^\d{12}$
         from_institution_id:
           type: string
         to_program_code:
           type: string
         transfer_certificate_ref:
           type: string
-
     AggregateSubmission:
       type: object
-      required: [institution_aicte_id, academic_year, programs]
+      required:
+      - institution_aicte_id
+      - academic_year
+      - programs
       properties:
         institution_aicte_id:
           type: string
@@ -2775,7 +3510,9 @@ components:
           type: array
           items:
             type: object
-            required: [program_code, total_enrolment]
+            required:
+            - program_code
+            - total_enrolment
             properties:
               program_code:
                 type: string
@@ -2785,10 +3522,13 @@ components:
                 type: integer
               nri_count:
                 type: integer
-
     DeclaredTotalRecord:
       type: object
-      required: [institution_aicte_id, program_code, academic_year, approved_intake]
+      required:
+      - institution_aicte_id
+      - program_code
+      - academic_year
+      - approved_intake
       properties:
         institution_aicte_id:
           type: string
@@ -2800,10 +3540,14 @@ components:
           type: integer
         supernumerary_allowed:
           type: object
-
     ReconciliationItem:
       type: object
-      required: [program_code, declared, uploaded, delta, status]
+      required:
+      - program_code
+      - declared
+      - uploaded
+      - delta
+      - status
       properties:
         program_code:
           type: string
@@ -2815,11 +3559,19 @@ components:
           type: integer
         status:
           type: string
-          enum: [MATCH, MISMATCH, EXCESS]
-
+          enum:
+          - MATCH
+          - MISMATCH
+          - EXCESS
     RolloverSummary:
       type: object
-      required: [from_academic_year, to_academic_year, eligible_students, rolled_over, graduated, errors]
+      required:
+      - from_academic_year
+      - to_academic_year
+      - eligible_students
+      - rolled_over
+      - graduated
+      - errors
       properties:
         from_academic_year:
           type: string
@@ -2835,51 +3587,71 @@ components:
           type: array
           items:
             type: string
-
     ConsentRecord:
       type: object
-      required: [apaar_id, consent_status, purposes, consent_date]
+      required:
+      - apaar_id
+      - consent_status
+      - purposes
+      - consent_date
       properties:
         apaar_id:
           type: string
-          pattern: '^\d{12}$'
+          pattern: ^\d{12}$
         consent_status:
           type: string
-          enum: [GRANTED, REFUSED, WITHDRAWN]
+          enum:
+          - GRANTED
+          - REFUSED
+          - WITHDRAWN
         purposes:
           type: array
           items:
             type: string
-            enum: [REPOSITORY, VERIFICATION_SHARE, ANALYTICS_AGGREGATE]
+            enum:
+            - REPOSITORY
+            - VERIFICATION_SHARE
+            - ANALYTICS_AGGREGATE
         guardian_consent:
           type: boolean
           default: false
         consent_date:
           type: string
           format: date
-
     ConsentRecordRequest:
       type: object
-      required: [purpose, action]
+      required:
+      - purpose
+      - action
       properties:
         purpose:
           type: string
-          enum: [REPOSITORY, VERIFICATION_SHARE, ANALYTICS_AGGREGATE]
+          enum:
+          - REPOSITORY
+          - VERIFICATION_SHARE
+          - ANALYTICS_AGGREGATE
         action:
           type: string
-          enum: [GRANT, WITHDRAW]
+          enum:
+          - GRANT
+          - WITHDRAW
         apaar_id:
           type: string
-          pattern: '^\d{12}$'
+          pattern: ^\d{12}$
         evidence_ref:
           type: string
         guardian_consent:
           type: boolean
           default: false
-
     ConsentItemResponse:
       type: object
-      required: [id, apaar_id, purpose, status, effective_at, guardian_consent]
+      required:
+      - id
+      - apaar_id
+      - purpose
+      - status
+      - effective_at
+      - guardian_consent
       properties:
         id:
           type: integer
@@ -2889,7 +3661,9 @@ components:
           type: string
         status:
           type: string
-          enum: [GRANTED, WITHDRAWN]
+          enum:
+          - GRANTED
+          - WITHDRAWN
         effective_at:
           type: string
           format: date-time
@@ -2904,10 +3678,12 @@ components:
         hash:
           type: string
           nullable: true
-
     StudentConsentSummaryResponse:
       type: object
-      required: [apaar_id, consents, history]
+      required:
+      - apaar_id
+      - consents
+      - history
       properties:
         apaar_id:
           type: string
@@ -2919,24 +3695,31 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ConsentItemResponse'
-
     IssueCredentialRequest:
       type: object
-      required: [apaar_id, credential_type, holder_jwk]
+      required:
+      - apaar_id
+      - credential_type
+      - holder_jwk
       properties:
         apaar_id:
           type: string
-          pattern: '^\d{12}$'
+          pattern: ^\d{12}$
         credential_type:
           type: string
-          enum: [ENROLMENT_CREDENTIAL, DEGREE_CERTIFICATE]
+          enum:
+          - ENROLMENT_CREDENTIAL
+          - DEGREE_CERTIFICATE
         holder_jwk:
           type: object
           description: Public WebCrypto key of student browser
-
     IssuedCredentialResponse:
       type: object
-      required: [credential_id, sd_jwt, qr_data_uri, issued_at]
+      required:
+      - credential_id
+      - sd_jwt
+      - qr_data_uri
+      - issued_at
       properties:
         credential_id:
           type: string
@@ -2948,10 +3731,14 @@ components:
         issued_at:
           type: string
           format: date-time
-
     CredentialMetadata:
       type: object
-      required: [credential_id, apaar_id, credential_type, status, issued_at]
+      required:
+      - credential_id
+      - apaar_id
+      - credential_type
+      - status
+      - issued_at
       properties:
         credential_id:
           type: string
@@ -2961,14 +3748,19 @@ components:
           type: string
         status:
           type: string
-          enum: [VALID, REVOKED, SUPERSEDED, SUSPENDED]
+          enum:
+          - VALID
+          - REVOKED
+          - SUPERSEDED
+          - SUSPENDED
         issued_at:
           type: string
           format: date-time
-
     PresentationRequest:
       type: object
-      required: [sd_jwt_presentation, nonce]
+      required:
+      - sd_jwt_presentation
+      - nonce
       properties:
         sd_jwt_presentation:
           type: string
@@ -2976,16 +3768,26 @@ components:
           type: string
         aud:
           type: string
-
     VerificationResult:
       type: object
-      required: [valid, status, issuer, verified_at]
+      required:
+      - valid
+      - status
+      - issuer
+      - verified_at
       properties:
         valid:
           type: boolean
         status:
           type: string
-          enum: [VALID, REVOKED, SUPERSEDED, SUSPENDED, INVALID_SIGNATURE, EXPIRED, KEY_BINDING_FAILED]
+          enum:
+          - VALID
+          - REVOKED
+          - SUPERSEDED
+          - SUSPENDED
+          - INVALID_SIGNATURE
+          - EXPIRED
+          - KEY_BINDING_FAILED
         issuer:
           type: string
         issuer_trusted:
@@ -2998,10 +3800,14 @@ components:
         error_message:
           type: string
           nullable: true
-
     WebhookConfig:
       type: object
-      required: [id, url, events, is_active, created_at]
+      required:
+      - id
+      - url
+      - events
+      - is_active
+      - created_at
       properties:
         id:
           type: string
@@ -3017,10 +3823,12 @@ components:
         created_at:
           type: string
           format: date-time
-
     CreateWebhookRequest:
       type: object
-      required: [url, events, secret]
+      required:
+      - url
+      - events
+      - secret
       properties:
         url:
           type: string
@@ -3032,46 +3840,64 @@ components:
         secret:
           type: string
           minLength: 16
-
     NotificationRecord:
       type: object
-      required: [id, channel, recipient_masked, subject, status, created_at]
+      required:
+      - id
+      - channel
+      - recipient_masked
+      - subject
+      - status
+      - created_at
       properties:
         id:
           type: string
         channel:
           type: string
-          enum: [EMAIL, SMS]
+          enum:
+          - EMAIL
+          - SMS
         recipient_masked:
           type: string
         subject:
           type: string
         status:
           type: string
-          enum: [PENDING, SENT, FAILED]
+          enum:
+          - PENDING
+          - SENT
+          - FAILED
         created_at:
           type: string
           format: date-time
-
     GenerateReportRequest:
       type: object
-      required: [report_type]
+      required:
+      - report_type
       properties:
         report_type:
           type: string
-          enum: [DQ_BEFORE_AFTER, AICTE_COMPLIANCE, ACCREDITATION_SUMMARY]
+          enum:
+          - DQ_BEFORE_AFTER
+          - AICTE_COMPLIANCE
+          - ACCREDITATION_SUMMARY
         batch_id:
           type: string
         academic_year:
           type: string
         format:
           type: string
-          enum: [PDF, XLSX]
+          enum:
+          - PDF
+          - XLSX
           default: PDF
-
     ReportMetadata:
       type: object
-      required: [report_id, report_type, status, created_at]
+      required:
+      - report_id
+      - report_type
+      - status
+      - created_at
       properties:
         report_id:
           type: string
@@ -3079,17 +3905,29 @@ components:
           type: string
         status:
           type: string
-          enum: [GENERATING, COMPLETED, FAILED]
+          enum:
+          - GENERATING
+          - COMPLETED
+          - FAILED
         download_url:
           type: string
           nullable: true
         created_at:
           type: string
           format: date-time
-
     AuditEntry:
       type: object
-      required: [id, ts, actor_type, actor_id, role, action, resource, ip_hash, prev_hash, hash]
+      required:
+      - id
+      - ts
+      - actor_type
+      - actor_id
+      - role
+      - action
+      - resource
+      - ip_hash
+      - prev_hash
+      - hash
       properties:
         id:
           type: string
@@ -3117,10 +3955,11 @@ components:
           type: string
         hash:
           type: string
-
     AuditListResponse:
       type: object
-      required: [total, items]
+      required:
+      - total
+      - items
       properties:
         total:
           type: integer
@@ -3128,10 +3967,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AuditEntry'
-
     AuditChainVerifyResponse:
       type: object
-      required: [valid, length, head_hash, reason]
+      required:
+      - valid
+      - length
+      - head_hash
+      - reason
       properties:
         valid:
           type: boolean
@@ -3154,10 +3996,12 @@ components:
         verified_at:
           type: string
           format: date-time
-
     RetentionPurgeResponse:
       type: object
-      required: [purged_count, cutoff_date, retention_days]
+      required:
+      - purged_count
+      - cutoff_date
+      - retention_days
       properties:
         purged_count:
           type: integer
@@ -3166,10 +4010,14 @@ components:
           format: date-time
         retention_days:
           type: integer
-
     AicteDashboardSummary:
       type: object
-      required: [total_institutions, onboarded_institutions, coverage_percentage, total_enrolled, active_batches]
+      required:
+      - total_institutions
+      - onboarded_institutions
+      - coverage_percentage
+      - total_enrolled
+      - active_batches
       properties:
         total_institutions:
           type: integer
@@ -3185,10 +4033,14 @@ components:
           type: number
         cross_institution_duplicates:
           type: integer
-
     InstitutionDashboardSummary:
       type: object
-      required: [institution_aicte_id, total_students, active_batches, latest_quality_score, pending_transfers]
+      required:
+      - institution_aicte_id
+      - total_students
+      - active_batches
+      - latest_quality_score
+      - pending_transfers
       properties:
         institution_aicte_id:
           type: string
@@ -3202,10 +4054,14 @@ components:
           type: integer
         open_issues_count:
           type: integer
-
     GeoStatRecord:
       type: object
-      required: [lgd_state_code, state_name, total_institutions, enrolled_count, coverage_rate]
+      required:
+      - lgd_state_code
+      - state_name
+      - total_institutions
+      - enrolled_count
+      - coverage_rate
       properties:
         lgd_state_code:
           type: integer
@@ -3217,10 +4073,14 @@ components:
           type: integer
         coverage_rate:
           type: number
-
     LeaderboardEntry:
       type: object
-      required: [rank, institution_aicte_id, institution_name, quality_score, on_time_submission]
+      required:
+      - rank
+      - institution_aicte_id
+      - institution_name
+      - quality_score
+      - on_time_submission
       properties:
         rank:
           type: integer
@@ -3232,10 +4092,15 @@ components:
           type: number
         on_time_submission:
           type: boolean
-
     AnomalyFeedItem:
       type: object
-      required: [id, institution_name, metric, z_score, detected_at, reason]
+      required:
+      - id
+      - institution_name
+      - metric
+      - z_score
+      - detected_at
+      - reason
       properties:
         id:
           type: string
@@ -3250,3 +4115,2130 @@ components:
           format: date-time
         reason:
           type: string
+    AggregateProgramItem:
+      properties:
+        program_code:
+          type: string
+          title: Program Code
+        total_enrolment:
+          type: integer
+          minimum: 0.0
+          title: Total Enrolment
+        supernumerary_count:
+          type: integer
+          minimum: 0.0
+          title: Supernumerary Count
+          default: 0
+        nri_count:
+          type: integer
+          minimum: 0.0
+          title: Nri Count
+          default: 0
+        oci_count:
+          type: integer
+          minimum: 0.0
+          title: Oci Count
+          default: 0
+        fn_count:
+          type: integer
+          minimum: 0.0
+          title: Fn Count
+          default: 0
+      type: object
+      required:
+      - program_code
+      - total_enrolment
+      title: AggregateProgramItem
+    AggregateSubmissionRequest:
+      properties:
+        institution_aicte_id:
+          type: string
+          title: Institution Aicte Id
+        academic_year:
+          type: string
+          title: Academic Year
+        programs:
+          items:
+            $ref: '#/components/schemas/AggregateProgramItem'
+          type: array
+          title: Programs
+      type: object
+      required:
+      - institution_aicte_id
+      - academic_year
+      - programs
+      title: AggregateSubmissionRequest
+    AicteLeaderboardItem:
+      properties:
+        institution_aicte_id:
+          type: string
+          title: Institution Aicte Id
+        institution_name:
+          type: string
+          title: Institution Name
+        state_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: State Name
+        metric_value:
+          anyOf:
+          - type: number
+          - type: integer
+          title: Metric Value
+        detail:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Detail
+      type: object
+      required:
+      - institution_aicte_id
+      - institution_name
+      - metric_value
+      title: AicteLeaderboardItem
+    AicteLeaderboards:
+      properties:
+        excess_enrolment:
+          items:
+            $ref: '#/components/schemas/AicteLeaderboardItem'
+          type: array
+          title: Excess Enrolment
+          description: Top institutions exceeding sanctioned intake
+        low_dq:
+          items:
+            $ref: '#/components/schemas/AicteLeaderboardItem'
+          type: array
+          title: Low Dq
+          description: Institutions with lowest average data quality score
+        most_cross_dupes:
+          items:
+            $ref: '#/components/schemas/AicteLeaderboardItem'
+          type: array
+          title: Most Cross Dupes
+          description: Institutions with most cross-institution duplicate student
+            flags
+        cached_at:
+          type: string
+          format: date-time
+          title: Cached At
+      type: object
+      required:
+      - excess_enrolment
+      - low_dq
+      - most_cross_dupes
+      - cached_at
+      title: AicteLeaderboards
+    AicteMapMetricResponse:
+      properties:
+        metric:
+          type: string
+          title: Metric
+        unit:
+          type: string
+          title: Unit
+        states:
+          items:
+            $ref: '#/components/schemas/StateMetric'
+          type: array
+          title: States
+        national_average:
+          type: number
+          title: National Average
+        cached_at:
+          type: string
+          format: date-time
+          title: Cached At
+      type: object
+      required:
+      - metric
+      - unit
+      - states
+      - national_average
+      - cached_at
+      title: AicteMapMetricResponse
+    AicteSummaryDashboard:
+      properties:
+        institutions:
+          type: integer
+          title: Institutions
+          description: Total AICTE approved institutions
+        coverage_percent:
+          type: number
+          title: Coverage Percent
+          description: Percentage of institutions with active batches
+        students:
+          type: integer
+          title: Students
+          description: Total student records enrolled
+        fill_percent:
+          type: number
+          title: Fill Percent
+          description: Overall enrollment vs approved intake percentage
+        excess_enrolment:
+          type: integer
+          title: Excess Enrolment
+          description: Total excess seats flagged over sanctioned intake
+        supernumerary_breakdown:
+          additionalProperties:
+            type: integer
+          type: object
+          title: Supernumerary Breakdown
+          description: 'Quota breakdown: NRI, OCI, FN, and other supernumerary admissions'
+        dq_avg:
+          type: number
+          title: Dq Avg
+          description: Weighted average data quality score across all batches
+        cached_at:
+          type: string
+          format: date-time
+          title: Cached At
+          description: Timestamp of cached computation
+      type: object
+      required:
+      - institutions
+      - coverage_percent
+      - students
+      - fill_percent
+      - excess_enrolment
+      - supernumerary_breakdown
+      - dq_avg
+      - cached_at
+      title: AicteSummaryDashboard
+    AuditChainVerificationResponse:
+      properties:
+        valid:
+          type: boolean
+          title: Valid
+          description: True if the cryptographic hash chain is unbroken
+        length:
+          type: integer
+          title: Length
+          description: Total number of audit records verified
+        first_broken_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: First Broken Id
+          description: ID of first tampered or invalid audit entry, if broken
+        head_hash:
+          type: string
+          title: Head Hash
+          description: SHA-256 digest of the latest audit record in the chain
+        reason:
+          type: string
+          title: Reason
+          description: Verification summary or failure details
+        chain_valid:
+          type: boolean
+          title: Chain Valid
+          default: true
+        total_records:
+          type: integer
+          title: Total Records
+          default: 0
+        broken_link_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Broken Link Id
+        verified_at:
+          type: string
+          format: date-time
+          title: Verified At
+      type: object
+      required:
+      - valid
+      - length
+      - head_hash
+      - reason
+      title: AuditChainVerificationResponse
+    AuditLogEntryResponse:
+      properties:
+        id:
+          type: integer
+          title: Id
+        ts:
+          type: string
+          format: date-time
+          title: Ts
+        actor_type:
+          type: string
+          title: Actor Type
+        actor_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Actor Id
+        role:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Role
+        action:
+          type: string
+          title: Action
+        resource:
+          type: string
+          title: Resource
+        resource_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Resource Id
+        ip_hash:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Ip Hash
+        payload:
+          additionalProperties: true
+          type: object
+          title: Payload
+        prev_hash:
+          type: string
+          title: Prev Hash
+        hash:
+          type: string
+          title: Hash
+      type: object
+      required:
+      - id
+      - ts
+      - actor_type
+      - action
+      - resource
+      - prev_hash
+      - hash
+      title: AuditLogEntryResponse
+    BatchIssueResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        batch_id:
+          type: string
+          title: Batch Id
+        rule_id:
+          type: string
+          title: Rule Id
+        row_index:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Row Index
+        field_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Field Name
+        apaar_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Apaar Id
+        severity:
+          type: string
+          title: Severity
+        priority:
+          type: string
+          title: Priority
+        bucket:
+          type: string
+          title: Bucket
+        message:
+          type: string
+          title: Message
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+        evidence_json:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Evidence Json
+        suggested_fix_json:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Suggested Fix Json
+        value_masked:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Value Masked
+        status:
+          type: string
+          title: Status
+        decided_by:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Decided By
+        decided_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Decided At
+      type: object
+      required:
+      - id
+      - batch_id
+      - rule_id
+      - severity
+      - priority
+      - bucket
+      - message
+      - status
+      title: BatchIssueResponse
+    Body_create_batch_v1_batches_post:
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+        academic_year:
+          type: string
+          title: Academic Year
+        supersedes_batch_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Supersedes Batch Id
+      type: object
+      required:
+      - file
+      - academic_year
+      title: Body_create_batch_v1_batches_post
+    ColumnMappingModel:
+      properties:
+        source:
+          type: string
+          title: Source
+          description: Uploaded column name
+        target:
+          type: string
+          title: Target
+          description: Canonical student_record field name
+        confidence:
+          type: number
+          maximum: 1.0
+          minimum: 0.0
+          title: Confidence
+          description: Match confidence
+        method:
+          type: string
+          enum:
+          - synonym
+          - fuzzy
+          - user
+          - sniffed
+          - exact
+          title: Method
+          description: Resolution method
+      additionalProperties: false
+      type: object
+      required:
+      - source
+      - target
+      - confidence
+      - method
+      title: ColumnMappingModel
+    CommitRequest:
+      properties:
+        version:
+          type: integer
+          title: Version
+          description: Optimistic concurrency batch version
+      type: object
+      required:
+      - version
+      title: CommitRequest
+    ConfirmMappingRequest:
+      properties:
+        mappings:
+          items:
+            $ref: '#/components/schemas/ColumnMappingModel'
+          type: array
+          title: Mappings
+          description: Confirmed column mappings
+        save_profile:
+          type: boolean
+          title: Save Profile
+          description: Whether to save this mapping as a profile
+          default: false
+        profile_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Profile Name
+          description: Profile name if saving
+      type: object
+      required:
+      - mappings
+      title: ConfirmMappingRequest
+    CorrectionResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        correction_id:
+          type: string
+          title: Correction Id
+        batch_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Batch Id
+        issue_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Issue Id
+        apaar_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Apaar Id
+        field:
+          type: string
+          title: Field
+        old_value:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Old Value
+        new_value:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: New Value
+        status:
+          type: string
+          title: Status
+        proposed_by:
+          type: string
+          title: Proposed By
+        approved_by:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Approved By
+        note:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Note
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        decided_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Decided At
+      type: object
+      required:
+      - id
+      - correction_id
+      - field
+      - status
+      - proposed_by
+      - created_at
+      title: CorrectionResponse
+    CreateAcademicYearRequest:
+      properties:
+        academic_year:
+          type: string
+          title: Academic Year
+        start_date:
+          type: string
+          format: date
+          title: Start Date
+        end_date:
+          type: string
+          format: date
+          title: End Date
+        admission_window_start:
+          type: string
+          format: date
+          title: Admission Window Start
+        admission_window_end:
+          type: string
+          format: date
+          title: Admission Window End
+        is_current:
+          type: boolean
+          title: Is Current
+          default: false
+      type: object
+      required:
+      - academic_year
+      - start_date
+      - end_date
+      - admission_window_start
+      - admission_window_end
+      title: CreateAcademicYearRequest
+    CreateDabRequest:
+      properties:
+        dab_id:
+          type: string
+          title: Dab Id
+        name:
+          type: string
+          title: Name
+        type:
+          type: string
+          title: Type
+        state_code:
+          type: integer
+          title: State Code
+        did:
+          type: string
+          title: Did
+      type: object
+      required:
+      - dab_id
+      - name
+      - type
+      - state_code
+      - did
+      title: CreateDabRequest
+    CreateDistrictRequest:
+      properties:
+        lgd_district_code:
+          type: integer
+          title: Lgd District Code
+        lgd_state_code:
+          type: integer
+          title: Lgd State Code
+        name:
+          type: string
+          title: Name
+      type: object
+      required:
+      - lgd_district_code
+      - lgd_state_code
+      - name
+      title: CreateDistrictRequest
+    CreateEnumItemRequest:
+      properties:
+        enum_name:
+          type: string
+          title: Enum Name
+        value:
+          type: string
+          title: Value
+        label_en:
+          type: string
+          title: Label En
+        label_hi:
+          type: string
+          title: Label Hi
+      type: object
+      required:
+      - enum_name
+      - value
+      - label_en
+      - label_hi
+      title: CreateEnumItemRequest
+    CreateInstitutionRequest:
+      properties:
+        institution_aicte_id:
+          type: string
+          title: Institution Aicte Id
+        name:
+          type: string
+          title: Name
+        state_code:
+          type: integer
+          title: State Code
+        district_code:
+          type: integer
+          title: District Code
+        type:
+          type: string
+          title: Type
+        affiliated_dab_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Affiliated Dab Id
+        onboarding_level:
+          type: string
+          title: Onboarding Level
+          default: FULL
+        did:
+          type: string
+          title: Did
+      type: object
+      required:
+      - institution_aicte_id
+      - name
+      - state_code
+      - district_code
+      - type
+      - did
+      title: CreateInstitutionRequest
+    CreateProgramRequest:
+      properties:
+        program_code:
+          type: string
+          title: Program Code
+        name:
+          type: string
+          title: Name
+        course_level:
+          type: string
+          title: Course Level
+        department:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Department
+        duration_years:
+          type: integer
+          title: Duration Years
+        lateral_allowed:
+          type: boolean
+          title: Lateral Allowed
+          default: false
+      type: object
+      required:
+      - program_code
+      - name
+      - course_level
+      - duration_years
+      title: CreateProgramRequest
+    CreateReportRequest:
+      properties:
+        report_type:
+          type: string
+          title: Report Type
+          description: 'Report type: POLICY, ACCREDITATION, MONITORING, or REGULATORY'
+          default: POLICY
+        type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Type
+          description: Alias for report_type per prompt B7 specification
+        academic_year:
+          type: string
+          title: Academic Year
+          description: Target academic year
+          default: 2026-27
+        state:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: State
+          description: State filter name or code
+        program:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Program
+          description: Program code filter
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+          description: Quota/Category filter
+        format:
+          type: string
+          title: Format
+          description: 'Format: PDF or XLSX'
+          default: PDF
+        filters:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Filters
+          description: 'Optional nested filters object: {year, state, program, category}'
+      type: object
+      title: CreateReportRequest
+    CreateStateRequest:
+      properties:
+        lgd_state_code:
+          type: integer
+          title: Lgd State Code
+        name:
+          type: string
+          title: Name
+        name_hi:
+          type: string
+          title: Name Hi
+      type: object
+      required:
+      - lgd_state_code
+      - name
+      - name_hi
+      title: CreateStateRequest
+    CredentialMetadataResponse:
+      properties:
+        credential_id:
+          type: string
+          title: Credential Id
+        apaar_id:
+          type: string
+          title: Apaar Id
+        credential_type:
+          type: string
+          title: Credential Type
+        status:
+          type: string
+          title: Status
+          description: VALID, REVOKED, SUPERSEDED, SUSPENDED
+        issued_at:
+          type: string
+          format: date-time
+          title: Issued At
+        revoked_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Revoked At
+        sd_jwt:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Sd Jwt
+      type: object
+      required:
+      - credential_id
+      - apaar_id
+      - credential_type
+      - status
+      - issued_at
+      title: CredentialMetadataResponse
+      description: Metadata response for a student or institution credential query.
+    DeclaredTotalCreateRequest:
+      properties:
+        institution_aicte_id:
+          type: string
+          title: Institution Aicte Id
+        program_code:
+          type: string
+          title: Program Code
+        academic_year:
+          type: string
+          title: Academic Year
+        approved_intake:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Approved Intake
+        declared_enrolment:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Declared Enrolment
+        supernumerary_allowed:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Supernumerary Allowed
+          default: 0
+        declared_supernumerary:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Declared Supernumerary
+          default: 0
+        declared_nri:
+          anyOf:
+          - type: integer
+            minimum: 0.0
+          - type: 'null'
+          title: Declared Nri
+          default: 0
+      type: object
+      required:
+      - institution_aicte_id
+      - program_code
+      - academic_year
+      title: DeclaredTotalCreateRequest
+    DeclaredTotalResponse:
+      properties:
+        id:
+          type: integer
+          title: Id
+        institution_aicte_id:
+          type: string
+          title: Institution Aicte Id
+        program_code:
+          type: string
+          title: Program Code
+        academic_year:
+          type: string
+          title: Academic Year
+        declared_enrolment:
+          type: integer
+          title: Declared Enrolment
+        declared_supernumerary:
+          type: integer
+          title: Declared Supernumerary
+        declared_nri:
+          type: integer
+          title: Declared Nri
+        source:
+          type: string
+          title: Source
+        submitted_at:
+          type: string
+          format: date-time
+          title: Submitted At
+      type: object
+      required:
+      - id
+      - institution_aicte_id
+      - program_code
+      - academic_year
+      - declared_enrolment
+      - declared_supernumerary
+      - declared_nri
+      - source
+      - submitted_at
+      title: DeclaredTotalResponse
+    DidDocumentResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        '@context':
+          items:
+            type: string
+          type: array
+          title: '@Context'
+        verificationMethod:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Verificationmethod
+        authentication:
+          items:
+            type: string
+          type: array
+          title: Authentication
+        assertionMethod:
+          items:
+            type: string
+          type: array
+          title: Assertionmethod
+      type: object
+      required:
+      - id
+      - verificationMethod
+      - authentication
+      - assertionMethod
+      title: DidDocumentResponse
+      description: W3C did:web document structure.
+    DqTrendPoint:
+      properties:
+        batch_id:
+          type: string
+          title: Batch Id
+        batch_number:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Batch Number
+        quality_score:
+          type: number
+          title: Quality Score
+        committed_at:
+          type: string
+          format: date-time
+          title: Committed At
+      type: object
+      required:
+      - batch_id
+      - quality_score
+      - committed_at
+      title: DqTrendPoint
+    DuplicateClusterResponse:
+      properties:
+        cluster_id:
+          type: string
+          title: Cluster Id
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+        batch_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Batch Id
+        scope:
+          type: string
+          title: Scope
+          description: INTRA or CROSS_INSTITUTION
+        bucket:
+          type: string
+          title: Bucket
+          default: HUMAN_REVIEW
+        status:
+          type: string
+          title: Status
+          description: OPEN, SAME_PERSON, DIFFERENT_PEOPLE, TRANSFER
+          default: OPEN
+        similarity_score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Similarity Score
+        matched_fields:
+          additionalProperties: true
+          type: object
+          title: Matched Fields
+        members:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Members
+        notes:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Notes
+        decided_by:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Decided By
+        decided_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Decided At
+      type: object
+      required:
+      - cluster_id
+      - scope
+      - similarity_score
+      title: DuplicateClusterResponse
+    EventTicketResponse:
+      properties:
+        ticket:
+          type: string
+          title: Ticket
+        expires_in:
+          type: integer
+          title: Expires In
+          default: 60
+      type: object
+      required:
+      - ticket
+      title: EventTicketResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    HolderKeyRegistrationRequest:
+      properties:
+        jwk:
+          additionalProperties: true
+          type: object
+          title: Jwk
+          description: Public ECDSA P-256 JWK from student browser WebCrypto (kty=EC,
+            crv=P-256, x, y)
+      type: object
+      required:
+      - jwk
+      title: HolderKeyRegistrationRequest
+      description: Student WebCrypto public JWK registration payload.
+    HolderKeyRegistrationResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+          default: REGISTERED
+        apaar_id:
+          type: string
+          title: Apaar Id
+        jwk:
+          additionalProperties: true
+          type: object
+          title: Jwk
+        registered_at:
+          type: string
+          format: date-time
+          title: Registered At
+      type: object
+      required:
+      - apaar_id
+      - jwk
+      - registered_at
+      title: HolderKeyRegistrationResponse
+      description: Response after successful student holder key registration.
+    InstitutionDqTrend:
+      properties:
+        institution_aicte_id:
+          type: string
+          title: Institution Aicte Id
+        data_points:
+          items:
+            $ref: '#/components/schemas/DqTrendPoint'
+          type: array
+          title: Data Points
+        trend_direction:
+          type: string
+          title: Trend Direction
+        cached_at:
+          type: string
+          format: date-time
+          title: Cached At
+      type: object
+      required:
+      - institution_aicte_id
+      - data_points
+      - trend_direction
+      - cached_at
+      title: InstitutionDqTrend
+    InstitutionSummaryDashboard:
+      properties:
+        institution_aicte_id:
+          type: string
+          title: Institution Aicte Id
+        institution_name:
+          type: string
+          title: Institution Name
+        total_students:
+          type: integer
+          title: Total Students
+        sanctioned_intake:
+          type: integer
+          title: Sanctioned Intake
+        fill_percent:
+          type: number
+          title: Fill Percent
+        active_batches:
+          type: integer
+          title: Active Batches
+        avg_quality_score:
+          type: number
+          title: Avg Quality Score
+        pending_reviews:
+          type: integer
+          title: Pending Reviews
+        excess_seats:
+          type: integer
+          title: Excess Seats
+        cached_at:
+          type: string
+          format: date-time
+          title: Cached At
+      type: object
+      required:
+      - institution_aicte_id
+      - institution_name
+      - total_students
+      - sanctioned_intake
+      - fill_percent
+      - active_batches
+      - avg_quality_score
+      - pending_reviews
+      - excess_seats
+      - cached_at
+      title: InstitutionSummaryDashboard
+    NotificationResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        recipient:
+          type: string
+          title: Recipient
+        channel:
+          type: string
+          title: Channel
+        subject:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Subject
+        body:
+          type: string
+          title: Body
+        status:
+          type: string
+          title: Status
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        sent_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Sent At
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+      type: object
+      required:
+      - id
+      - recipient
+      - channel
+      - body
+      - status
+      - created_at
+      title: NotificationResponse
+    PresentationNonceResponse:
+      properties:
+        nonce:
+          type: string
+          title: Nonce
+        expires_at:
+          type: string
+          format: date-time
+          title: Expires At
+      type: object
+      required:
+      - nonce
+      - expires_at
+      title: PresentationNonceResponse
+      description: Response payload for 5-minute replay-prevention verification challenge.
+    ReportItemResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        title:
+          type: string
+          title: Title
+        title_hi:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Title Hi
+        report_type:
+          type: string
+          title: Report Type
+        format:
+          type: string
+          title: Format
+        academic_year:
+          type: string
+          title: Academic Year
+        state:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: State
+        program:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Program
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+        status:
+          type: string
+          title: Status
+        generated_at:
+          anyOf:
+          - type: string
+          - type: string
+            format: date-time
+          title: Generated At
+        generated_by:
+          type: string
+          title: Generated By
+        file_size:
+          type: string
+          title: File Size
+        download_url:
+          type: string
+          title: Download Url
+        summary:
+          anyOf:
+          - $ref: '#/components/schemas/ReportSummary'
+          - type: 'null'
+      type: object
+      required:
+      - id
+      - title
+      - report_type
+      - format
+      - academic_year
+      - status
+      - generated_at
+      - generated_by
+      - file_size
+      - download_url
+      title: ReportItemResponse
+    ReportJobResponse:
+      properties:
+        job_id:
+          type: string
+          title: Job Id
+        status:
+          type: string
+          title: Status
+        progress_percent:
+          type: integer
+          title: Progress Percent
+        current_step:
+          type: string
+          title: Current Step
+        result_report:
+          anyOf:
+          - $ref: '#/components/schemas/ReportItemResponse'
+          - type: 'null'
+        download_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Download Url
+        error_message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error Message
+      type: object
+      required:
+      - job_id
+      - status
+      - progress_percent
+      - current_step
+      title: ReportJobResponse
+    ReportSummary:
+      properties:
+        total_institutions:
+          type: integer
+          title: Total Institutions
+          default: 0
+        total_students:
+          type: integer
+          title: Total Students
+          default: 0
+        approved_intake:
+          type: integer
+          title: Approved Intake
+          default: 0
+        enrolled_count:
+          type: integer
+          title: Enrolled Count
+          default: 0
+        excess_seats:
+          type: integer
+          title: Excess Seats
+          default: 0
+        compliance_score:
+          type: number
+          title: Compliance Score
+          default: 0.0
+      type: object
+      title: ReportSummary
+    RevokeCredentialRequest:
+      properties:
+        reason:
+          type: string
+          title: Reason
+          description: Administrative reason for revocation
+        status:
+          type: string
+          title: Status
+          description: 'Target status: REVOKED or SUSPENDED'
+          default: REVOKED
+      type: object
+      required:
+      - reason
+      title: RevokeCredentialRequest
+      description: Request payload to manually revoke or suspend a verifiable credential.
+    RolloverRequest:
+      properties:
+        from_academic_year:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: From Academic Year
+          description: Source academic year e.g. 2025-26
+        from_year:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: From Year
+          description: Alias for from_academic_year
+        to_academic_year:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: To Academic Year
+          description: Target academic year e.g. 2026-27
+        to_year:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: To Year
+          description: Alias for to_academic_year
+        dry_run:
+          type: boolean
+          title: Dry Run
+          description: Whether to simulate rollover without persistence
+          default: true
+      type: object
+      title: RolloverRequest
+    RolloverSummaryResponse:
+      properties:
+        from_academic_year:
+          type: string
+          title: From Academic Year
+        to_academic_year:
+          type: string
+          title: To Academic Year
+        eligible_students:
+          type: integer
+          title: Eligible Students
+        rolled_over:
+          type: integer
+          title: Rolled Over
+        graduated:
+          type: integer
+          title: Graduated
+        errors:
+          type: integer
+          title: Errors
+          default: 0
+        dry_run:
+          type: boolean
+          title: Dry Run
+          default: true
+        details:
+          additionalProperties: true
+          type: object
+          title: Details
+      type: object
+      required:
+      - from_academic_year
+      - to_academic_year
+      - eligible_students
+      - rolled_over
+      - graduated
+      title: RolloverSummaryResponse
+    StateMetric:
+      properties:
+        lgd_state_code:
+          type: integer
+          title: Lgd State Code
+        state_name:
+          type: string
+          title: State Name
+        metric_value:
+          type: number
+          title: Metric Value
+        institutions:
+          type: integer
+          title: Institutions
+        students:
+          type: integer
+          title: Students
+        fill_percent:
+          type: number
+          title: Fill Percent
+        dq_avg:
+          type: number
+          title: Dq Avg
+        excess_enrolment:
+          type: integer
+          title: Excess Enrolment
+      type: object
+      required:
+      - lgd_state_code
+      - state_name
+      - metric_value
+      - institutions
+      - students
+      - fill_percent
+      - dq_avg
+      - excess_enrolment
+      title: StateMetric
+    StatusListResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        type:
+          type: string
+          title: Type
+          default: BitstringStatusListEntry
+        statusList:
+          anyOf:
+          - type: string
+          - additionalProperties: true
+            type: object
+          title: Statuslist
+      type: object
+      required:
+      - id
+      - statusList
+      title: StatusListResponse
+      description: W3C Token Status List response.
+    StudentRecordResponse:
+      properties:
+        apaar_id:
+          type: string
+          title: Apaar Id
+        institution_aicte_id:
+          type: string
+          title: Institution Aicte Id
+        institution_student_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Institution Student Id
+        full_name:
+          type: string
+          title: Full Name
+        dob:
+          type: string
+          format: date
+          title: Dob
+        gender:
+          type: string
+          title: Gender
+        category:
+          type: string
+          title: Category
+        pwd:
+          type: boolean
+          title: Pwd
+          default: false
+        course_level:
+          type: string
+          title: Course Level
+        program_code:
+          type: string
+          title: Program Code
+        academic_year:
+          type: string
+          title: Academic Year
+        year_of_study:
+          type: integer
+          title: Year Of Study
+        admission_date:
+          type: string
+          format: date
+          title: Admission Date
+        admission_type:
+          type: string
+          title: Admission Type
+        seat_type:
+          type: string
+          title: Seat Type
+        supernumerary_scheme:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Supernumerary Scheme
+        quota:
+          type: string
+          title: Quota
+          default: NONE
+        nationality:
+          type: string
+          title: Nationality
+          default: IN
+        nri_status:
+          type: boolean
+          title: Nri Status
+          default: false
+        oci_status:
+          type: boolean
+          title: Oci Status
+          default: false
+        fn_status:
+          type: boolean
+          title: Fn Status
+          default: false
+        enrolment_status:
+          type: string
+          title: Enrolment Status
+        consent_status:
+          type: string
+          title: Consent Status
+        consent_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Consent Date
+        guardian_consent:
+          type: boolean
+          title: Guardian Consent
+          default: false
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+        mobile:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Mobile
+        record_version:
+          type: integer
+          title: Record Version
+          default: 1
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+      type: object
+      required:
+      - apaar_id
+      - institution_aicte_id
+      - full_name
+      - dob
+      - gender
+      - category
+      - course_level
+      - program_code
+      - academic_year
+      - year_of_study
+      - admission_date
+      - admission_type
+      - seat_type
+      - enrolment_status
+      - consent_status
+      - created_at
+      title: StudentRecordResponse
+    StudentUpdateRequest:
+      properties:
+        full_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Full Name
+        dob:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Dob
+        gender:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Gender
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+        pwd:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Pwd
+        course_level:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Course Level
+        program_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Program Code
+        academic_year:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Academic Year
+        year_of_study:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Year Of Study
+        admission_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Admission Date
+        admission_type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Admission Type
+        seat_type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Seat Type
+        supernumerary_scheme:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Supernumerary Scheme
+        quota:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Quota
+        nationality:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Nationality
+        nri_status:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Nri Status
+        oci_status:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Oci Status
+        fn_status:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Fn Status
+        enrolment_status:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Enrolment Status
+        consent_status:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Consent Status
+        consent_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Consent Date
+        guardian_consent:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Guardian Consent
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+        mobile:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Mobile
+        reason:
+          type: string
+          title: Reason
+          description: Audit reason for update
+          default: Administrative correction
+      type: object
+      title: StudentUpdateRequest
+    TestWebhookResponse:
+      properties:
+        success:
+          type: boolean
+          title: Success
+        status_code:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Status Code
+        event:
+          type: string
+          title: Event
+          default: ping
+        delivered_at:
+          type: string
+          format: date-time
+          title: Delivered At
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+      type: object
+      required:
+      - success
+      - delivered_at
+      title: TestWebhookResponse
+    TransferDecisionRequest:
+      properties:
+        decision:
+          type: string
+          title: Decision
+          description: APPROVED or REJECTED
+        remarks:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Remarks
+          description: Decision remarks or notes
+      type: object
+      required:
+      - decision
+      title: TransferDecisionRequest
+    TransferOverrideRequest:
+      properties:
+        decision:
+          type: string
+          title: Decision
+          description: APPROVED or REJECTED
+        reason:
+          type: string
+          title: Reason
+          description: Mandatory AICTE statutory justification for override
+      type: object
+      required:
+      - decision
+      - reason
+      title: TransferOverrideRequest
+    TransferRecordResponse:
+      properties:
+        transfer_id:
+          type: string
+          title: Transfer Id
+        id:
+          type: string
+          title: Id
+        apaar_id:
+          type: string
+          title: Apaar Id
+        from_institution_id:
+          type: string
+          title: From Institution Id
+        source_institution_id:
+          type: string
+          title: Source Institution Id
+        to_institution_id:
+          type: string
+          title: To Institution Id
+        dest_institution_id:
+          type: string
+          title: Dest Institution Id
+        academic_year:
+          type: string
+          title: Academic Year
+        status:
+          type: string
+          title: Status
+          description: PENDING, APPROVED, REJECTED, CANCELLED, OVERRIDDEN
+          default: PENDING
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+        evidence_ref:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Evidence Ref
+        requested_at:
+          type: string
+          format: date-time
+          title: Requested At
+        decided_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Decided At
+        decided_by:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Decided By
+      type: object
+      required:
+      - transfer_id
+      - id
+      - apaar_id
+      - from_institution_id
+      - source_institution_id
+      - to_institution_id
+      - dest_institution_id
+      - academic_year
+      - requested_at
+      title: TransferRecordResponse
+    TrustListEntry:
+      properties:
+        did:
+          type: string
+          title: Did
+        issuer_id:
+          type: string
+          title: Issuer Id
+        name:
+          type: string
+          title: Name
+        type:
+          type: string
+          title: Type
+          description: ROOT, INSTITUTION, or DAB
+      type: object
+      required:
+      - did
+      - issuer_id
+      - name
+      - type
+      title: TrustListEntry
+      description: Single trusted issuer entity in AICTE trust list.
+    TrustListResponse:
+      properties:
+        issuer:
+          type: string
+          title: Issuer
+          description: AICTE root issuer DID
+        issued_at:
+          type: string
+          format: date-time
+          title: Issued At
+        trust_list:
+          items:
+            $ref: '#/components/schemas/TrustListEntry'
+          type: array
+          title: Trust List
+        jwt:
+          type: string
+          title: Jwt
+          description: AICTE Ed25519-signed trust list JWT token
+      type: object
+      required:
+      - issuer
+      - issued_at
+      - trust_list
+      - jwt
+      title: TrustListResponse
+      description: AICTE-signed trust list response containing authorized issuer DIDs.
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    VerificationResultResponse:
+      properties:
+        result:
+          type: string
+          title: Result
+          description: 'Result status: VALID, INVALID, REVOKED, SUPERSEDED, or SUSPENDED'
+        status:
+          type: string
+          title: Status
+          description: 'Status code: VALID, REVOKED, SUPERSEDED, SUSPENDED, INVALID_SIGNATURE,
+            EXPIRED, or KEY_BINDING_FAILED'
+        valid:
+          type: boolean
+          title: Valid
+          description: True if credential signature, trust, and status are valid
+        issuer:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Issuer
+          description: Issuer DID string
+        issuer_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Issuer Name
+          description: Human-readable issuer name
+        issuer_trusted:
+          type: boolean
+          title: Issuer Trusted
+          description: True if issuer DID is in AICTE trust list
+          default: true
+        issued_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: string
+          - type: 'null'
+          title: Issued At
+        checked_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: string
+          - type: 'null'
+          title: Checked At
+        verified_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: string
+          - type: 'null'
+          title: Verified At
+        disclosed_claims:
+          additionalProperties: true
+          type: object
+          title: Disclosed Claims
+          description: Selectively disclosed student claims verified under issuer
+            signature
+        reasons:
+          items:
+            type: string
+          type: array
+          title: Reasons
+          description: Verification validation logs or rejection error reasons
+        error_message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error Message
+      type: object
+      required:
+      - result
+      - status
+      - valid
+      title: VerificationResultResponse
+      description: Standardized verification result payload.
+    WebhookDeliveryResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        webhook_id:
+          type: string
+          title: Webhook Id
+        event_type:
+          type: string
+          title: Event Type
+        payload_json:
+          additionalProperties: true
+          type: object
+          title: Payload Json
+        status:
+          type: string
+          title: Status
+        response_code:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Response Code
+        attempts:
+          type: integer
+          title: Attempts
+        error_message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error Message
+        delivered_at:
+          type: string
+          format: date-time
+          title: Delivered At
+      type: object
+      required:
+      - id
+      - webhook_id
+      - event_type
+      - payload_json
+      - status
+      - attempts
+      - delivered_at
+      title: WebhookDeliveryResponse
+    WebhookResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        institution_aicte_id:
+          type: string
+          title: Institution Aicte Id
+        url:
+          type: string
+          title: Url
+        events:
+          items:
+            type: string
+          type: array
+          title: Events
+        is_active:
+          type: boolean
+          title: Is Active
+        secret:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Secret
+          description: Signing secret (shown ONCE only at creation time).
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - institution_aicte_id
+      - url
+      - events
+      - is_active
+      - created_at
+      - updated_at
+      title: WebhookResponse

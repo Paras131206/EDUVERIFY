@@ -15,6 +15,7 @@ from sqlalchemy import (
     DateTime,
     Float,
     ForeignKey,
+    Index,
     Integer,
     LargeBinary,
     String,
@@ -261,6 +262,10 @@ class Batch(Base):
         nullable=False,
     )
 
+    __table_args__ = (
+        Index("ix_batches_inst_year", "institution_aicte_id", "academic_year"),
+    )
+
 
 class BatchFile(Base):
     """Raw uploaded student batch payload (stored as bytea/BLOB)."""
@@ -330,6 +335,11 @@ class Issue(Base):
         String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
     decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    __table_args__ = (
+        Index("ix_issues_rule_priority", "rule_id", "priority"),
+        Index("ix_issues_batch_status", "batch_id", "status"),
+    )
 
 
 class Correction(Base):
@@ -456,6 +466,10 @@ class StudentRecord(Base):
         default=lambda: datetime.now(UTC),
         onupdate=lambda: datetime.now(UTC),
         nullable=False,
+    )
+
+    __table_args__ = (
+        Index("ix_student_records_inst_year", "institution_aicte_id", "academic_year"),
     )
 
 

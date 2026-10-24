@@ -71,3 +71,23 @@ def get_my_consent(
         principal=principal,
     )
     return StudentConsentSummaryResponse.model_validate(summary)
+
+
+@router.get(
+    "/{apaar_id}",
+    response_model=StudentConsentSummaryResponse,
+    summary="Get student consent summary by APAAR ID",
+)
+def get_student_consent_by_apaar(
+    apaar_id: str,
+    principal: Principal = Depends(get_current_principal),
+    db: Session = Depends(get_db),
+) -> StudentConsentSummaryResponse:
+    """Retrieves consent state and audit ledger history by student's APAAR ID."""
+    summary = get_consent_summary_service(
+        db,
+        apaar_id=apaar_id,
+        principal=principal,
+    )
+    return StudentConsentSummaryResponse.model_validate(summary)
+
