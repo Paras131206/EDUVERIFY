@@ -4,19 +4,19 @@ Local dev harness only (never deployed to production).
 Runs on port 8100.
 """
 
-import uuid
+from typing import Any
 
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
 
+# Imports when run from engine directory
 from eduverify_engine import __version__
 from eduverify_engine.catalog import load_rule_catalog
-
-# Relative import within engine directory when uvicorn is run with --app-dir engine
-from eduverify_engine.models import (
-    BatchReport,
-    ColumnMapping,
-)
+from eduverify_engine.mapping import suggest_mapping
+from eduverify_engine.models import BatchReport, ColumnMapping
+from eduverify_engine.parse import parse_file
+from eduverify_engine.validate import validate_batch
 
 app = FastAPI(
     title="EduVerify Engine Dev Harness",
@@ -31,6 +31,21 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+class MapHeadersRequest(BaseModel):
+    headers: list[str] = Field(..., description="List of raw column headers from spreadsheet")
+    saved_profile: dict[str, str] | None = Field(
+        default=None, description="Optional institution saved mapping profile"
+    )
+
+
+class ParseResponse(BaseModel):
+    headers: list[str]
+    rows_total: int
+    detected_encoding: str
+    cell_types: dict[str, str]
+    sample_preview: list[dict[str, Any]]
 
 
 @app.get("/healthz")
@@ -50,56 +65,48 @@ def get_catalog() -> dict:
     return catalog.model_dump()
 
 
-@app.post("/validate", response_model=BatchReport)
-async def validate_batch(file: UploadFile = File(...)) -> BatchReport:
+@app.post("/map", response_model=list[ColumnMapping])
+def map_headers(payload: list[str] | MapHeadersRequest) -> list[ColumnMapping]:
     """
-    Accepts CSV or XLSX file and returns a validated BatchReport.
-    Used for dev and testing before full engine pipeline connection.
+    Suggests smart column mappings for input headers.
+    Accepts either raw JSON array of strings e.g. ["PRN", "DOB", "Dept"]
+    or an object with { "headers": [...], "saved_profile": {...} }.
     """
-    batch_id = str(uuid.uuid4())
-    catalog = load_rule_catalog()
-
-    # Read uploaded bytes to count rows if CSV
-    content = await file.read()
-    filename = file.filename or "upload.csv"
-
-    rows_total = 0
-    if filename.endswith(".csv"):
-        text = content.decode("utf-8", errors="replace")
-        lines = [line for line in text.splitlines() if line.strip()]
-        rows_total = max(0, len(lines) - 1)
+    if isinstance(payload, list):
+        headers = payload
+        saved_profile = None
     else:
-        rows_total = 10
+        headers = payload.headers
+        saved_profile = payload.saved_profile
 
-    # Build initial baseline report
-    return BatchReport(
-        batch_id=batch_id,
-        institution_aicte_id="1-DEMO12345",
-        engine_version=__version__,
-        rule_catalog_version=catalog.catalog_version,
-        rows_total=rows_total,
-        rows_valid=rows_total,
-        rows_warning=0,
-        rows_error=0,
-        quality_score=100.0,
-        column_mapping=[
-            ColumnMapping(
-                source="apaar_id",
-                target="apaar_id",
-                confidence=1.0,
-                method="exact",
-            )
-        ],
-        metrics={"completeness": {"apaar_id": 1.0}},
-        issues=[],
-        review_summary={"AUTO_FLAG": 0, "HUMAN_REVIEW": 0, "INFO": 0},
-        priority_summary={"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0},
-        intake_summary=[],
-        reconciliation=[],
-        duplicate_clusters=[],
-        schema_drift=[],
-        anomalies=[],
+    return suggest_mapping(headers, saved_profile=saved_profile)
+
+
+@app.post("/parse", response_model=ParseResponse)
+async def parse_uploaded_file(file: UploadFile = File(...)) -> ParseResponse:
+    """
+    Parses uploaded CSV or XLSX file and returns headers, row counts, and preview.
+    """
+    content = await file.read()
+    parsed = parse_file(content)
+    preview = parsed.df.head(5).to_dict(orient="records") if not parsed.df.empty else []
+
+    return ParseResponse(
+        headers=parsed.original_headers,
+        rows_total=parsed.rows_total,
+        detected_encoding=parsed.detected_encoding,
+        cell_types=parsed.cell_types,
+        sample_preview=preview,
     )
+
+
+@app.post("/validate", response_model=BatchReport)
+async def validate_batch_endpoint(file: UploadFile = File(...)) -> BatchReport:
+    """
+    Accepts CSV or XLSX file and executes the engine validation pipeline.
+    """
+    content = await file.read()
+    return validate_batch(content)
 
 
 if __name__ == "__main__":
