@@ -1,105 +1,126 @@
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { UploadCloud, FileSpreadsheet, Download, CheckCircle2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { OfflineBanner } from '@/components/shared/OfflineBanner';
+import { Step1Choose } from './components/Step1Choose';
+import { Step2Mapping } from './components/Step2Mapping';
+import { Step3Validate } from './components/Step3Validate';
+import { Step4Summary } from './components/Step4Summary';
+import { ColumnMappingItem } from './types';
+import { Check, UploadCloud, TableProperties, Radio, BarChart3 } from 'lucide-react';
+
+export type WizardStep = 1 | 2 | 3 | 4;
 
 export const UploadPage: React.FC = () => {
-  const [file, setFile] = useState<File | null>(null);
-  const [academicYear, setAcademicYear] = useState('2026-27');
-  const [isUploading, setIsUploading] = useState(false);
-  const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState<WizardStep>(1);
+  const [batchInfo, setBatchInfo] = useState<{
+    id: string;
+    filename: string;
+    academic_year: string;
+  }>({
+    id: 'batch-demo-2',
+    filename: 'batch_2_errors.xlsx',
+    academic_year: '2026-27',
+  });
 
-  const handleUpload = () => {
-    if (!file) return;
-    setIsUploading(true);
-    setTimeout(() => {
-      setIsUploading(false);
-      navigate('/institution/batches/batch-demo-2/review');
-    }, 600);
+  const handleStep1Success = (createdBatch: {
+    id: string;
+    filename: string;
+    academic_year: string;
+  }) => {
+    setBatchInfo(createdBatch);
+    setCurrentStep(2);
   };
 
+  const handleStep2Confirm = (_mappings: ColumnMappingItem[], _saveProfile: boolean) => {
+    setCurrentStep(3);
+  };
+
+  const handleStep3Complete = () => {
+    setCurrentStep(4);
+  };
+
+  const handleReset = () => {
+    setCurrentStep(1);
+  };
+
+  const stepsMeta = [
+    { num: 1, label: '1. Choose File', icon: <UploadCloud className="w-4 h-4" /> },
+    { num: 2, label: '2. Map Columns', icon: <TableProperties className="w-4 h-4" /> },
+    { num: 3, label: '3. Validate Engine', icon: <Radio className="w-4 h-4" /> },
+    { num: 4, label: '4. Result Summary', icon: <BarChart3 className="w-4 h-4" /> },
+  ];
+
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6 pb-12">
+      <OfflineBanner />
+
+      {/* Main Page Title Header */}
       <div className="border-b border-slate-200 pb-4">
-        <h2 className="text-2xl font-bold tracking-tight text-gov-navy">Upload Student Data</h2>
-        <p className="text-xs text-slate-500 mt-1">
-          Upload student admission records with 12-digit APAAR ID key (CSV or XLSX format)
-        </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight text-gov-navy">
+              Institution Batch Upload Wizard
+            </h2>
+            <p className="text-xs text-slate-500 mt-1">
+              Ingest student admission records, auto-map columns with AICTE synonym catalog, and validate against national rules.
+            </p>
+          </div>
+        </div>
+
+        {/* Stepper Navigation */}
+        <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {stepsMeta.map((s) => {
+            const isDone = currentStep > s.num;
+            const isCurrent = currentStep === s.num;
+
+            return (
+              <div
+                key={s.num}
+                className={`flex items-center gap-2.5 p-2.5 rounded-lg border text-xs font-semibold transition-all ${
+                  isCurrent
+                    ? 'bg-gov-navy text-white border-gov-navy shadow-sm'
+                    : isDone
+                      ? 'bg-green-50 text-green-900 border-green-200'
+                      : 'bg-slate-50 text-slate-400 border-slate-200'
+                }`}
+              >
+                <div
+                  className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${
+                    isCurrent
+                      ? 'bg-gov-saffron text-slate-900'
+                      : isDone
+                        ? 'bg-green-600 text-white'
+                        : 'bg-slate-200 text-slate-500'
+                  }`}
+                >
+                  {isDone ? <Check className="w-3.5 h-3.5" /> : s.num}
+                </div>
+                <span className="truncate">{s.label}</span>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle className="text-base">Step 1: Download Official Excel Template</CardTitle>
-              <CardDescription>
-                Contains dropdown validations, instructions, and text-formatted APAAR column
-              </CardDescription>
-            </div>
-            <a href="http://localhost:8000/v1/templates/student-upload.xlsx" download>
-              <Button variant="outline" size="sm">
-                <Download className="w-4 h-4 mr-2" />
-                Download Template
-              </Button>
-            </a>
-          </div>
-        </CardHeader>
-      </Card>
+      {/* Wizard Steps Rendering */}
+      {currentStep === 1 && <Step1Choose onSuccess={handleStep1Success} />}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Step 2: Upload Completed File</CardTitle>
-          <CardDescription>Select academic year and drop your student admissions file</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label htmlFor="academic-year-select" className="block text-xs font-semibold text-slate-700 mb-1">Academic Year</label>
-            <select
-              id="academic-year-select"
-              value={academicYear}
-              onChange={(e) => setAcademicYear(e.target.value)}
-              className="w-full sm:w-64 border border-slate-300 rounded-md px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-gov-saffron"
-            >
-              <option value="2026-27">2026-27 (Current)</option>
-              <option value="2025-26">2025-26</option>
-            </select>
-          </div>
+      {currentStep === 2 && (
+        <Step2Mapping
+          batchId={batchInfo.id}
+          filename={batchInfo.filename}
+          academicYear={batchInfo.academic_year}
+          onBack={() => setCurrentStep(1)}
+          onConfirm={handleStep2Confirm}
+        />
+      )}
 
-          <div
-            className="border-2 border-dashed border-slate-300 hover:border-gov-navy rounded-lg p-8 text-center cursor-pointer bg-slate-50/50 hover:bg-slate-50 transition"
-            onClick={() => {
-              const mock = new File(['mock content'], 'batch_2_errors.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-              setFile(mock);
-            }}
-          >
-            <div className="flex flex-col items-center justify-center">
-              <UploadCloud className="w-10 h-10 text-slate-400 mb-2" />
-              <p className="text-sm font-semibold text-slate-700">
-                {file ? file.name : 'Click to select or drag and drop batch file'}
-              </p>
-              <p className="text-xs text-slate-500 mt-1">Accepts .csv, .xlsx (Max 10 MB)</p>
-            </div>
-          </div>
+      {currentStep === 3 && (
+        <Step3Validate batchId={batchInfo.id} onComplete={handleStep3Complete} />
+      )}
 
-          {file && (
-            <div className="p-3 bg-green-50 rounded border border-green-200 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm text-green-800">
-                <FileSpreadsheet className="w-4 h-4 text-green-700" />
-                <span className="font-semibold">{file.name}</span>
-                <span className="text-xs text-green-600">(Ready for smart column mapping)</span>
-              </div>
-              <CheckCircle2 className="w-4 h-4 text-green-600" />
-            </div>
-          )}
-
-          <div className="flex justify-end pt-4">
-            <Button variant="default" onClick={handleUpload} disabled={!file || isUploading}>
-              {isUploading ? 'Validating...' : 'Proceed to Column Mapping'}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {currentStep === 4 && (
+        <Step4Summary batchId={batchInfo.id} onReset={handleReset} />
+      )}
     </div>
   );
 };
