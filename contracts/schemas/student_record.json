@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eduverify.aicte-india.org/schemas/student_record.json",
+  "title": "StudentRecord",
+  "description": "Canonical schema for a student record in EduVerify per agents.md §5.1",
+  "type": "object",
+  "required": [
+    "apaar_id",
+    "institution_aicte_id",
+    "institution_student_id",
+    "full_name",
+    "dob",
+    "gender",
+    "category",
+    "program_code",
+    "course_level",
+    "academic_year",
+    "year_of_study",
+    "admission_date",
+    "admission_type",
+    "seat_type",
+    "quota",
+    "nationality",
+    "nri_status",
+    "oci_status",
+    "fn_status",
+    "enrolment_status",
+    "consent_status"
+  ],
+  "properties": {
+    "apaar_id": {
+      "type": "string",
+      "pattern": "^\\d{12}$",
+      "description": "Exactly 12 digits APAAR ID, always treated as string with leading zeros preserved"
+    },
+    "institution_aicte_id": {
+      "type": "string",
+      "description": "AICTE-assigned institution ID"
+    },
+    "institution_student_id": {
+      "type": "string",
+      "description": "Roll no / PRN / Enrolment no, unique within institution + academic year"
+    },
+    "full_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Full name of the student"
+    },
+    "dob": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of birth in ISO YYYY-MM-DD"
+    },
+    "gender": {
+      "type": "string",
+      "enum": ["M", "F", "T"],
+      "description": "Gender: M, F, or T"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["GEN", "EWS", "OBC-NCL", "SC", "ST"],
+      "description": "Social reservation category"
+    },
+    "pwd": {
+      "type": "boolean",
+      "default": false,
+      "description": "Persons with Benchmark Disabilities status"
+    },
+    "program_code": {
+      "type": "string",
+      "description": "Approved program code"
+    },
+    "course_level": {
+      "type": "string",
+      "enum": ["DIPLOMA", "UG", "PG", "PGDM", "PHD"],
+      "description": "Course level"
+    },
+    "department": {
+      "type": "string",
+      "description": "Academic department"
+    },
+    "academic_year": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}$",
+      "description": "Academic year in YYYY-YY format (e.g. 2026-27)"
+    },
+    "year_of_study": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 6,
+      "description": "Current year of study (1 to 6)"
+    },
+    "admission_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Admission date in ISO YYYY-MM-DD"
+    },
+    "admission_type": {
+      "type": "string",
+      "enum": ["REGULAR", "LATERAL", "TRANSFER_IN"],
+      "description": "Admission mode"
+    },
+    "expected_graduation_year": {
+      "type": "integer",
+      "description": "Expected year of degree completion"
+    },
+    "seat_type": {
+      "type": "string",
+      "enum": ["REGULAR", "SUPERNUMERARY"],
+      "description": "Seat type"
+    },
+    "supernumerary_scheme": {
+      "type": ["string", "null"],
+      "enum": ["TFW", "PMSSS", "JK", "NE", "FN_OCI_NRI", "PWD", "OTHER", null],
+      "description": "Supernumerary quota scheme if seat_type is SUPERNUMERARY"
+    },
+    "quota": {
+      "type": "string",
+      "enum": ["NONE", "NRI", "OCI", "FN", "PIO", "CIWG"],
+      "description": "Quota status"
+    },
+    "nationality": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}$",
+      "description": "ISO-3166-1 alpha-2 country code"
+    },
+    "nri_status": {
+      "type": "boolean",
+      "description": "Non-Resident Indian status"
+    },
+    "oci_status": {
+      "type": "boolean",
+      "description": "Overseas Citizen of India status"
+    },
+    "fn_status": {
+      "type": "boolean",
+      "description": "Foreign National status"
+    },
+    "enrolment_status": {
+      "type": "string",
+      "enum": ["ACTIVE", "WITHDRAWN", "DEFERRED", "TRANSFERRED_OUT", "COMPLETED", "GRADUATED"],
+      "description": "Student lifecycle status"
+    },
+    "consent_status": {
+      "type": "string",
+      "enum": ["GRANTED", "REFUSED", "WITHDRAWN"],
+      "description": "Consent status for data processing"
+    },
+    "consent_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date consent was granted"
+    },
+    "guardian_consent": {
+      "type": "boolean",
+      "description": "Parental/Guardian consent if minor"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "Student email address"
+    },
+    "mobile": {
+      "type": "string",
+      "pattern": "^[+]?[0-9]{10,13}$",
+      "description": "Student mobile contact number"
+    }
+  },
+  "additionalProperties": false
+}

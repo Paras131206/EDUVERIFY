@@ -1,0 +1,647 @@
+{
+  "$defs": {
+    "Anomaly": {
+      "additionalProperties": false,
+      "properties": {
+        "metric": {
+          "description": "Metric name (e.g. nri_share, null_rate)",
+          "title": "Metric",
+          "type": "string"
+        },
+        "value": {
+          "description": "Current batch metric value",
+          "title": "Value",
+          "type": "number"
+        },
+        "baseline": {
+          "description": "Historical baseline metric",
+          "title": "Baseline",
+          "type": "number"
+        },
+        "z": {
+          "description": "Z-score deviation",
+          "title": "Z",
+          "type": "number"
+        },
+        "method": {
+          "description": "Statistical detection method",
+          "enum": [
+            "zscore",
+            "isolation_forest"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "reason": {
+          "description": "Explainable description of anomaly",
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "metric",
+        "value",
+        "baseline",
+        "z",
+        "method",
+        "reason"
+      ],
+      "title": "Anomaly",
+      "type": "object"
+    },
+    "ColumnMapping": {
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "description": "Uploaded column name",
+          "title": "Source",
+          "type": "string"
+        },
+        "target": {
+          "description": "Canonical student_record field name",
+          "title": "Target",
+          "type": "string"
+        },
+        "confidence": {
+          "description": "Match confidence",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "method": {
+          "description": "Resolution method",
+          "enum": [
+            "synonym",
+            "fuzzy",
+            "user",
+            "sniffed",
+            "exact"
+          ],
+          "title": "Method",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "target",
+        "confidence",
+        "method"
+      ],
+      "title": "ColumnMapping",
+      "type": "object"
+    },
+    "DuplicateCluster": {
+      "additionalProperties": false,
+      "properties": {
+        "cluster_id": {
+          "description": "Cluster identifier",
+          "title": "Cluster Id",
+          "type": "string"
+        },
+        "members": {
+          "description": "Cluster candidate records",
+          "items": {
+            "$ref": "#/$defs/DuplicateMember"
+          },
+          "title": "Members",
+          "type": "array"
+        },
+        "score": {
+          "description": "Composite similarity score",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Score",
+          "type": "number"
+        },
+        "matched_fields": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "description": "Per-field similarity scores",
+          "title": "Matched Fields",
+          "type": "object"
+        },
+        "scope": {
+          "description": "Within same batch or across institutions",
+          "enum": [
+            "INTRA",
+            "CROSS_INSTITUTION"
+          ],
+          "title": "Scope",
+          "type": "string"
+        },
+        "bucket": {
+          "description": "Review routing bucket",
+          "enum": [
+            "AUTO_FLAG",
+            "HUMAN_REVIEW"
+          ],
+          "title": "Bucket",
+          "type": "string"
+        }
+      },
+      "required": [
+        "cluster_id",
+        "members",
+        "score",
+        "scope",
+        "bucket"
+      ],
+      "title": "DuplicateCluster",
+      "type": "object"
+    },
+    "DuplicateMember": {
+      "additionalProperties": false,
+      "properties": {
+        "row": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Row number if in current batch",
+          "title": "Row"
+        },
+        "apaar_masked": {
+          "description": "Masked APAAR ID (1234****9012)",
+          "title": "Apaar Masked",
+          "type": "string"
+        },
+        "institution": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Institution AICTE ID",
+          "title": "Institution"
+        },
+        "student_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Roll/PRN/Student ID",
+          "title": "Student Id"
+        }
+      },
+      "required": [
+        "apaar_masked"
+      ],
+      "title": "DuplicateMember",
+      "type": "object"
+    },
+    "IntakeSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "program_code": {
+          "description": "AICTE program code",
+          "title": "Program Code",
+          "type": "string"
+        },
+        "approved": {
+          "description": "Approved intake count",
+          "minimum": 0,
+          "title": "Approved",
+          "type": "integer"
+        },
+        "enrolled": {
+          "description": "Regular enrolled student count",
+          "minimum": 0,
+          "title": "Enrolled",
+          "type": "integer"
+        },
+        "supernumerary": {
+          "description": "Supernumerary student count",
+          "minimum": 0,
+          "title": "Supernumerary",
+          "type": "integer"
+        },
+        "excess": {
+          "description": "Enrolment excess beyond approved quota",
+          "title": "Excess",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "program_code",
+        "approved",
+        "enrolled",
+        "supernumerary",
+        "excess"
+      ],
+      "title": "IntakeSummary",
+      "type": "object"
+    },
+    "Issue": {
+      "additionalProperties": false,
+      "properties": {
+        "issue_id": {
+          "description": "Unique issue UUID",
+          "title": "Issue Id",
+          "type": "string"
+        },
+        "row": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "1-indexed row number in uploaded file",
+          "title": "Row"
+        },
+        "record_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Institution student ID or key",
+          "title": "Record Key"
+        },
+        "field": {
+          "description": "Target field name or column",
+          "title": "Field",
+          "type": "string"
+        },
+        "rule_id": {
+          "description": "Rule code (e.g. V001..V035)",
+          "title": "Rule Id",
+          "type": "string"
+        },
+        "severity": {
+          "description": "Issue severity",
+          "enum": [
+            "ERROR",
+            "WARN",
+            "INFO"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "priority": {
+          "description": "Risk-based priority",
+          "enum": [
+            "CRITICAL",
+            "HIGH",
+            "MEDIUM",
+            "LOW"
+          ],
+          "title": "Priority",
+          "type": "string"
+        },
+        "confidence": {
+          "default": 1.0,
+          "description": "Rule engine confidence",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "bucket": {
+          "description": "Review routing bucket",
+          "enum": [
+            "AUTO_FLAG",
+            "HUMAN_REVIEW",
+            "INFO"
+          ],
+          "title": "Bucket",
+          "type": "string"
+        },
+        "message": {
+          "description": "Short plain-English summary",
+          "title": "Message",
+          "type": "string"
+        },
+        "reason": {
+          "description": "Explainable reason detailing numbers/values",
+          "title": "Reason",
+          "type": "string"
+        },
+        "evidence": {
+          "additionalProperties": true,
+          "description": "Contextual key-values demonstrating the defect",
+          "title": "Evidence",
+          "type": "object"
+        },
+        "suggested_fix": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SuggestedFix"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Deterministic suggested correction if safe"
+        },
+        "value_masked": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Masked representation of offending value",
+          "title": "Value Masked"
+        }
+      },
+      "required": [
+        "issue_id",
+        "field",
+        "rule_id",
+        "severity",
+        "priority",
+        "bucket",
+        "message",
+        "reason"
+      ],
+      "title": "Issue",
+      "type": "object"
+    },
+    "ReconciliationRow": {
+      "additionalProperties": false,
+      "properties": {
+        "program_code": {
+          "description": "AICTE program code",
+          "title": "Program Code",
+          "type": "string"
+        },
+        "declared": {
+          "description": "Total declared in approval process",
+          "minimum": 0,
+          "title": "Declared",
+          "type": "integer"
+        },
+        "uploaded": {
+          "description": "Total uploaded student-level records",
+          "minimum": 0,
+          "title": "Uploaded",
+          "type": "integer"
+        },
+        "delta": {
+          "description": "Difference (uploaded - declared)",
+          "title": "Delta",
+          "type": "integer"
+        },
+        "status": {
+          "description": "Reconciliation status within tolerance",
+          "enum": [
+            "MATCH",
+            "MISMATCH"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "program_code",
+        "declared",
+        "uploaded",
+        "delta",
+        "status"
+      ],
+      "title": "ReconciliationRow",
+      "type": "object"
+    },
+    "SchemaDrift": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "description": "Drift classification",
+          "enum": [
+            "COLUMN_REMOVED",
+            "TYPE_CHANGED",
+            "NEW_CATEGORY",
+            "NULL_RATE_JUMP"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "column": {
+          "description": "Affected column name",
+          "title": "Column",
+          "type": "string"
+        },
+        "previous": {
+          "description": "Baseline value from prior batch",
+          "title": "Previous"
+        },
+        "current": {
+          "description": "Detected value in current batch",
+          "title": "Current"
+        }
+      },
+      "required": [
+        "kind",
+        "column",
+        "previous",
+        "current"
+      ],
+      "title": "SchemaDrift",
+      "type": "object"
+    },
+    "SuggestedFix": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "description": "Suggested replacement value",
+          "title": "Value"
+        },
+        "rationale": {
+          "description": "Reason for this suggested fix",
+          "title": "Rationale",
+          "type": "string"
+        },
+        "requires_approval": {
+          "default": true,
+          "description": "Whether human confirmation is required",
+          "title": "Requires Approval",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "value",
+        "rationale"
+      ],
+      "title": "SuggestedFix",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "batch_id": {
+      "description": "Batch UUID",
+      "title": "Batch Id",
+      "type": "string"
+    },
+    "institution_aicte_id": {
+      "description": "AICTE institution ID",
+      "title": "Institution Aicte Id",
+      "type": "string"
+    },
+    "engine_version": {
+      "default": "0.0.1",
+      "description": "Semantic version of engine",
+      "title": "Engine Version",
+      "type": "string"
+    },
+    "rule_catalog_version": {
+      "default": "0.1.0",
+      "description": "Semantic version of rule catalog",
+      "title": "Rule Catalog Version",
+      "type": "string"
+    },
+    "rows_total": {
+      "default": 0,
+      "description": "Total rows in batch",
+      "minimum": 0,
+      "title": "Rows Total",
+      "type": "integer"
+    },
+    "rows_valid": {
+      "default": 0,
+      "description": "Rows with no errors or warnings",
+      "minimum": 0,
+      "title": "Rows Valid",
+      "type": "integer"
+    },
+    "rows_warning": {
+      "default": 0,
+      "description": "Rows with warnings only",
+      "minimum": 0,
+      "title": "Rows Warning",
+      "type": "integer"
+    },
+    "rows_error": {
+      "default": 0,
+      "description": "Rows with fatal errors",
+      "minimum": 0,
+      "title": "Rows Error",
+      "type": "integer"
+    },
+    "quality_score": {
+      "default": 100.0,
+      "description": "Batch quality score [0..100]",
+      "maximum": 100.0,
+      "minimum": 0.0,
+      "title": "Quality Score",
+      "type": "number"
+    },
+    "column_mapping": {
+      "description": "Resolved column mapping",
+      "items": {
+        "$ref": "#/$defs/ColumnMapping"
+      },
+      "title": "Column Mapping",
+      "type": "array"
+    },
+    "metrics": {
+      "additionalProperties": {
+        "additionalProperties": {
+          "type": "number"
+        },
+        "type": "object"
+      },
+      "description": "Deequ-style metrics: completeness, validity, uniqueness",
+      "title": "Metrics",
+      "type": "object"
+    },
+    "issues": {
+      "description": "All detected issues sorted by priority",
+      "items": {
+        "$ref": "#/$defs/Issue"
+      },
+      "title": "Issues",
+      "type": "array"
+    },
+    "review_summary": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "description": "Issue count per review bucket",
+      "title": "Review Summary",
+      "type": "object"
+    },
+    "priority_summary": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "description": "Issue count per priority",
+      "title": "Priority Summary",
+      "type": "object"
+    },
+    "intake_summary": {
+      "description": "Per-program intake compliance",
+      "items": {
+        "$ref": "#/$defs/IntakeSummary"
+      },
+      "title": "Intake Summary",
+      "type": "array"
+    },
+    "reconciliation": {
+      "description": "Reconciliation against declared totals",
+      "items": {
+        "$ref": "#/$defs/ReconciliationRow"
+      },
+      "title": "Reconciliation",
+      "type": "array"
+    },
+    "duplicate_clusters": {
+      "description": "Grouped duplicate clusters",
+      "items": {
+        "$ref": "#/$defs/DuplicateCluster"
+      },
+      "title": "Duplicate Clusters",
+      "type": "array"
+    },
+    "schema_drift": {
+      "description": "Detected schema drift events",
+      "items": {
+        "$ref": "#/$defs/SchemaDrift"
+      },
+      "title": "Schema Drift",
+      "type": "array"
+    },
+    "anomalies": {
+      "description": "Statistical anomalies vs history",
+      "items": {
+        "$ref": "#/$defs/Anomaly"
+      },
+      "title": "Anomalies",
+      "type": "array"
+    }
+  },
+  "required": [
+    "batch_id",
+    "institution_aicte_id"
+  ],
+  "title": "BatchReport",
+  "type": "object"
+}

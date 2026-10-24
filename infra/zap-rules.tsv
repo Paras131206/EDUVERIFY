@@ -1,0 +1,4 @@
+# ZAP baseline scan rules configuration for EduVerify
+# rule_id	action	notes
+10020	IGNORE	X-Frame-Options (configured in app)
+10038	IGNORE	Content Security Policy (configured in app)
