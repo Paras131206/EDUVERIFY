@@ -9,6 +9,7 @@ Targets:
 from __future__ import annotations
 
 import ctypes
+import importlib
 import os
 import sys
 import time
@@ -21,7 +22,9 @@ repo_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(repo_root / "engine"))
 sys.path.insert(0, str(repo_root))
 
-from data.adapters.neuralsorcerer import adapt_neuralsorcerer  # noqa: E402
+# Dynamic import from repo root to satisfy IDE static analysis across engine pyproject boundary
+_ns_module = importlib.import_module("data.adapters.neuralsorcerer")
+adapt_neuralsorcerer = _ns_module.adapt_neuralsorcerer
 
 from eduverify_engine.validate import validate_batch  # noqa: E402
 
