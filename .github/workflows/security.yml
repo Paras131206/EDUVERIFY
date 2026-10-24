@@ -77,5 +77,6 @@ jobs:
         with:
           target: "https://eduverify-api.onrender.com/health"
           rules_file_name: "infra/zap-rules.tsv"
+          artifact_name: "zap-scan-report"
           allow_issue_writing: false
           fail_action: false

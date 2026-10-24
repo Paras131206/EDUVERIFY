@@ -3,6 +3,8 @@ Backend configuration using pydantic-settings.
 Complies with agents.md §3 and prompt B0.
 """
 
+import json
+from contextlib import suppress
 from functools import lru_cache
 from typing import Any
 
@@ -43,7 +45,7 @@ class Settings(BaseSettings):
     )
 
     # CORS & URLs
-    CORS_ORIGINS: list[str] = Field(
+    CORS_ORIGINS: list[str] | str = Field(
         default_factory=lambda: [
             "http://localhost:5173",
             "http://127.0.0.1:5173",
@@ -86,7 +88,13 @@ class Settings(BaseSettings):
     @classmethod
     def parse_cors_origins(cls, v: Any) -> list[str]:
         if isinstance(v, str):
-            # Handle comma-separated string from environment variables
+            v = v.strip()
+            if v.startswith("[") and v.endswith("]"):
+                with suppress(json.JSONDecodeError):
+                    parsed = json.loads(v)
+                    if isinstance(parsed, list):
+                        return [str(origin).strip() for origin in parsed if str(origin).strip()]
+            # Handle comma-separated or single URL string from environment variables
             return [origin.strip() for origin in v.split(",") if origin.strip()]
         if isinstance(v, list):
             return [str(origin).strip() for origin in v if str(origin).strip()]
