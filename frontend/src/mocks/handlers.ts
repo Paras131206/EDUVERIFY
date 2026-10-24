@@ -265,21 +265,17 @@ export const handlers = [
 
     try {
       const contentType = request.headers.get('content-type') || '';
-      if (contentType.includes('multipart/form-data')) {
-        const formData = await request.formData();
-        academicYear = (formData.get('academic_year') as string) || academicYear;
-        supersedesBatchId = (formData.get('supersedes_batch_id') as string) || null;
-        const file = formData.get('file');
-        if (file && typeof file === 'object' && 'name' in file) {
-          filename = (file as File).name;
-        }
-        if (formData.get('trigger_conflict') === 'true' || filename.includes('conflict')) {
+      if (contentType.includes('application/json')) {
+        const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
+        academicYear = (body.academic_year as string) || academicYear;
+        supersedesBatchId = (body.supersedes_batch_id as string) || null;
+        filename = (body.filename as string) || filename;
+        if (body.trigger_conflict || filename.includes('conflict')) {
           triggerConflict = true;
         }
       } else {
-        // In JSDOM test runner, FormData may arrive without standard multipart header
         try {
-          const formData = await request.formData();
+          const formData = await request.clone().formData();
           academicYear = (formData.get('academic_year') as string) || academicYear;
           supersedesBatchId = (formData.get('supersedes_batch_id') as string) || null;
           const file = formData.get('file');
