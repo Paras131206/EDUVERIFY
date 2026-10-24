@@ -15,6 +15,8 @@ import {
   Scale,
   LogOut,
   LogIn,
+  Users,
+  BarChart3,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 
@@ -60,8 +62,20 @@ export const Sidebar: React.FC = () => {
     },
     {
       to: '/institution/transfers',
-      label: t('nav.transfers'),
+      label: t('nav.transfers', 'Transfers Desk'),
       icon: <ArrowLeftRight className="w-4 h-4" aria-hidden="true" />,
+      visible: !role || role === 'INSTITUTION_ADMIN' || role === 'INSTITUTION_STAFF',
+    },
+    {
+      to: '/institution/students',
+      label: t('nav.students', 'Student Registry'),
+      icon: <Users className="w-4 h-4" aria-hidden="true" />,
+      visible: !role || role === 'INSTITUTION_ADMIN' || role === 'INSTITUTION_STAFF',
+    },
+    {
+      to: '/institution/aggregates',
+      label: t('nav.aggregates', 'Aggregate Intake'),
+      icon: <BarChart3 className="w-4 h-4" aria-hidden="true" />,
       visible: !role || role === 'INSTITUTION_ADMIN' || role === 'INSTITUTION_STAFF',
     },
     // AICTE items

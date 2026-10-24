@@ -1,14 +1,45 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { ApiKeyItem, CreatedApiKey, InstitutionUserItem } from '@/types/auth';
+import { WebhookConfigItem } from '@/features/institution/types';
 import { API_BASE_URL } from '@/lib/api';
-import { Key, Users, Webhook, Copy, Check, AlertTriangle, Plus, Trash2, Mail, ShieldCheck } from 'lucide-react';
+import {
+  Key,
+  Users,
+  Webhook,
+  Copy,
+  Check,
+  AlertTriangle,
+  Plus,
+  Trash2,
+  Mail,
+  ShieldCheck,
+  Send,
+  Code2,
+  CheckCircle2,
+  Lock,
+} from 'lucide-react';
 
 export const SettingsPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'api-keys' | 'users' | 'security'>('api-keys');
+  const location = useLocation();
+  const getInitialTab = (): 'api-keys' | 'users' | 'security' | 'webhooks' => {
+    if (location.pathname.includes('/webhooks')) return 'webhooks';
+    if (location.pathname.includes('/users')) return 'users';
+    return 'api-keys';
+  };
+
+  const [activeTab, setActiveTab] = useState<'api-keys' | 'users' | 'security' | 'webhooks'>(getInitialTab);
+
+  useEffect(() => {
+    if (location.pathname.includes('/webhooks')) {
+      setActiveTab('webhooks');
+    }
+  }, [location.pathname]);
+
 
   // API Keys state
   const [apiKeys, setApiKeys] = useState<ApiKeyItem[]>([]);
@@ -24,6 +55,20 @@ export const SettingsPage: React.FC = () => {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<'INSTITUTION_ADMIN' | 'INSTITUTION_STAFF'>('INSTITUTION_STAFF');
   const [userSuccessMessage, setUserSuccessMessage] = useState<string | null>(null);
+
+  // Webhooks state
+  const [webhooks, setWebhooks] = useState<WebhookConfigItem[]>([]);
+  const [isWebhookModalOpen, setIsWebhookModalOpen] = useState(false);
+  const [newWebhookUrl, setNewWebhookUrl] = useState('');
+  const [selectedWebhookEvents, setSelectedWebhookEvents] = useState<string[]>([
+    'batch.committed',
+    'student.transitioned',
+  ]);
+  const [newlyCreatedSecret, setNewlyCreatedSecret] = useState<string | null>(null);
+  const [hasCopiedSecret, setHasCopiedSecret] = useState(false);
+  const [testFeedback, setTestFeedback] = useState<string | null>(null);
+  const [codeLanguage, setCodeLanguage] = useState<'nodejs' | 'python' | 'go'>('nodejs');
+  const [hasCopiedSnippet, setHasCopiedSnippet] = useState(false);
 
   // Fetch API Keys
   const loadApiKeys = async () => {
@@ -51,10 +96,25 @@ export const SettingsPage: React.FC = () => {
     }
   };
 
+  // Fetch Webhooks
+  const loadWebhooks = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/v1/webhooks`);
+      if (res.ok) {
+        const data = await res.json();
+        setWebhooks(data);
+      }
+    } catch {
+      // Ignore in dev
+    }
+  };
+
   useEffect(() => {
     loadApiKeys();
     loadUsers();
+    loadWebhooks();
   }, []);
+
 
   const handleCreateApiKey = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,6 +186,126 @@ export const SettingsPage: React.FC = () => {
     }
   };
 
+  const handleCreateWebhook = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newWebhookUrl.trim()) return;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/v1/webhooks`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: newWebhookUrl.trim(),
+          events: selectedWebhookEvents,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        // Secret is only returned here once!
+        setNewlyCreatedSecret(data.raw_secret);
+        setNewWebhookUrl('');
+        setSelectedWebhookEvents(['batch.committed', 'student.transitioned']);
+        setIsWebhookModalOpen(false);
+        loadWebhooks();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteWebhook = async (id: string) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/v1/webhooks/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        loadWebhooks();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSendTestWebhook = async (id: string) => {
+    try {
+      setTestFeedback('Dispatching test ping to webhook URL...');
+      const res = await fetch(`${API_BASE_URL}/v1/webhooks/${id}/test`, { method: 'POST' });
+      if (res.ok) {
+        setTestFeedback('Ping delivery succeeded (HTTP 200 OK)');
+        loadWebhooks();
+        setTimeout(() => setTestFeedback(null), 4000);
+      }
+    } catch (err) {
+      console.error(err);
+      setTestFeedback('Test ping failed');
+    }
+  };
+
+  const handleCopySecret = () => {
+    if (newlyCreatedSecret) {
+      navigator.clipboard.writeText(newlyCreatedSecret);
+      setHasCopiedSecret(true);
+      setTimeout(() => setHasCopiedSecret(false), 3000);
+    }
+  };
+
+  const handleCloseSecretModal = () => {
+    // Secret permanently discarded from state
+    setNewlyCreatedSecret(null);
+    setHasCopiedSecret(false);
+  };
+
+  const getSignatureSnippet = () => {
+    if (codeLanguage === 'nodejs') {
+      return `const crypto = require('crypto');
+
+// Express.js middleware / webhook handler
+function verifyEduVerifySignature(rawBody, signatureHeader, secret) {
+  // signatureHeader format: "sha256=<hex_hash>"
+  const expectedSignature = 'sha256=' + crypto.createHmac('sha256', secret)
+    .update(rawBody, 'utf8')
+    .digest('hex');
+
+  return crypto.timingSafeEqual(
+    Buffer.from(signatureHeader),
+    Buffer.from(expectedSignature)
+  );
+}`;
+    }
+    if (codeLanguage === 'python') {
+      return `import hmac
+import hashlib
+
+def verify_eduverify_signature(raw_body: bytes, signature_header: str, secret: str) -> bool:
+    """Verifies HMAC-SHA256 signature from X-EduVerify-Signature header."""
+    expected = "sha256=" + hmac.new(
+        secret.encode('utf-8'),
+        raw_body,
+        hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(signature_header, expected)`;
+    }
+    return `package main
+
+import (
+    "crypto/hmac"
+    "crypto/sha256"
+    "encoding/hex"
+)
+
+func VerifyEduVerifyWebhook(payload []byte, signatureHeader string, secret string) bool {
+    mac := hmac.New(sha256.New, []byte(secret))
+    mac.Write(payload)
+    expected := "sha256=" + hex.EncodeToString(mac.Sum(nil))
+    return hmac.Equal([]byte(signatureHeader), []byte(expected))
+}`;
+  };
+
+  const handleCopySnippet = () => {
+    navigator.clipboard.writeText(getSignatureSnippet());
+    setHasCopiedSnippet(true);
+    setTimeout(() => setHasCopiedSnippet(false), 3000);
+  };
+
   return (
     <div className="space-y-6">
       <div className="border-b border-slate-200 pb-4">
@@ -133,7 +313,7 @@ export const SettingsPage: React.FC = () => {
           Institution Administration & Settings
         </h2>
         <p className="text-xs text-slate-500 mt-1">
-          Self-service institutional API keys, team role assignments, and security compliance
+          Self-service institutional API keys, team role assignments, webhooks, and security compliance
         </p>
 
         {/* Subtabs */}
@@ -149,6 +329,18 @@ export const SettingsPage: React.FC = () => {
           >
             <Key className="w-4 h-4" />
             <span>API Keys</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('webhooks')}
+            id="tab-webhooks"
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all ${
+              activeTab === 'webhooks'
+                ? 'bg-gov-navy text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-gov-navy'
+            }`}
+          >
+            <Webhook className="w-4 h-4" />
+            <span>Webhooks</span>
           </button>
           <button
             onClick={() => setActiveTab('users')}
@@ -176,6 +368,7 @@ export const SettingsPage: React.FC = () => {
           </button>
         </div>
       </div>
+
 
       {userSuccessMessage && (
         <div className="p-3 bg-green-50 border border-green-200 text-green-800 rounded-md text-xs font-semibold flex items-center gap-2">
@@ -420,6 +613,253 @@ export const SettingsPage: React.FC = () => {
         </div>
       )}
 
+      {/* TAB 4: WEBHOOKS */}
+      {activeTab === 'webhooks' && (
+        <div className="space-y-6">
+          {testFeedback && (
+            <div className="p-3 bg-blue-50 border border-blue-200 text-blue-900 rounded-lg text-xs font-semibold flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
+              <span>{testFeedback}</span>
+            </div>
+          )}
+
+          {/* REGISTERED WEBHOOKS */}
+          <Card>
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-100">
+              <div>
+                <CardTitle className="text-base text-gov-navy flex items-center gap-2">
+                  <Webhook className="w-5 h-5 text-gov-navy" />
+                  <span>Configured Webhook Endpoints</span>
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Real-time HMAC-signed HTTP notifications dispatched on batch ingestion, student lifecycle, and transfer events
+                </CardDescription>
+              </div>
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => setIsWebhookModalOpen(true)}
+                id="register-webhook-btn"
+                data-testid="register-webhook-btn"
+                className="bg-gov-navy hover:bg-gov-navyDark text-white shrink-0"
+              >
+                <Plus className="w-4 h-4 mr-1.5" />
+                Register Webhook
+              </Button>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <Table id="webhooks-table">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Target URL</TableHead>
+                    <TableHead>Subscribed Events</TableHead>
+                    <TableHead>Secret</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {webhooks.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center text-xs text-slate-500 py-6">
+                        No webhooks registered. Click "Register Webhook" to integrate campus ERP.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    webhooks.map((wh) => (
+                      <TableRow key={wh.id} className="hover:bg-slate-50/50">
+                        <TableCell className="font-mono text-xs font-semibold text-slate-800 max-w-xs truncate">
+                          {wh.url}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1">
+                            {wh.events.map((ev) => (
+                              <span
+                                key={ev}
+                                className="text-[10px] bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded font-mono font-medium border border-slate-200"
+                              >
+                                {ev}
+                              </span>
+                            ))}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <code className="text-[11px] font-mono text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                            {wh.secret_masked}
+                          </code>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-green-100 text-green-800 border border-green-200">
+                            ACTIVE
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-xs text-slate-500">
+                          {new Date(wh.created_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs h-7 px-2"
+                              onClick={() => handleSendTestWebhook(wh.id)}
+                              id="send-test-btn"
+                              data-testid="send-test-btn"
+                            >
+                              <Send className="w-3 h-3 mr-1" />
+                              Send Test
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-xs h-7 px-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                              onClick={() => handleDeleteWebhook(wh.id)}
+                              id={`delete-webhook-${wh.id}`}
+                              data-testid={`delete-webhook-${wh.id}`}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          {/* DELIVERY LOG */}
+          <Card>
+            <CardHeader className="pb-3 border-b border-slate-100">
+              <CardTitle className="text-base text-gov-navy flex items-center justify-between">
+                <span>Webhook Delivery Log & Telemetry</span>
+                <span className="text-xs font-normal text-slate-500">Last 10 Dispatches</span>
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Inspection log with HTTP status codes, latency, and automatic exponential backoff retry counts
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <Table id="delivery-log-table">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Event Type</TableHead>
+                    <TableHead>Timestamp</TableHead>
+                    <TableHead>HTTP Status</TableHead>
+                    <TableHead>Latency</TableHead>
+                    <TableHead>Retry Count</TableHead>
+                    <TableHead>Payload Summary</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {webhooks.flatMap((w) => w.deliveries).length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center text-xs text-slate-500 py-6">
+                        No delivery events recorded yet. Send a test ping to verify endpoint connectivity.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    webhooks
+                      .flatMap((w) => w.deliveries)
+                      .map((del) => (
+                        <TableRow key={del.id} className="hover:bg-slate-50/50">
+                          <TableCell className="font-mono text-xs font-bold text-slate-800">
+                            {del.event}
+                          </TableCell>
+                          <TableCell className="text-xs text-slate-500">
+                            {new Date(del.delivered_at).toLocaleTimeString()}
+                          </TableCell>
+                          <TableCell>
+                            <span
+                              className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded border ${
+                                del.status_code === 200
+                                  ? 'bg-green-100 text-green-800 border-green-200'
+                                  : 'bg-red-100 text-red-800 border-red-200'
+                              }`}
+                            >
+                              {del.status_code} {del.status_code === 200 ? 'OK' : 'ERR'}
+                            </span>
+                          </TableCell>
+                          <TableCell className="font-mono text-xs text-slate-600">
+                            {del.response_time_ms} ms
+                          </TableCell>
+                          <TableCell className="font-mono text-xs text-slate-600">
+                            {del.retry_count} retries
+                          </TableCell>
+                          <TableCell className="text-xs text-slate-500 max-w-xs truncate font-mono">
+                            {del.payload_summary}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          {/* SIGNATURE VERIFICATION SNIPPET */}
+          <Card>
+            <CardHeader className="pb-3 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <CardTitle className="text-base text-gov-navy flex items-center gap-2">
+                  <Code2 className="w-5 h-5 text-gov-navy" />
+                  <span>HMAC-SHA256 Signature Verification Snippet</span>
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Copy and paste into your server backend to authenticate the X-EduVerify-Signature request header
+                </CardDescription>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+                  <button
+                    onClick={() => setCodeLanguage('nodejs')}
+                    className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
+                      codeLanguage === 'nodejs' ? 'bg-white text-gov-navy shadow-xs' : 'text-slate-600'
+                    }`}
+                  >
+                    Node.js
+                  </button>
+                  <button
+                    onClick={() => setCodeLanguage('python')}
+                    className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
+                      codeLanguage === 'python' ? 'bg-white text-gov-navy shadow-xs' : 'text-slate-600'
+                    }`}
+                  >
+                    Python
+                  </button>
+                  <button
+                    onClick={() => setCodeLanguage('go')}
+                    className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
+                      codeLanguage === 'go' ? 'bg-white text-gov-navy shadow-xs' : 'text-slate-600'
+                    }`}
+                  >
+                    Go
+                  </button>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopySnippet}
+                  id="copy-snippet-btn"
+                  className="flex items-center gap-1.5 text-xs"
+                >
+                  {hasCopiedSnippet ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{hasCopiedSnippet ? 'Copied' : 'Copy Snippet'}</span>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <pre className="p-4 bg-slate-900 text-slate-100 rounded-lg text-xs font-mono overflow-x-auto leading-relaxed">
+                <code>{getSignatureSnippet()}</code>
+              </pre>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+
       {/* MODAL: CREATE API KEY */}
       {isKeyModalOpen && (
         <div
@@ -615,6 +1055,150 @@ export const SettingsPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* MODAL: REGISTER WEBHOOK */}
+      {isWebhookModalOpen && (
+        <div
+          role="dialog"
+          aria-labelledby="webhook-modal-title"
+          className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in"
+        >
+          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 border-t-4 border-gov-navy space-y-4">
+            <h3 id="webhook-modal-title" className="text-lg font-bold text-gov-navy flex items-center gap-2">
+              <Webhook className="w-5 h-5 text-gov-navy" />
+              <span>Register New Webhook</span>
+            </h3>
+
+            <form onSubmit={handleCreateWebhook} className="space-y-4">
+              <div>
+                <label htmlFor="webhook-url-input" className="block text-xs font-semibold text-slate-700 mb-1">
+                  Endpoint Destination URL <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  id="webhook-url-input"
+                  type="url"
+                  value={newWebhookUrl}
+                  onChange={(e) => setNewWebhookUrl(e.target.value)}
+                  placeholder="https://campus.institution.ac.in/api/v1/eduverify-listener"
+                  required
+                  className="w-full text-xs font-mono"
+                />
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Must be an accessible HTTPS endpoint capable of receiving JSON POST payloads.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-2">
+                  Subscribed Event Topics
+                </label>
+                <div className="space-y-2 border border-slate-200 rounded-lg p-3 bg-slate-50 text-xs">
+                  {[
+                    { id: 'batch.committed', label: 'batch.committed: Student batch committed to central registry' },
+                    { id: 'student.transitioned', label: 'student.transitioned: Student lifecycle state changed' },
+                    { id: 'transfer.requested', label: 'transfer.requested: Inbound or outbound transfer initiated' },
+                    { id: 'transfer.approved', label: 'transfer.approved: Inter-institution transfer decided' },
+                    { id: 'issue.flagged', label: 'issue.flagged: High/Critical data quality rule violated' },
+                  ].map((evt) => (
+                    <label key={evt.id} className="flex items-center gap-2 text-slate-800 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selectedWebhookEvents.includes(evt.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedWebhookEvents([...selectedWebhookEvents, evt.id]);
+                          } else {
+                            setSelectedWebhookEvents(selectedWebhookEvents.filter((x) => x !== evt.id));
+                          }
+                        }}
+                        className="rounded border-slate-300 text-gov-navy focus:ring-gov-saffron"
+                      />
+                      <span>{evt.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                <Button variant="outline" size="sm" type="button" onClick={() => setIsWebhookModalOpen(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="default"
+                  size="sm"
+                  type="submit"
+                  disabled={!newWebhookUrl.trim() || selectedWebhookEvents.length === 0}
+                  id="confirm-create-webhook-btn"
+                  className="bg-gov-navy text-white"
+                >
+                  Register Endpoint
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: WEBHOOK SECRET SHOWN ONCE */}
+      {newlyCreatedSecret && (
+        <div
+          role="dialog"
+          aria-labelledby="secret-modal-title"
+          className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in"
+        >
+          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 border-t-4 border-amber-500 space-y-4">
+            <h3 id="secret-modal-title" className="text-lg font-bold text-gov-navy flex items-center gap-2">
+              <Lock className="w-5 h-5 text-amber-600" />
+              <span>Webhook Signing Secret Generated</span>
+            </h3>
+
+            <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-xs space-y-2">
+              <p className="font-bold text-amber-900 flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>Notice: Secret Displayed Only Once</span>
+              </p>
+              <p className="text-amber-800 leading-relaxed">
+                For security reasons, this HMAC shared secret will <strong>never be displayed again</strong>.
+                Store it in your server's secure vault or environment variables to verify incoming event signatures.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                HMAC Signing Secret Key
+              </label>
+              <div className="flex items-center gap-2 bg-slate-100 border border-slate-300 rounded-lg p-2.5">
+                <code id="webhook-secret-display" className="font-mono text-xs text-slate-900 font-bold flex-1 select-all break-all">
+                  {newlyCreatedSecret}
+                </code>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopySecret}
+                  id="copy-webhook-secret-btn"
+                  className="shrink-0 flex items-center gap-1 h-8 px-2.5"
+                >
+                  {hasCopiedSecret ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{hasCopiedSecret ? 'Copied' : 'Copy'}</span>
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2 border-t border-slate-100">
+              <Button
+                variant="default"
+                size="sm"
+                onClick={handleCloseSecretModal}
+                id="dismiss-secret-modal-btn"
+                className="bg-gov-navy text-white"
+              >
+                I Have Safely Saved This Secret
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+
   );
 };
