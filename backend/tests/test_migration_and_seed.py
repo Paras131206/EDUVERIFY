@@ -93,8 +93,8 @@ def test_alembic_upgrade_downgrade_cycle(tmp_path):
         assert "student_records" in tables_0002
         assert "corrections" in tables_0002
 
-        # Step 3: Downgrade 0002 -> 0001 (-1)
-        command.downgrade(cfg, "-1")
+        # Step 3: Downgrade back to 0001 (auth only)
+        command.downgrade(cfg, "0001_initial_auth")
         inspector = inspect(test_engine)
         tables_downgraded = set(inspector.get_table_names())
         assert "states" not in tables_downgraded

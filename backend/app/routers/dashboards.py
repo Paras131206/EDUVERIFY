@@ -113,3 +113,60 @@ def get_institution_dq_trend(
 ) -> InstitutionDqTrend:
     """Returns batch-by-batch historical DQ progression and trend direction."""
     return get_institution_dq_trend_service(db, principal=principal, institution_id=institution_id)
+
+
+# OpenAPI Contract compatibility aliases
+@router.get(
+    "/aicte",
+    response_model=AicteSummaryDashboard,
+    summary="AICTE summary dashboard alias",
+)
+def get_aicte_summary_alias(db: Session = Depends(get_db)) -> AicteSummaryDashboard:
+    return get_aicte_summary_service(db)
+
+
+@router.get(
+    "/map",
+    response_model=AicteMapMetricResponse,
+    summary="Geographic map breakdown alias",
+)
+def get_aicte_map_alias(
+    metric: str = Query("coverage"),
+    db: Session = Depends(get_db),
+) -> AicteMapMetricResponse:
+    return get_aicte_map_metric_service(db, metric=metric)
+
+
+@router.get(
+    "/leaderboards",
+    response_model=AicteLeaderboards,
+    summary="National leaderboards alias",
+)
+def get_aicte_leaderboards_alias(db: Session = Depends(get_db)) -> AicteLeaderboards:
+    return get_aicte_leaderboards_service(db)
+
+
+@router.get(
+    "/anomalies",
+    response_model=list[AnomalyFeedItem],
+    summary="Real-time anomalies feed alias",
+)
+def get_aicte_anomalies_alias(
+    limit: int = Query(50, ge=1, le=200),
+    db: Session = Depends(get_db),
+) -> list[AnomalyFeedItem]:
+    return get_aicte_anomalies_feed_service(db, limit=limit)
+
+
+@router.get(
+    "/institution/{institution_id}",
+    response_model=InstitutionSummaryDashboard,
+    summary="Institution dashboard by ID alias",
+)
+def get_institution_by_id_alias(
+    institution_id: str,
+    principal: Principal = Depends(get_current_principal),
+    db: Session = Depends(get_db),
+) -> InstitutionSummaryDashboard:
+    return get_institution_summary_service(db, principal=principal, institution_id=institution_id)
+
