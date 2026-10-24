@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { ApiKeyItem, CreatedApiKey, InstitutionUserItem } from '@/types/auth';
 import { WebhookConfigItem } from '@/features/institution/types';
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, authFetch } from '@/lib/api';
 import {
   Key,
   Users,
@@ -73,7 +73,7 @@ export const SettingsPage: React.FC = () => {
   // Fetch API Keys
   const loadApiKeys = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/v1/api-keys`);
+      const res = await authFetch(`${API_BASE_URL}/v1/api-keys`);
       if (res.ok) {
         const data = await res.json();
         setApiKeys(data);
@@ -86,7 +86,7 @@ export const SettingsPage: React.FC = () => {
   // Fetch Users
   const loadUsers = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/v1/users`);
+      const res = await authFetch(`${API_BASE_URL}/v1/users`);
       if (res.ok) {
         const data = await res.json();
         setUsers(data);
@@ -99,7 +99,7 @@ export const SettingsPage: React.FC = () => {
   // Fetch Webhooks
   const loadWebhooks = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/v1/webhooks`);
+      const res = await authFetch(`${API_BASE_URL}/v1/webhooks`);
       if (res.ok) {
         const data = await res.json();
         setWebhooks(data);
@@ -121,7 +121,7 @@ export const SettingsPage: React.FC = () => {
     if (!newKeyName.trim()) return;
 
     try {
-      const res = await fetch(`${API_BASE_URL}/v1/api-keys`, {
+      const res = await authFetch(`${API_BASE_URL}/v1/api-keys`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newKeyName, scopes: selectedScopes }),
@@ -140,7 +140,7 @@ export const SettingsPage: React.FC = () => {
 
   const handleRevokeApiKey = async (id: string) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/v1/api-keys/${id}`, { method: 'DELETE' });
+      const res = await authFetch(`${API_BASE_URL}/v1/api-keys/${id}`, { method: 'DELETE' });
       if (res.ok) {
         loadApiKeys();
       }
@@ -169,7 +169,7 @@ export const SettingsPage: React.FC = () => {
     if (!inviteEmail.trim()) return;
 
     try {
-      const res = await fetch(`${API_BASE_URL}/v1/users/invite`, {
+      const res = await authFetch(`${API_BASE_URL}/v1/users/invite`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: inviteEmail, role: inviteRole }),
@@ -191,7 +191,7 @@ export const SettingsPage: React.FC = () => {
     if (!newWebhookUrl.trim()) return;
 
     try {
-      const res = await fetch(`${API_BASE_URL}/v1/webhooks`, {
+      const res = await authFetch(`${API_BASE_URL}/v1/webhooks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -216,7 +216,7 @@ export const SettingsPage: React.FC = () => {
 
   const handleDeleteWebhook = async (id: string) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/v1/webhooks/${id}`, { method: 'DELETE' });
+      const res = await authFetch(`${API_BASE_URL}/v1/webhooks/${id}`, { method: 'DELETE' });
       if (res.ok) {
         loadWebhooks();
       }
@@ -228,7 +228,7 @@ export const SettingsPage: React.FC = () => {
   const handleSendTestWebhook = async (id: string) => {
     try {
       setTestFeedback('Dispatching test ping to webhook URL...');
-      const res = await fetch(`${API_BASE_URL}/v1/webhooks/${id}/test`, { method: 'POST' });
+      const res = await authFetch(`${API_BASE_URL}/v1/webhooks/${id}/test`, { method: 'POST' });
       if (res.ok) {
         setTestFeedback('Ping delivery succeeded (HTTP 200 OK)');
         loadWebhooks();

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useOptionalAuth } from '@/lib/auth';
+import { authFetch } from '@/lib/api';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { QualityScoreGauge } from '@/components/shared/QualityScoreGauge';
@@ -72,7 +73,7 @@ export const ReviewPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/v1/batches/${batchId}/report`);
+      const res = await authFetch(`/v1/batches/${batchId}/report`);
       if (!res.ok) {
         throw new Error(`Failed to load batch report (HTTP ${res.status})`);
       }
@@ -122,7 +123,7 @@ export const ReviewPage: React.FC = () => {
   // Issue Action Handlers
   const handleAcceptFix = async (issueId: string) => {
     try {
-      const res = await fetch(`/v1/issues/${issueId}/decide`, {
+      const res = await authFetch(`/v1/issues/${issueId}/decide`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ decision: 'ACCEPT_FIX', user_role: userRole }),
@@ -144,7 +145,7 @@ export const ReviewPage: React.FC = () => {
 
   const handleEditValue = async (issueId: string, newValue: string) => {
     try {
-      const res = await fetch(`/v1/issues/${issueId}/decide`, {
+      const res = await authFetch(`/v1/issues/${issueId}/decide`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -169,7 +170,7 @@ export const ReviewPage: React.FC = () => {
 
   const handleDismiss = async (issueId: string, note: string) => {
     try {
-      const res = await fetch(`/v1/issues/${issueId}/decide`, {
+      const res = await authFetch(`/v1/issues/${issueId}/decide`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -195,7 +196,7 @@ export const ReviewPage: React.FC = () => {
   // Staff Propose Handlers
   const handleProposeFix = async (issueId: string) => {
     try {
-      const res = await fetch(`/v1/issues/${issueId}/decide`, {
+      const res = await authFetch(`/v1/issues/${issueId}/decide`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ decision: 'PROPOSE_FIX', user_role: userRole }),
@@ -214,7 +215,7 @@ export const ReviewPage: React.FC = () => {
 
   const handleProposeEdit = async (issueId: string, newValue: string) => {
     try {
-      const res = await fetch(`/v1/issues/${issueId}/decide`, {
+      const res = await authFetch(`/v1/issues/${issueId}/decide`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -241,7 +242,7 @@ export const ReviewPage: React.FC = () => {
 
   const handleProposeDismiss = async (issueId: string, note: string) => {
     try {
-      const res = await fetch(`/v1/issues/${issueId}/decide`, {
+      const res = await authFetch(`/v1/issues/${issueId}/decide`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -269,7 +270,7 @@ export const ReviewPage: React.FC = () => {
   // Bulk Actions
   const handleBulkAcceptInfo = async () => {
     try {
-      const res = await fetch(`/v1/batches/${batchId}/issues/bulk-decide`, {
+      const res = await authFetch(`/v1/batches/${batchId}/issues/bulk-decide`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'ACCEPT_INFO' }),
@@ -300,7 +301,7 @@ export const ReviewPage: React.FC = () => {
 
   const handleBulkDismissSelected = async (issueIds: string[], note: string) => {
     try {
-      const res = await fetch(`/v1/batches/${batchId}/issues/bulk-decide`, {
+      const res = await authFetch(`/v1/batches/${batchId}/issues/bulk-decide`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -338,7 +339,7 @@ export const ReviewPage: React.FC = () => {
     decision: 'SAME_PERSON' | 'DIFFERENT_PEOPLE' | 'TRANSFER'
   ) => {
     try {
-      const res = await fetch(`/v1/duplicates/${clusterId}/resolve`, {
+      const res = await authFetch(`/v1/duplicates/${clusterId}/resolve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ resolution: decision }),
@@ -370,7 +371,7 @@ export const ReviewPage: React.FC = () => {
     }, 150);
 
     try {
-      const res = await fetch(`/v1/batches/${batchId}/revalidate`, {
+      const res = await authFetch(`/v1/batches/${batchId}/revalidate`, {
         method: 'POST',
       });
       clearInterval(progressInterval);
@@ -400,7 +401,7 @@ export const ReviewPage: React.FC = () => {
   const handleCommitConfirm = async () => {
     setIsCommitting(true);
     try {
-      const res = await fetch(`/v1/batches/${batchId}/commit`, {
+      const res = await authFetch(`/v1/batches/${batchId}/commit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ version: 1 }),

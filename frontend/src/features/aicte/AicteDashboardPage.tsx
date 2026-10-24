@@ -42,7 +42,7 @@ import {
   mockTrustList,
   mockRolloverDryRun,
 } from '@/mocks/data';
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, authFetch } from '@/lib/api';
 import {
   ShieldCheck,
   ShieldAlert,
@@ -122,7 +122,7 @@ export const AicteDashboardPage: React.FC = () => {
     try {
       // 1. Fetch AICTE Summary
       try {
-        const sumRes = await fetch(`${API_BASE_URL}/v1/dashboards/aicte/summary`);
+        const sumRes = await authFetch(`${API_BASE_URL}/v1/dashboards/aicte/summary`);
         if (sumRes.ok) {
           const sumData = await sumRes.json();
           setSummary(sumData);
@@ -133,7 +133,7 @@ export const AicteDashboardPage: React.FC = () => {
 
       // 2. Fetch Audit Chain Verification for Header Badge
       try {
-        const auditRes = await fetch(`${API_BASE_URL}/v1/audit/verify-chain`);
+        const auditRes = await authFetch(`${API_BASE_URL}/v1/audit/verify-chain`);
         if (auditRes.ok) {
           const auditData = await auditRes.json();
           setAuditVerdict(auditData);
@@ -144,7 +144,7 @@ export const AicteDashboardPage: React.FC = () => {
 
       // 3. Fetch Map Metrics
       try {
-        const mapRes = await fetch(`${API_BASE_URL}/v1/dashboards/aicte/map`);
+        const mapRes = await authFetch(`${API_BASE_URL}/v1/dashboards/aicte/map`);
         if (mapRes.ok) {
           const mapData = await mapRes.json();
           if (Array.isArray(mapData) && mapData.length > 0) {
@@ -157,7 +157,7 @@ export const AicteDashboardPage: React.FC = () => {
 
       // 4. Fetch Leaderboards
       try {
-        const lbRes = await fetch(`${API_BASE_URL}/v1/dashboards/aicte/leaderboards`);
+        const lbRes = await authFetch(`${API_BASE_URL}/v1/dashboards/aicte/leaderboards`);
         if (lbRes.ok) {
           const lbData = await lbRes.json();
           setLeaderboards(lbData);
@@ -168,7 +168,7 @@ export const AicteDashboardPage: React.FC = () => {
 
       // 5. Fetch Quotas
       try {
-        const quotaRes = await fetch(`${API_BASE_URL}/v1/dashboards/aicte/quotas`);
+        const quotaRes = await authFetch(`${API_BASE_URL}/v1/dashboards/aicte/quotas`);
         if (quotaRes.ok) {
           const quotaData = await quotaRes.json();
           if (quotaData.schemes) setSchemes(quotaData.schemes);
@@ -180,7 +180,7 @@ export const AicteDashboardPage: React.FC = () => {
 
       // 6. Fetch Duplicates
       try {
-        const dupRes = await fetch(`${API_BASE_URL}/v1/dashboards/aicte/duplicates`);
+        const dupRes = await authFetch(`${API_BASE_URL}/v1/dashboards/aicte/duplicates`);
         if (dupRes.ok) {
           const dupData = await dupRes.json();
           if (Array.isArray(dupData) && dupData.length > 0) {
@@ -193,7 +193,7 @@ export const AicteDashboardPage: React.FC = () => {
 
       // 7. Fetch Anomalies
       try {
-        const anomRes = await fetch(`${API_BASE_URL}/v1/dashboards/aicte/anomalies`);
+        const anomRes = await authFetch(`${API_BASE_URL}/v1/dashboards/aicte/anomalies`);
         if (anomRes.ok) {
           const anomData = await anomRes.json();
           if (Array.isArray(anomData) && anomData.length > 0) {
@@ -206,7 +206,7 @@ export const AicteDashboardPage: React.FC = () => {
 
       // 8. Fetch Reconciliation
       try {
-        const recRes = await fetch(`${API_BASE_URL}/v1/dashboards/aicte/reconciliation`);
+        const recRes = await authFetch(`${API_BASE_URL}/v1/dashboards/aicte/reconciliation`);
         if (recRes.ok) {
           const recData = await recRes.json();
           if (Array.isArray(recData) && recData.length > 0) {
@@ -219,7 +219,7 @@ export const AicteDashboardPage: React.FC = () => {
 
       // 9. Fetch Audit Log
       try {
-        const logRes = await fetch(`${API_BASE_URL}/v1/audit/log`);
+        const logRes = await authFetch(`${API_BASE_URL}/v1/audit/log`);
         if (logRes.ok) {
           const logData = await logRes.json();
           if (Array.isArray(logData) && logData.length > 0) {
@@ -232,7 +232,7 @@ export const AicteDashboardPage: React.FC = () => {
 
       // 10. Fetch Trust List
       try {
-        const trustRes = await fetch(`${API_BASE_URL}/v1/admin/trust-list`);
+        const trustRes = await authFetch(`${API_BASE_URL}/v1/admin/trust-list`);
         if (trustRes.ok) {
           const trustData = await trustRes.json();
           if (Array.isArray(trustData) && trustData.length > 0) {
@@ -245,7 +245,7 @@ export const AicteDashboardPage: React.FC = () => {
 
       // 11. Fetch Rollover Dry Run
       try {
-        const rollRes = await fetch(`${API_BASE_URL}/v1/admin/rollover`, {
+        const rollRes = await authFetch(`${API_BASE_URL}/v1/admin/rollover`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ dry_run: true }),
@@ -260,7 +260,7 @@ export const AicteDashboardPage: React.FC = () => {
 
       // 12. Fetch Initial Ticker
       try {
-        const tickRes = await fetch(`${API_BASE_URL}/v1/events/ticker`);
+        const tickRes = await authFetch(`${API_BASE_URL}/v1/events/ticker`);
         if (tickRes.ok) {
           const tickData = await tickRes.json();
           if (Array.isArray(tickData) && tickData.length > 0) {
@@ -285,7 +285,7 @@ export const AicteDashboardPage: React.FC = () => {
   const handleVerifyAuditChain = async () => {
     setIsVerifyingHeaderAudit(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/v1/audit/verify-chain`);
+      const res = await authFetch(`${API_BASE_URL}/v1/audit/verify-chain`);
       if (res.ok) {
         const data = await res.json();
         setAuditVerdict(data);

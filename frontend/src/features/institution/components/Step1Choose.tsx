@@ -13,7 +13,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, authFetch, getAuthToken } from '@/lib/api';
 import { BatchItem } from '../types';
 
 interface Step1ChooseProps {
@@ -35,7 +35,7 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
   // Fetch academic years master and existing batches
   useEffect(() => {
     let mounted = true;
-    fetch(`${API_BASE_URL}/v1/master/academic-years`)
+    authFetch(`${API_BASE_URL}/v1/master/academic-years`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data: { academic_year: string; is_current?: boolean }[]) => {
         if (!mounted || !data.length) return;
@@ -46,7 +46,7 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
       })
       .catch(() => {});
 
-    fetch(`${API_BASE_URL}/v1/batches`)
+    authFetch(`${API_BASE_URL}/v1/batches`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data: BatchItem[]) => {
         if (mounted && Array.isArray(data)) {
@@ -116,23 +116,29 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
       formData.append('supersedes_batch_id', supersedesBatchId);
     }
 
+    const token = getAuthToken();
+    const authHeaders: Record<string, string> = {
+      'Idempotency-Key': idempotencyKey,
+    };
+    if (token) {
+      authHeaders['Authorization'] = `Bearer ${token}`;
+    }
+
     try {
       let response: Response;
       try {
-        response = await fetch(`${API_BASE_URL}/v1/batches`, {
+        response = await authFetch(`${API_BASE_URL}/v1/batches`, {
           method: 'POST',
-          headers: {
-            'Idempotency-Key': idempotencyKey,
-          },
+          headers: authHeaders,
           body: formData,
         });
       } catch {
         // Fallback for test / JSDOM environments where FormData file streaming fails
-        response = await fetch(`${API_BASE_URL}/v1/batches`, {
+        response = await authFetch(`${API_BASE_URL}/v1/batches`, {
           method: 'POST',
           headers: {
+            ...authHeaders,
             'Content-Type': 'application/json',
-            'Idempotency-Key': idempotencyKey,
           },
           body: JSON.stringify({
             filename: file.name,
@@ -155,8 +161,24 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
       }
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Upload failed');
+        let msg = 'Upload failed';
+        try {
+          const errorJson = await response.json();
+          if (response.status === 401) {
+            msg = 'Authentication required. Your session may have expired — please sign in again.';
+          } else if (typeof errorJson.detail === 'string') {
+            msg = errorJson.detail;
+          } else if (errorJson.detail && typeof errorJson.detail.detail === 'string') {
+            msg = errorJson.detail.detail;
+          } else if (errorJson.message) {
+            msg = errorJson.message;
+          } else {
+            msg = typeof errorJson === 'object' ? JSON.stringify(errorJson) : String(errorJson);
+          }
+        } catch {
+          msg = (await response.text()) || 'Upload failed';
+        }
+        throw new Error(msg);
       }
 
       const createdBatch = await response.json();
@@ -252,10 +274,20 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
       {errorMessage && (
         <div
           role="alert"
-          className="p-3 bg-red-50 border border-red-200 rounded-md text-xs text-red-700 flex items-center gap-2"
+          className="p-3 bg-red-50 border border-red-200 rounded-md text-xs text-red-700 flex items-center justify-between gap-3 shadow-xs"
         >
-          <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
-          <span>{errorMessage}</span>
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
+            <span>{errorMessage}</span>
+          </div>
+          {errorMessage.toLowerCase().includes('authentication') || errorMessage.toLowerCase().includes('sign in') || errorMessage.toLowerCase().includes('log in') ? (
+            <Link
+              to="/login"
+              className="font-semibold text-gov-navy hover:underline shrink-0 bg-white px-2.5 py-1 rounded border border-red-200 text-xs shadow-xs"
+            >
+              Sign In &rarr;
+            </Link>
+          ) : null}
         </div>
       )}
 

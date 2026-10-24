@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, authFetch } from '@/lib/api';
 import {
   StudentOwnRecord,
   StudentVersionHistoryItem,
@@ -69,10 +69,10 @@ export const StudentWalletPage: React.FC = () => {
     setError(null);
     try {
       const [recRes, verRes, cstRes, credRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/v1/students/me`),
-        fetch(`${API_BASE_URL}/v1/students/me/versions`),
-        fetch(`${API_BASE_URL}/v1/students/me/consent`),
-        fetch(`${API_BASE_URL}/v1/credentials/me`),
+        authFetch(`${API_BASE_URL}/v1/students/me`),
+        authFetch(`${API_BASE_URL}/v1/students/me/versions`),
+        authFetch(`${API_BASE_URL}/v1/students/me/consent`),
+        authFetch(`${API_BASE_URL}/v1/credentials/me`),
       ]);
 
       if (!recRes.ok) {

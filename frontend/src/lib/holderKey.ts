@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, authFetch } from '@/lib/api';
 
 const DB_NAME = 'eduverify_holder_db';
 const DB_VERSION = 1;
@@ -151,7 +151,7 @@ export async function getOrInitHolderKey(autoRegister = true): Promise<{
 
   if (autoRegister) {
     try {
-      await fetch(`${API_BASE_URL}/v1/credentials/holder-key`, {
+      await authFetch(`${API_BASE_URL}/v1/credentials/holder-key`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

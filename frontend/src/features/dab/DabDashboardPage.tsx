@@ -6,6 +6,7 @@ import { MaskedValue } from '@/components/shared/MaskedValue';
 import { Scale, CheckCircle2, XCircle, Award, GraduationCap, Search, Eye, ShieldCheck, RefreshCw, AlertCircle } from 'lucide-react';
 import { DabGraduateItem, StudentCredentialItem, StudentOwnRecord } from '@/features/student/types';
 import { CertificateModal } from '@/features/student/components/CertificateModal';
+import { authFetch } from '@/lib/api';
 
 interface DisputeItem {
   id: string;
@@ -68,7 +69,7 @@ export const DabDashboardPage: React.FC = () => {
   const fetchGraduates = async () => {
     setGraduatesLoading(true);
     try {
-      const res = await fetch('/v1/dab/graduates');
+      const res = await authFetch('/v1/dab/graduates');
       if (res.ok) {
         const data = await res.json();
         setGraduates(data);
@@ -87,7 +88,7 @@ export const DabDashboardPage: React.FC = () => {
   const handleIssueCredential = async (studentId: string, studentName: string) => {
     setIssuingStudentId(studentId);
     try {
-      const res = await fetch('/v1/dab/credentials/issue', {
+      const res = await authFetch('/v1/dab/credentials/issue', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ student_id: studentId }),
