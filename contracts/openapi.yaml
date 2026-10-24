@@ -1430,6 +1430,42 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConsentRecord'
 
+  /v1/credentials/holder-key:
+    post:
+      tags: [Credentials]
+      summary: Register student browser WebCrypto public JWK
+      operationId: registerHolderKey
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [jwk]
+              properties:
+                jwk:
+                  type: object
+      responses:
+        '200':
+          description: Holder key registered
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, apaar_id, jwk]
+                properties:
+                  status:
+                    type: string
+                  apaar_id:
+                    type: string
+                  jwk:
+                    type: object
+                  registered_at:
+                    type: string
+                    format: date-time
+
   /v1/credentials/issue:
     post:
       tags: [Credentials]
@@ -1473,6 +1509,23 @@ paths:
                 items:
                   $ref: '#/components/schemas/CredentialMetadata'
 
+  /v1/credentials/me:
+    get:
+      tags: [Credentials]
+      summary: List credentials for current student
+      operationId: listMyCredentials
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Student credentials
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CredentialMetadata'
+
   /v1/credentials/{id}/revoke:
     post:
       tags: [Credentials]
@@ -1504,11 +1557,77 @@ paths:
         '200':
           description: Credential status updated
 
+  /v1/credentials/{id}/qr.png:
+    get:
+      tags: [Credentials]
+      summary: Retrieve PNG QR code
+      operationId: getCredentialQr
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: PNG QR code image
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+
+  /v1/credentials/{id}/certificate.pdf:
+    get:
+      tags: [Credentials]
+      summary: Retrieve PDF certificate
+      operationId: getCredentialCertificate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: PDF certificate document
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
   /v1/credentials/presentation-nonce:
     post:
       tags: [Credentials]
       summary: Generate fresh nonce for presentation verification
       operationId: generatePresentationNonce
+      responses:
+        '200':
+          description: Nonce generated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [nonce, expires_at]
+                properties:
+                  nonce:
+                    type: string
+                  expires_at:
+                    type: string
+                    format: date-time
+
+  /v1/verify/nonce:
+    get:
+      tags: [Verification]
+      summary: Generate fresh challenge nonce for presentation verification
+      operationId: getVerificationNonce
+      parameters:
+        - name: aud
+          in: query
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: Nonce generated
@@ -1560,6 +1679,59 @@ paths:
                   id:
                     type: string
                   verificationMethod:
+                    type: array
+                    items:
+                      type: object
+
+  /issuers/{issuer_id}/did.json:
+    get:
+      tags: [Decentralized Identifiers]
+      summary: Discover institution or DAB did:web document
+      operationId: getIssuerDidDocument
+      parameters:
+        - name: issuer_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: DID Document with Ed25519 public keys
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, verificationMethod]
+                properties:
+                  id:
+                    type: string
+                  verificationMethod:
+                    type: array
+                    items:
+                      type: object
+
+  /v1/trust-list:
+    get:
+      tags: [Verification]
+      summary: Retrieve AICTE-signed list of authorized issuer DIDs
+      operationId: getTrustList
+      responses:
+        '200':
+          description: Trust list response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [issuer, issued_at, trust_list, jwt]
+                properties:
+                  issuer:
+                    type: string
+                  issued_at:
+                    type: string
+                    format: date-time
+                  jwt:
+                    type: string
+                  trust_list:
                     type: array
                     items:
                       type: object

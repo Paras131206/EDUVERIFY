@@ -132,6 +132,23 @@ def get_current_principal(
     )
 
 
+def get_current_principal_optional(
+    request: Request,
+    authorization: str | None = Header(None),
+    x_api_key: str | None = Header(None, alias="X-API-Key"),
+    db: Session = Depends(get_db),
+) -> Principal | None:
+    """Optional dependency resolving authenticated principal if credentials exist, else None."""
+    if not authorization and not x_api_key:
+        return None
+    try:
+        return get_current_principal(
+            request=request, authorization=authorization, x_api_key=x_api_key, db=db
+        )
+    except HTTPException:
+        return None
+
+
 def require_roles(*allowed_roles: Any):
     """Factory creating an endpoint dependency enforcing allowed user roles."""
     flat_roles: set[str] = set()
