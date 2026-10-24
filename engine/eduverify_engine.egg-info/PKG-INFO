@@ -1,0 +1,67 @@
+Metadata-Version: 2.4
+Name: eduverify_engine
+Version: 0.0.1
+Summary: Pure Python rule, data validation and deduplication engine for EduVerify
+Author: EduVerify Team C (AI / Data)
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: pandas<4.0.0,>=2.2.0
+Requires-Dist: pydantic<3.0.0,>=2.7.0
+Requires-Dist: openpyxl>=3.1.0
+Requires-Dist: charset-normalizer>=3.3.0
+Requires-Dist: rapidfuzz>=3.9.0
+Requires-Dist: jellyfish>=1.0.0
+Requires-Dist: scikit-learn>=1.5.0
+Requires-Dist: pyyaml>=6.0.0
+Requires-Dist: numpy<3.0.0,>=1.26.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: ruff>=0.5.0; extra == "dev"
+Requires-Dist: fastapi>=0.115.0; extra == "dev"
+Requires-Dist: uvicorn[standard]>=0.30.0; extra == "dev"
+Requires-Dist: python-multipart>=0.0.9; extra == "dev"
+Requires-Dist: httpx>=0.27.0; extra == "dev"
+Provides-Extra: splink
+Requires-Dist: splink<5.0.0,>=4.0.0; extra == "splink"
+Requires-Dist: duckdb>=1.0.0; extra == "splink"
+
+# EduVerify AI / Data Engine (`eduverify_engine`)
+
+Team C's pure Python package for data parsing, smart column mapping, explainable validation (rules V001–V035), duplicate detection, schema drift, and data-quality reporting.
+
+## Installation
+
+From the repository root:
+```bash
+pip install -e "./engine[dev]"
+```
+
+Or using `uv`:
+```bash
+uv pip install -e "./engine[dev]"
+```
+
+## Running Tests
+
+```bash
+pytest engine/tests
+```
+
+Linting and formatting:
+```bash
+ruff check engine contracts
+ruff format --check engine
+```
+
+## Developer Harness
+
+To run the local developer API harness on port 8100:
+```bash
+uvicorn devserver:app --app-dir engine --port 8100 --reload
+```
+
+Endpoints:
+- `GET http://localhost:8100/healthz` — Service healthcheck
+- `GET http://localhost:8100/catalog` — Lists all V001–V035 validation rules
+- `POST http://localhost:8100/validate` — Validate uploaded CSV/XLSX file
+- Interactive Swagger docs: `http://localhost:8100/docs`

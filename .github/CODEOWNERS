@@ -1,0 +1,20 @@
+/frontend/            @team-a
+/docs/                @team-a
+/demo/                @team-a
+/reports/templates/   @team-a
+/.github/workflows/frontend.yml @team-a
+/backend/             @team-b
+/infra/               @team-b
+/render.yaml          @team-b
+/docker-compose.yml   @team-b
+/.env.example         @team-b
+/contracts/openapi.yaml  @team-b
+/contracts/schemas/      @team-b
+/.github/workflows/backend.yml  @team-b
+/.github/workflows/security.yml @team-b
+/engine/              @team-c
+/data/                @team-c
+/contracts/rule_catalog.yaml     @team-c
+/contracts/column_synonyms.yaml  @team-c
+/.github/workflows/engine.yml    @team-c
+/agents.md /steps.md /runthrough.md /prompts/ /.github/CODEOWNERS @lead
