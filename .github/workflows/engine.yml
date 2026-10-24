@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ruff bandit pytest
+          pip install ruff bandit pytest openpyxl python-multipart pandas anyio
           pip install -e "./engine[dev]"
 
       - name: Lint and Format Check (Ruff)
@@ -44,4 +44,6 @@ jobs:
 
       - name: Run Pytest
         run: |
-          cd engine && pytest -v
+          cd engine
+          PYTHONPATH=.. python -c "from data.generator.generate import generate_dataset; generate_dataset()"
+          pytest -v
