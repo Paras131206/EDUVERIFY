@@ -38,7 +38,7 @@ def test_schemathesis_spec_loads(repo_root):
     if hasattr(schemathesis, "experimental") and hasattr(schemathesis.experimental, "OPEN_API_3_1"):
         schemathesis.experimental.OPEN_API_3_1.enable()
 
-    schema = schemathesis.openapi.from_path(str(spec_path))
+    schema = schemathesis.from_path(str(spec_path))
     operations = list(schema.get_all_operations())
     assert len(operations) > 50, f"Expected >50 operations, got {len(operations)}"
 

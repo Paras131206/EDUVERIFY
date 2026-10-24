@@ -203,7 +203,8 @@ def client(db_session: Session) -> Generator[TestClient, None, None]:
     limiter.reset()
 
 
-def make_auth_headers(user: User) -> dict[str, str]:
+def make_auth_headers(user: User | None) -> dict[str, str]:
     """Generates Authorization: Bearer <jwt> headers for a user."""
+    assert user is not None, "Cannot make auth headers for None user"
     token = create_access_token(user)
     return {"Authorization": f"Bearer {token}"}

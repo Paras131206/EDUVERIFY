@@ -64,7 +64,7 @@ class JSONFormatter(logging.Formatter):
 
         # Include request_id if available on the record
         if hasattr(record, "request_id"):
-            log_data["request_id"] = record.request_id
+            log_data["request_id"] = getattr(record, "request_id")  # noqa: B009
 
         if record.exc_info:
             log_data["exception"] = self.formatException(record.exc_info)

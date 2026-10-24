@@ -242,7 +242,10 @@ def generate_student_upload_template(db: Session | None = None) -> bytes:
     # Sheet 1: StudentData
     # -------------------------------------------------------------
     ws_data = wb.active
-    ws_data.title = "StudentData"
+    if ws_data is None:
+        ws_data = wb.create_sheet(title="StudentData")
+    else:
+        ws_data.title = "StudentData"
 
     # Write column headers
     for col_idx, (col_name, _friendly_name, is_req) in enumerate(CANONICAL_COLUMNS, start=1):

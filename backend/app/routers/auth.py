@@ -113,7 +113,8 @@ def login(
     if not verify_password(body.password, user.password_hash):
         user.failed_logins += 1
         if user.failed_logins >= 5:
-            user.locked_until = now + timedelta(minutes=15)
+            lock_time = now + timedelta(minutes=15)
+            user.locked_until = lock_time
             append_audit_log(
                 db,
                 action="LOCKOUT",
@@ -123,7 +124,7 @@ def login(
                 resource="AUTH",
                 payload={
                     "reason": "max_failed_logins",
-                    "locked_until": user.locked_until.isoformat(),
+                    "locked_until": lock_time.isoformat(),
                 },
                 ip_address=ip_addr,
             )
