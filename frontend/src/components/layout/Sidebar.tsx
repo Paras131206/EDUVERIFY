@@ -88,9 +88,9 @@ export const Sidebar: React.FC = () => {
     // DAB items
     {
       to: '/dab',
-      label: 'DAB Appeals Docket',
+      label: 'DAB Portal & Degrees',
       icon: <Scale className="w-4 h-4" aria-hidden="true" />,
-      visible: !role || role === 'DAB_MEMBER',
+      visible: !role || role === 'DAB_MEMBER' || role === 'DAB_ADMIN',
     },
     // Student items
     {

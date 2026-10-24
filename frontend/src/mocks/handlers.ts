@@ -33,7 +33,22 @@ import {
   mockMasterDabs,
   mockMasterPrograms,
   mockMasterAcademicYears,
+  mockStudentOwnRecord,
+  mockStudentVersionHistory,
+  mockConsentPurposes,
+  mockConsentHistory,
+  mockStudentCredentials,
+  mockDabGraduates,
 } from './data';
+import {
+  StudentOwnRecord,
+  StudentVersionHistoryItem,
+  ConsentPurposeSetting,
+  ConsentHistoryRecord,
+  StudentCredentialItem,
+  DabGraduateItem,
+} from '@/features/student/types';
+import { parsePresentation } from '@/lib/sdjwt';
 
 import {
   BatchItem,
@@ -78,6 +93,25 @@ export const resetAicteMock = () => {
 
 export const setMockAicteSummary = (summary: Partial<typeof mockAicteSummary>) => {
   aicteSummaryState = { ...aicteSummaryState, ...summary };
+};
+
+// Task A6: Trust UIs State (Student, Consent, Credentials, DAB)
+export let studentOwnRecordState: StudentOwnRecord = JSON.parse(JSON.stringify(mockStudentOwnRecord));
+export let studentVersionHistoryState: StudentVersionHistoryItem[] = JSON.parse(JSON.stringify(mockStudentVersionHistory));
+export let consentPurposesState: ConsentPurposeSetting[] = JSON.parse(JSON.stringify(mockConsentPurposes));
+export let consentHistoryState: ConsentHistoryRecord[] = JSON.parse(JSON.stringify(mockConsentHistory));
+export let studentCredentialsState: StudentCredentialItem[] = JSON.parse(JSON.stringify(mockStudentCredentials));
+export let dabGraduatesState: DabGraduateItem[] = JSON.parse(JSON.stringify(mockDabGraduates));
+export let holderRegisteredKeyState: any = null;
+
+export const resetTrustMock = () => {
+  studentOwnRecordState = JSON.parse(JSON.stringify(mockStudentOwnRecord));
+  studentVersionHistoryState = JSON.parse(JSON.stringify(mockStudentVersionHistory));
+  consentPurposesState = JSON.parse(JSON.stringify(mockConsentPurposes));
+  consentHistoryState = JSON.parse(JSON.stringify(mockConsentHistory));
+  studentCredentialsState = JSON.parse(JSON.stringify(mockStudentCredentials));
+  dabGraduatesState = JSON.parse(JSON.stringify(mockDabGraduates));
+  holderRegisteredKeyState = null;
 };
 
 export const resetOperationsMock = () => {
@@ -926,6 +960,77 @@ export const handlers = [
     });
   }),
 
+  /* =========================================================================
+     TASK A6: TRUST UIS ENDPOINTS (Student, Consent, Credentials, Verifier, DAB)
+     ========================================================================= */
+
+  // 1. Student own record (unmasked for self) - must be before :apaar_id
+  http.get('*/v1/students/me', () => {
+    return HttpResponse.json(studentOwnRecordState);
+  }),
+
+  // 2. Student record version history
+  http.get('*/v1/students/me/versions', () => {
+    return HttpResponse.json(studentVersionHistoryState);
+  }),
+
+  // 3. Student consent settings & history
+  http.get('*/v1/students/me/consent', () => {
+    return HttpResponse.json({
+      purposes: consentPurposesState,
+      history: consentHistoryState,
+    });
+  }),
+
+  // 4. Update student consent (withdrawing VERIFICATION_SHARE suspends credentials per §8.4)
+  http.post('*/v1/students/me/consent', async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as any;
+    const { purpose, action, notes } = body;
+
+    const target = consentPurposesState.find((p) => p.purpose === purpose);
+    if (!target) {
+      return HttpResponse.json({ message: 'Purpose not found' }, { status: 404 });
+    }
+
+    if (!target.can_toggle) {
+      return HttpResponse.json(
+        { message: 'Statutory consent purpose cannot be withdrawn' },
+        { status: 400 }
+      );
+    }
+
+    target.is_granted = action === 'GRANTED';
+
+    // Withdrawing VERIFICATION_SHARE suspends credentials per agents.md §8.4
+    if (purpose === 'VERIFICATION_SHARE') {
+      const newStatus = target.is_granted ? 'VALID' : 'SUSPENDED';
+      studentCredentialsState = studentCredentialsState.map((c) => ({
+        ...c,
+        status: newStatus as any,
+        status_reason: target.is_granted
+          ? undefined
+          : 'Suspended: Holder has withdrawn VERIFICATION_SHARE consent',
+      }));
+    }
+
+    const historyRecord: ConsentHistoryRecord = {
+      id: `cst-${Date.now()}`,
+      purpose,
+      action,
+      timestamp: new Date().toISOString(),
+      actor: 'Student (Self via Browser)',
+      notes: notes || `Consent status updated to ${action}`,
+    };
+    consentHistoryState = [historyRecord, ...consentHistoryState];
+
+    return HttpResponse.json({
+      success: true,
+      message: `Consent for ${purpose} set to ${action}`,
+      purposes: consentPurposesState,
+      history: consentHistoryState,
+    });
+  }),
+
   // Students & Lifecycle transitions
   http.get('*/v1/students', ({ request }) => {
     const url = new URL(request.url);
@@ -953,6 +1058,9 @@ export const handlers = [
   }),
 
   http.get('*/v1/students/:apaar_id', ({ params }) => {
+    if (params.apaar_id === 'me') {
+      return HttpResponse.json(studentOwnRecordState);
+    }
     const student = studentsState.find((s) => s.apaar_id === params.apaar_id);
     if (!student) {
       return HttpResponse.json({ message: 'Student record not found' }, { status: 404 });
@@ -1217,23 +1325,188 @@ export const handlers = [
     return HttpResponse.json({ message: 'Test ping delivered successfully', delivery: testDelivery });
   }),
 
-  http.post('*/v1/verify', () => {
+  // 5. Register holder public JWK (WebCrypto ECDSA P-256)
+  http.post('*/v1/credentials/holder-key', async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as any;
+    holderRegisteredKeyState = body;
     return HttpResponse.json({
+      registered: true,
+      holder_did: `did:key:${body?.jwk?.x ? String(body.jwk.x).slice(0, 16) : 'device-registered'}`,
+      device_label: body?.device_label || 'Current Web Device',
+      registered_at: new Date().toISOString(),
+    });
+  }),
+
+  // 6. Student credentials list
+  http.get('*/v1/credentials/me', () => {
+    return HttpResponse.json(studentCredentialsState);
+  }),
+
+  // 7. Nonce request for challenge-response presentation binding
+  http.get('*/v1/credentials/nonce', () => {
+    return HttpResponse.json({
+      nonce: `nonce-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      expires_in_seconds: 300,
+      issued_at: new Date().toISOString(),
+    });
+  }),
+
+  // 8. Public + Verifier verification endpoint (/v1/verify)
+  http.post('*/v1/verify', async ({ request }) => {
+    let body: any = {};
+    try {
+      body = await request.json();
+    } catch {
+      // ignore
+    }
+
+    const { sd_jwt_presentation } = body;
+    if (!sd_jwt_presentation || typeof sd_jwt_presentation !== 'string') {
+      return HttpResponse.json(
+        {
+          valid: false,
+          status: 'INVALID_SIGNATURE',
+          issuer: 'Unknown Issuer',
+          issuer_trusted: false,
+          verified_at: new Date().toISOString(),
+          checked_at: new Date().toISOString(),
+          disclosed_claims: {},
+          reasons: ['No presentation payload provided', 'Malformed payload'],
+          holder_bound: false,
+          error_message: 'Invalid presentation payload',
+        },
+        { status: 400 }
+      );
+    }
+
+    // A. Check if presentation is tampered / invalid
+    if (
+      sd_jwt_presentation.includes('TAMPERED') ||
+      sd_jwt_presentation.includes('INVALID') ||
+      sd_jwt_presentation.includes('corrupted')
+    ) {
+      return HttpResponse.json({
+        valid: false,
+        status: 'INVALID_SIGNATURE',
+        issuer: 'Delhi College of Engineering & Technology',
+        issuer_trusted: false,
+        verified_at: new Date().toISOString(),
+        checked_at: new Date().toISOString(),
+        disclosed_claims: {},
+        reasons: [
+          'Disclosure digest mismatch: calculated SHA-256 does not match issuer _sd digest',
+          'Cryptographic signature validation failed',
+        ],
+        holder_bound: false,
+        error_message: 'Cryptographic signature or disclosure digest mismatch',
+      });
+    }
+
+    // B. Check if student has withdrawn VERIFICATION_SHARE consent (Section 8.4)
+    const verificationConsent = consentPurposesState.find((p) => p.purpose === 'VERIFICATION_SHARE');
+    if (verificationConsent && !verificationConsent.is_granted) {
+      return HttpResponse.json({
+        valid: false,
+        status: 'SUSPENDED',
+        issuer: 'Delhi College of Engineering & Technology',
+        issuer_trusted: true,
+        verified_at: new Date().toISOString(),
+        checked_at: new Date().toISOString(),
+        disclosed_claims: {}, // ZERO claims revealed when suspended per Section 8.4!
+        reasons: [
+          'Holder has withdrawn VERIFICATION_SHARE consent under Section 8.4',
+          'AICTE status list revocation/suspension bit set: 1 (SUSPENDED)',
+        ],
+        holder_bound: false,
+        error_message: 'Holder has withdrawn consent for third-party verification',
+      });
+    }
+
+    // C. Check if presentation is superseded
+    if (
+      sd_jwt_presentation.includes('SUPERSEDED') ||
+      (studentOwnRecordState.record_version > 1 && !sd_jwt_presentation.includes(`v${studentOwnRecordState.record_version}`))
+    ) {
+      return HttpResponse.json({
+        valid: false,
+        status: 'SUPERSEDED',
+        issuer: 'Delhi College of Engineering & Technology',
+        issuer_trusted: true,
+        verified_at: new Date().toISOString(),
+        checked_at: new Date().toISOString(),
+        disclosed_claims: {},
+        reasons: [
+          'A newer student record version exists (v2); ask the holder for an updated credential',
+          'Status list index 42 superseded',
+        ],
+        holder_bound: true,
+        error_message: 'Credential superseded by record update',
+      });
+    }
+
+    // D. Normal valid presentation: parse disclosures
+    const parsed = parsePresentation(sd_jwt_presentation);
+
+    return HttpResponse.json({
+      valid: true,
       status: 'VALID',
-      disclosed_claims: {
-        apaar_id: '1234****9012',
-        full_name: 'Aditi Verma',
-        program_code: 'BTECH-CSE',
-        institution_name: 'Delhi Institute of Engineering & Technology',
-        enrolment_status: 'ACTIVE',
-        admission_year: 2026,
-      },
-      issuer: {
-        did: 'did:web:aicte.gov.in',
-        name: 'AICTE Central Registry',
-        trusted: true,
-      },
+      issuer: 'Delhi College of Engineering & Technology',
+      issuer_trusted: true,
       verified_at: new Date().toISOString(),
+      checked_at: new Date().toISOString(),
+      disclosed_claims: parsed.disclosedClaims,
+      reasons: [
+        'Issuer Ed25519 signature verified against AICTE Trust List',
+        'KB-JWT holder key binding verified with client WebCrypto hardware key',
+        'AICTE national status list verified: bit 42 is 0 (ACTIVE)',
+        'Audience and challenge nonce validated',
+      ],
+      holder_bound: true,
+    });
+  }),
+
+  // 9. DAB Portal: list graduates of affiliated institutions
+  http.get('*/v1/dab/graduates', ({ request }) => {
+    const url = new URL(request.url);
+    const search = (url.searchParams.get('q') || '').toLowerCase();
+    const inst = url.searchParams.get('institution');
+    const status = url.searchParams.get('status');
+
+    let items = dabGraduatesState;
+    if (search) {
+      items = items.filter(
+        (g) =>
+          g.full_name.toLowerCase().includes(search) ||
+          g.apaar_id.includes(search) ||
+          g.program_name.toLowerCase().includes(search)
+      );
+    }
+    if (inst) {
+      items = items.filter((g) => g.institution_aicte_id === inst);
+    }
+    if (status && status !== 'ALL') {
+      items = items.filter((g) => g.credential_status === status);
+    }
+    return HttpResponse.json(items);
+  }),
+
+  // 10. DAB Portal: issue degree credential
+  http.post('*/v1/dab/credentials/issue', async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as any;
+    const { student_id } = body;
+    const grad = dabGraduatesState.find((g) => g.student_id === student_id);
+    const credId = `cred-degree-${Date.now()}`;
+    if (grad) {
+      grad.credential_status = 'ISSUED';
+      grad.issued_credential_id = credId;
+      grad.issued_at = new Date().toISOString();
+    }
+    return HttpResponse.json({
+      success: true,
+      message: 'Degree certificate issued and signed by DAB',
+      credential_id: credId,
+      issued_at: new Date().toISOString(),
+      student_id,
     });
   }),
 ];
