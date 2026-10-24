@@ -10,6 +10,8 @@ import {
   mockInstitutionSummary,
 } from './data';
 
+import { BatchItem } from '@/features/institution/types';
+
 let failedLogins = 0;
 let activeSessionUser: typeof mockUser | null = null;
 let apiKeys = [...mockApiKeys];
@@ -22,7 +24,59 @@ export const resetAuthMock = () => {
   institutionUsers = [...mockInstitutionUsers];
 };
 
+let batches: BatchItem[] = [...mockBatches] as unknown as BatchItem[];
+
+export const resetBatchMock = () => {
+  batches = [...mockBatches] as unknown as BatchItem[];
+};
+
 export const handlers = [
+  http.get('*/v1/templates/student-upload.xlsx', () => {
+    const csvContent =
+      'apaar_id,institution_aicte_id,institution_student_id,full_name,dob,gender,category,program_code,course_level,department,academic_year,year_of_study,admission_date,admission_type,seat_type,quota,nationality,nri_status,oci_status,fn_status,enrolment_status,consent_status\n' +
+      '984572912301,1-1234567890,PRN-2026-001,Aarav Patel,2004-05-12,M,GEN,BTECH-CSE,UG,Computer Science,2026-27,1,2026-08-01,REGULAR,REGULAR,NONE,IN,NO,NO,NO,ACTIVE,GRANTED\n';
+    return new HttpResponse(new Blob([csvContent], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), {
+      headers: {
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition': 'attachment; filename="student-upload.xlsx"',
+      },
+    });
+  }),
+
+  http.get('*/v1/events/ticket', () => {
+    return HttpResponse.json({ ticket: `ticket-${Date.now()}`, expires_in: 60 });
+  }),
+
+  http.post('*/v1/events/ticket', () => {
+    return HttpResponse.json({ ticket: `ticket-${Date.now()}`, expires_in: 60 });
+  }),
+
+  http.get('*/v1/events', () => {
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        const stages = ['parsing', 'mapping', 'rules', 'duplicates', 'anomalies', 'report', 'complete'];
+        let i = 0;
+        const interval = setInterval(() => {
+          if (i < stages.length) {
+            const data = `data: ${JSON.stringify({ stage: stages[i], progress: Math.round(((i + 1) / stages.length) * 100), message: `Stage: ${stages[i]}` })}\n\n`;
+            controller.enqueue(encoder.encode(data));
+            i++;
+          } else {
+            clearInterval(interval);
+            controller.close();
+          }
+        }, 200);
+      },
+    });
+    return new HttpResponse(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    });
+  }),
   http.get('*/healthz', () => {
     return HttpResponse.json({
       status: 'ok',
@@ -193,26 +247,97 @@ export const handlers = [
   }),
 
   http.get('*/v1/batches', () => {
-    return HttpResponse.json(mockBatches);
+    return HttpResponse.json(batches);
   }),
 
-  http.post('*/v1/batches', () => {
-    return HttpResponse.json(
-      {
-        id: `batch-${Date.now()}`,
-        institution_aicte_id: '1-1234567890',
-        academic_year: '2026-27',
-        filename: 'uploaded_batch.csv',
-        status: 'MAPPING',
-        rows_total: 65,
-        created_at: new Date().toISOString(),
-      },
-      { status: 201 }
+  http.post('*/v1/batches', async ({ request }) => {
+    const idempotencyKey =
+      request.headers.get('Idempotency-Key') || request.headers.get('idempotency-key') || '';
+    let academicYear = '2026-27';
+    let supersedesBatchId: string | null = null;
+    let filename = 'uploaded_batch.csv';
+    let triggerConflict = false;
+
+    const url = new URL(request.url);
+    if (url.searchParams.get('conflict') === 'true') {
+      triggerConflict = true;
+    }
+
+    try {
+      const contentType = request.headers.get('content-type') || '';
+      if (contentType.includes('multipart/form-data')) {
+        const formData = await request.formData();
+        academicYear = (formData.get('academic_year') as string) || academicYear;
+        supersedesBatchId = (formData.get('supersedes_batch_id') as string) || null;
+        const file = formData.get('file');
+        if (file && typeof file === 'object' && 'name' in file) {
+          filename = (file as File).name;
+        }
+        if (formData.get('trigger_conflict') === 'true' || filename.includes('conflict')) {
+          triggerConflict = true;
+        }
+      } else {
+        const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
+        academicYear = (body.academic_year as string) || academicYear;
+        supersedesBatchId = (body.supersedes_batch_id as string) || null;
+        filename = (body.filename as string) || filename;
+        if (body.trigger_conflict || filename.includes('conflict')) {
+          triggerConflict = true;
+        }
+      }
+    } catch {
+      // Use defaults
+    }
+
+    // Check for open batch conflict (HTTP 409)
+    const openBatch = batches.find(
+      (b) =>
+        b.academic_year === academicYear &&
+        (b.status === 'IN_REVIEW' || b.status === 'VALIDATING' || b.status === 'MAPPING')
     );
+
+    if (triggerConflict || (openBatch && !supersedesBatchId && filename.includes('conflict'))) {
+      return HttpResponse.json(
+        {
+          detail: `Conflict: An active batch is currently open for academic year ${academicYear} (${openBatch?.id || 'batch-demo-2'}). Please resolve or supersede it.`,
+          open_batch_id: openBatch?.id || 'batch-demo-2',
+          code: 'BATCH_CONFLICT',
+        },
+        { status: 409 }
+      );
+    }
+
+    if (supersedesBatchId) {
+      batches = batches.map((b) =>
+        b.id === supersedesBatchId ? { ...b, status: 'SUPERSEDED' as const } : b
+      );
+    }
+
+    const newBatch = {
+      id: `batch-${Date.now()}`,
+      institution_aicte_id: '1-1234567890',
+      academic_year: academicYear,
+      filename,
+      status: 'MAPPING' as const,
+      quality_score: 74.0,
+      quality_score_before: 74.0,
+      quality_score_after: null,
+      rows_total: 65,
+      rows_valid: 48,
+      rows_error: 12,
+      rows_warning: 5,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      supersedes_batch_id: supersedesBatchId,
+      idempotency_key: idempotencyKey,
+    };
+
+    batches = [newBatch, ...batches];
+    return HttpResponse.json(newBatch, { status: 201 });
   }),
 
   http.get('*/v1/batches/:id', ({ params }) => {
-    const batch = mockBatches.find((b) => b.id === params.id) || mockBatches[1];
+    const batch = batches.find((b) => b.id === params.id) || mockBatches[1];
     return HttpResponse.json(batch);
   }),
 
@@ -220,14 +345,35 @@ export const handlers = [
     return HttpResponse.json(mockBatchReport);
   }),
 
+  http.get('*/v1/batches/:id/report.xlsx', () => {
+    return new HttpResponse(new Blob(['mock xlsx report data']), {
+      headers: {
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition': 'attachment; filename="validation_report.xlsx"',
+      },
+    });
+  }),
+
+  http.get('*/v1/batches/:id/report.pdf', () => {
+    return new HttpResponse(new Blob(['%PDF-1.4 mock pdf data']), {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename="validation_report.pdf"',
+      },
+    });
+  }),
+
   http.get('*/v1/batches/:id/mapping', () => {
     return HttpResponse.json(mockBatchReport.column_mapping);
   }),
 
-  http.put('*/v1/batches/:id/mapping', async ({ request }) => {
-    const body = await request.json();
+  http.put('*/v1/batches/:id/mapping', async ({ params, request }) => {
+    const body = (await request.json()) as { mappings?: unknown; save_profile?: boolean };
+    const batchId = params.id as string;
+    batches = batches.map((b) => (b.id === batchId ? { ...b, status: 'VALIDATING' as const } : b));
     return HttpResponse.json({
       ...mockBatches[1],
+      id: batchId,
       status: 'VALIDATING',
       updated_mapping: body,
     });

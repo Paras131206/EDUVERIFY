@@ -5,6 +5,7 @@ import { AppShell } from '@/components/layout/AppShell';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { InstitutionDashboardPage } from '@/features/institution/InstitutionDashboardPage';
 import { UploadPage } from '@/features/institution/UploadPage';
+import { BatchListPage } from '@/features/institution/BatchListPage';
 import { ReviewPage } from '@/features/institution/ReviewPage';
 import { TransfersPage } from '@/features/institution/TransfersPage';
 import { AicteDashboardPage } from '@/features/aicte/AicteDashboardPage';
@@ -50,6 +51,14 @@ export const router = createBrowserRouter([
             element: (
               <RequireRole roles={['INSTITUTION_ADMIN', 'INSTITUTION_STAFF']}>
                 <UploadPage />
+              </RequireRole>
+            ),
+          },
+          {
+            path: 'institution/batches',
+            element: (
+              <RequireRole roles={['INSTITUTION_ADMIN', 'INSTITUTION_STAFF']}>
+                <BatchListPage />
               </RequireRole>
             ),
           },

@@ -5,6 +5,7 @@ import {
   Building2,
   LayoutDashboard,
   UploadCloud,
+  Layers,
   CheckSquare,
   ArrowLeftRight,
   ShieldCheck,
@@ -43,6 +44,12 @@ export const Sidebar: React.FC = () => {
       to: '/institution/upload',
       label: t('nav.upload'),
       icon: <UploadCloud className="w-4 h-4" aria-hidden="true" />,
+      visible: !role || role === 'INSTITUTION_ADMIN' || role === 'INSTITUTION_STAFF',
+    },
+    {
+      to: '/institution/batches',
+      label: t('nav.batches', 'Batch Registry'),
+      icon: <Layers className="w-4 h-4" aria-hidden="true" />,
       visible: !role || role === 'INSTITUTION_ADMIN' || role === 'INSTITUTION_STAFF',
     },
     {
