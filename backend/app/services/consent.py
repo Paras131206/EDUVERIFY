@@ -8,10 +8,17 @@ import json
 import uuid
 from datetime import UTC, datetime
 
-from app.models.core import ConsentLedger, Credential, StudentRecord, StudentRecordVersion
+from app.models.core import (
+    ConsentLedger,
+    Credential,
+    StatusList,
+    StudentRecord,
+    StudentRecordVersion,
+)
 from app.security.crypto import keyed_apaar_hash
 from app.security.deps import Principal, require_self_student
 from app.services.audit import append_audit_log
+from app.vc.sdjwt import set_status_list_bit
 from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -151,18 +158,47 @@ def record_consent_service(
 
     # 3. Lifecycle Hooks per agents.md §8.4
     if purpose == "VERIFICATION_SHARE":
+        status_list = db.query(StatusList).order_by(StatusList.updated_at.desc()).first()
         if action == "WITHDRAW":
-            # Suspend all credentials issued to this student
-            db.query(Credential).filter(
-                Credential.apaar_id == target_apaar,
-                Credential.status == "VALID",
-            ).update({Credential.status: "SUSPENDED"})
+            creds = (
+                db.query(Credential)
+                .filter(
+                    Credential.apaar_id == target_apaar,
+                    Credential.status == "VALID",
+                )
+                .all()
+            )
+            for c in creds:
+                c.status = "SUSPENDED"
+                if c.status_list_index is not None and status_list:
+                    status_list.bitstring_data = set_status_list_bit(
+                        status_list.bitstring_data,
+                        c.status_list_index,
+                        3,  # SUSPENDED
+                        bits=2,
+                    )
+            if status_list and creds:
+                status_list.updated_at = now
         elif action == "GRANT":
-            # Re-activate suspended credentials
-            db.query(Credential).filter(
-                Credential.apaar_id == target_apaar,
-                Credential.status == "SUSPENDED",
-            ).update({Credential.status: "VALID"})
+            creds = (
+                db.query(Credential)
+                .filter(
+                    Credential.apaar_id == target_apaar,
+                    Credential.status == "SUSPENDED",
+                )
+                .all()
+            )
+            for c in creds:
+                c.status = "VALID"
+                if c.status_list_index is not None and status_list:
+                    status_list.bitstring_data = set_status_list_bit(
+                        status_list.bitstring_data,
+                        c.status_list_index,
+                        0,  # VALID
+                        bits=2,
+                    )
+            if status_list and creds:
+                status_list.updated_at = now
 
     elif purpose == "REPOSITORY":
         if action == "WITHDRAW":

@@ -9,7 +9,7 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-from app.models.core import Batch, Correction, Issue
+from app.models.core import Batch, Correction, Credential, Issue
 from app.security.deps import Principal
 from app.services.audit import append_audit_log
 from fastapi import HTTPException, status
@@ -262,6 +262,25 @@ def approve_correction_service(
             issue.status = "ACCEPTED"
             issue.decided_by = principal.id
             issue.decided_at = datetime.now(UTC)
+
+    # Lifecycle hook: record correction -> SUPERSEDED per agents.md §8.4
+    if correction.apaar_id:
+        from app.services.credentials import update_credential_status_hook
+
+        creds = (
+            db.query(Credential)
+            .filter(Credential.apaar_id == correction.apaar_id, Credential.status == "VALID")
+            .all()
+        )
+        for c in creds:
+            update_credential_status_hook(
+                db,
+                credential_id=c.credential_id,
+                new_status="SUPERSEDED",
+                reason=f"Record correction approved ({correction.field})",
+                principal_id=principal.id,
+                principal_role=principal.role,
+            )
 
     db.commit()
     db.refresh(correction)

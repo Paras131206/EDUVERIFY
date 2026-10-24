@@ -9,6 +9,7 @@ from app.routers.audit import router as audit_router
 from app.routers.auth import router as auth_router
 from app.routers.batches import router as batches_router
 from app.routers.consent import router as consent_router
+from app.routers.credentials import router as credentials_router
 from app.routers.duplicates import router as duplicates_router
 from app.routers.events import router as events_router
 from app.routers.issues import router as issues_router
@@ -20,6 +21,7 @@ from app.routers.students import router as students_router
 from app.routers.templates import router as templates_router
 from app.routers.transfers import router as transfers_router
 from app.routers.users import router as users_router
+from app.routers.verification import router as verification_router
 from fastapi import APIRouter
 
 # Registered feature routers in alphabetical order
@@ -29,6 +31,7 @@ ROUTERS: list[APIRouter] = [
     auth_router,
     batches_router,
     consent_router,
+    credentials_router,
     duplicates_router,
     events_router,
     issues_router,
@@ -40,4 +43,5 @@ ROUTERS: list[APIRouter] = [
     templates_router,
     transfers_router,
     users_router,
+    verification_router,
 ]

@@ -703,3 +703,63 @@ class MockApaarRegistry(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
     )
+
+
+class IssuerKey(Base):
+    """Ed25519 issuer private/public key storage encrypted at rest."""
+
+    __tablename__ = "issuer_keys"
+
+    issuer_id: Mapped[str] = mapped_column(String(100), primary_key=True)
+    did: Mapped[str] = mapped_column(String(255), nullable=False)
+    key_id: Mapped[str] = mapped_column(String(100), nullable=False, default="key-1")
+    encrypted_private_key: Mapped[str] = mapped_column(Text, nullable=False)
+    public_key_jwk_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
+
+
+class HolderKey(Base):
+    """Registered student browser WebCrypto public JWK for SD-JWT key binding."""
+
+    __tablename__ = "holder_keys"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    apaar_id: Mapped[str] = mapped_column(String(12), nullable=False, index=True)
+    apaar_hash: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    jwk_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
+
+
+class VerificationNonce(Base):
+    """Short-lived challenge nonce for replay protection."""
+
+    __tablename__ = "verification_nonces"
+
+    nonce: Mapped[str] = mapped_column(String(64), primary_key=True)
+    aud: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
+
+
+class ShortLink(Base):
+    """Short-lived 24-hour presentation short links for compact QR codes."""
+
+    __tablename__ = "short_links"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    credential_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    presentation_data: Mapped[str] = mapped_column(Text, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
