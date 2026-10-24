@@ -700,9 +700,86 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("apaar_id"),
     )
 
+    # 29. Issuer Keys table
+    op.create_table(
+        "issuer_keys",
+        sa.Column("issuer_id", sa.String(length=100), nullable=False),
+        sa.Column("did", sa.String(length=255), nullable=False),
+        sa.Column("key_id", sa.String(length=100), nullable=False, server_default="key-1"),
+        sa.Column("encrypted_private_key", sa.Text(), nullable=False),
+        sa.Column("public_key_jwk_json", sa.JSON(), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
+        sa.PrimaryKeyConstraint("issuer_id"),
+    )
+
+    # 30. Holder Keys table
+    op.create_table(
+        "holder_keys",
+        sa.Column("id", sa.String(length=36), nullable=False),
+        sa.Column("user_id", sa.String(length=36), nullable=False),
+        sa.Column("apaar_id", sa.String(length=12), nullable=False),
+        sa.Column("apaar_hash", sa.String(length=64), nullable=False),
+        sa.Column("jwk_json", sa.JSON(), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
+        sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index(op.f("ix_holder_keys_user_id"), "holder_keys", ["user_id"], unique=False)
+    op.create_index(op.f("ix_holder_keys_apaar_id"), "holder_keys", ["apaar_id"], unique=False)
+    op.create_index(op.f("ix_holder_keys_apaar_hash"), "holder_keys", ["apaar_hash"], unique=False)
+
+    # 31. Verification Nonces table
+    op.create_table(
+        "verification_nonces",
+        sa.Column("nonce", sa.String(length=64), nullable=False),
+        sa.Column("aud", sa.String(length=255), nullable=True),
+        sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False),
+        sa.Column("used_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
+        sa.PrimaryKeyConstraint("nonce"),
+    )
+
+    # 32. Short Links table
+    op.create_table(
+        "short_links",
+        sa.Column("id", sa.String(length=64), nullable=False),
+        sa.Column("credential_id", sa.String(length=100), nullable=True),
+        sa.Column("presentation_data", sa.Text(), nullable=False),
+        sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
+        sa.PrimaryKeyConstraint("id"),
+    )
+
+    # 33. Reports table
+    op.create_table(
+        "reports",
+        sa.Column("id", sa.String(length=36), nullable=False),
+        sa.Column("report_type", sa.String(length=50), nullable=False),
+        sa.Column("format", sa.String(length=10), nullable=False),
+        sa.Column("academic_year", sa.String(length=20), nullable=False),
+        sa.Column("state", sa.String(length=100), nullable=True),
+        sa.Column("program", sa.String(length=100), nullable=True),
+        sa.Column("category", sa.String(length=50), nullable=True),
+        sa.Column("status", sa.String(length=20), nullable=False, server_default="READY"),
+        sa.Column("generated_by", sa.String(length=255), nullable=False),
+        sa.Column("title", sa.String(length=255), nullable=False),
+        sa.Column("title_hi", sa.String(length=255), nullable=True),
+        sa.Column("file_bytes", sa.LargeBinary(), nullable=True),
+        sa.Column("file_size", sa.String(length=50), nullable=False, server_default="0 KB"),
+        sa.Column("summary_json", sa.JSON(), nullable=True),
+        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index(op.f("ix_reports_report_type"), "reports", ["report_type"], unique=False)
+
 
 def downgrade() -> None:
     # Drop tables in reverse dependency order
+    op.drop_table("reports")
+    op.drop_table("short_links")
+    op.drop_table("verification_nonces")
+    op.drop_table("holder_keys")
+    op.drop_table("issuer_keys")
     op.drop_table("mock_apaar_registry")
     op.drop_table("jobs")
     op.drop_table("column_mapping_profiles")

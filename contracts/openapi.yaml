@@ -1379,14 +1379,35 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ConsentRecord'
+              $ref: '#/components/schemas/ConsentRecordRequest'
       responses:
-        '200':
-          description: Consent saved
+        '201':
+          description: Consent recorded
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConsentRecord'
+                $ref: '#/components/schemas/ConsentItemResponse'
+
+  /v1/consent/me:
+    get:
+      tags: [Consent]
+      summary: Get active consent summary and audit history
+      operationId: getMyConsent
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: apaar_id
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Student consent summary and history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentConsentSummaryResponse'
 
   /v1/consent/{apaar_id}:
     get:
@@ -1408,6 +1429,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConsentRecord'
+
+  /v1/credentials/holder-key:
+    post:
+      tags: [Credentials]
+      summary: Register student browser WebCrypto public JWK
+      operationId: registerHolderKey
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [jwk]
+              properties:
+                jwk:
+                  type: object
+      responses:
+        '200':
+          description: Holder key registered
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, apaar_id, jwk]
+                properties:
+                  status:
+                    type: string
+                  apaar_id:
+                    type: string
+                  jwk:
+                    type: object
+                  registered_at:
+                    type: string
+                    format: date-time
 
   /v1/credentials/issue:
     post:
@@ -1452,6 +1509,23 @@ paths:
                 items:
                   $ref: '#/components/schemas/CredentialMetadata'
 
+  /v1/credentials/me:
+    get:
+      tags: [Credentials]
+      summary: List credentials for current student
+      operationId: listMyCredentials
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Student credentials
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CredentialMetadata'
+
   /v1/credentials/{id}/revoke:
     post:
       tags: [Credentials]
@@ -1483,11 +1557,77 @@ paths:
         '200':
           description: Credential status updated
 
+  /v1/credentials/{id}/qr.png:
+    get:
+      tags: [Credentials]
+      summary: Retrieve PNG QR code
+      operationId: getCredentialQr
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: PNG QR code image
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+
+  /v1/credentials/{id}/certificate.pdf:
+    get:
+      tags: [Credentials]
+      summary: Retrieve PDF certificate
+      operationId: getCredentialCertificate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: PDF certificate document
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
   /v1/credentials/presentation-nonce:
     post:
       tags: [Credentials]
       summary: Generate fresh nonce for presentation verification
       operationId: generatePresentationNonce
+      responses:
+        '200':
+          description: Nonce generated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [nonce, expires_at]
+                properties:
+                  nonce:
+                    type: string
+                  expires_at:
+                    type: string
+                    format: date-time
+
+  /v1/verify/nonce:
+    get:
+      tags: [Verification]
+      summary: Generate fresh challenge nonce for presentation verification
+      operationId: getVerificationNonce
+      parameters:
+        - name: aud
+          in: query
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: Nonce generated
@@ -1539,6 +1679,59 @@ paths:
                   id:
                     type: string
                   verificationMethod:
+                    type: array
+                    items:
+                      type: object
+
+  /issuers/{issuer_id}/did.json:
+    get:
+      tags: [Decentralized Identifiers]
+      summary: Discover institution or DAB did:web document
+      operationId: getIssuerDidDocument
+      parameters:
+        - name: issuer_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: DID Document with Ed25519 public keys
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, verificationMethod]
+                properties:
+                  id:
+                    type: string
+                  verificationMethod:
+                    type: array
+                    items:
+                      type: object
+
+  /v1/trust-list:
+    get:
+      tags: [Verification]
+      summary: Retrieve AICTE-signed list of authorized issuer DIDs
+      operationId: getTrustList
+      responses:
+        '200':
+          description: Trust list response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [issuer, issued_at, trust_list, jwt]
+                properties:
+                  issuer:
+                    type: string
+                  issued_at:
+                    type: string
+                    format: date-time
+                  jwt:
+                    type: string
+                  trust_list:
                     type: array
                     items:
                       type: object
@@ -1733,7 +1926,21 @@ paths:
       security:
         - BearerAuth: []
       parameters:
+        - name: from_date
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to_date
+          in: query
+          schema:
+            type: string
+            format: date-time
         - name: action
+          in: query
+          schema:
+            type: string
+        - name: actor_id
           in: query
           schema:
             type: string
@@ -1741,15 +1948,23 @@ paths:
           in: query
           schema:
             type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
       responses:
         '200':
           description: Audit log records
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AuditEntry'
+                $ref: '#/components/schemas/AuditListResponse'
 
   /v1/audit/verify-chain:
     get:
@@ -1765,6 +1980,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuditChainVerifyResponse'
+
+  /v1/admin/retention/purge:
+    post:
+      tags: [Audit]
+      summary: Trigger data retention purge for expired raw batch upload files
+      operationId: purgeRetentionBatchFiles
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: retention_days
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Purge outcome summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetentionPurgeResponse'
 
   /v1/dashboards/aicte:
     get:
@@ -2623,6 +2858,68 @@ components:
           type: string
           format: date
 
+    ConsentRecordRequest:
+      type: object
+      required: [purpose, action]
+      properties:
+        purpose:
+          type: string
+          enum: [REPOSITORY, VERIFICATION_SHARE, ANALYTICS_AGGREGATE]
+        action:
+          type: string
+          enum: [GRANT, WITHDRAW]
+        apaar_id:
+          type: string
+          pattern: '^\d{12}$'
+        evidence_ref:
+          type: string
+        guardian_consent:
+          type: boolean
+          default: false
+
+    ConsentItemResponse:
+      type: object
+      required: [id, apaar_id, purpose, status, effective_at, guardian_consent]
+      properties:
+        id:
+          type: integer
+        apaar_id:
+          type: string
+        purpose:
+          type: string
+        status:
+          type: string
+          enum: [GRANTED, WITHDRAWN]
+        effective_at:
+          type: string
+          format: date-time
+        guardian_consent:
+          type: boolean
+        signature_ref:
+          type: string
+          nullable: true
+        prev_hash:
+          type: string
+          nullable: true
+        hash:
+          type: string
+          nullable: true
+
+    StudentConsentSummaryResponse:
+      type: object
+      required: [apaar_id, consents, history]
+      properties:
+        apaar_id:
+          type: string
+        consents:
+          type: object
+          additionalProperties:
+            type: string
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentItemResponse'
+
     IssueCredentialRequest:
       type: object
       required: [apaar_id, credential_type, holder_jwk]
@@ -2821,10 +3118,32 @@ components:
         hash:
           type: string
 
+    AuditListResponse:
+      type: object
+      required: [total, items]
+      properties:
+        total:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEntry'
+
     AuditChainVerifyResponse:
       type: object
-      required: [chain_valid, total_records, broken_link_id, verified_at]
+      required: [valid, length, head_hash, reason]
       properties:
+        valid:
+          type: boolean
+        length:
+          type: integer
+        first_broken_id:
+          type: integer
+          nullable: true
+        head_hash:
+          type: string
+        reason:
+          type: string
         chain_valid:
           type: boolean
         total_records:
@@ -2835,6 +3154,18 @@ components:
         verified_at:
           type: string
           format: date-time
+
+    RetentionPurgeResponse:
+      type: object
+      required: [purged_count, cutoff_date, retention_days]
+      properties:
+        purged_count:
+          type: integer
+        cutoff_date:
+          type: string
+          format: date-time
+        retention_days:
+          type: integer
 
     AicteDashboardSummary:
       type: object

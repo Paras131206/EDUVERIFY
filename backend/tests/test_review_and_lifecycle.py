@@ -743,11 +743,13 @@ def test_rollover_dry_run_and_501_not_implemented(client, db_session: Session):
     assert "rolled_over" in dry_data
     assert "graduated" in dry_data
 
-    # 3. AICTE Admin with dry_run=False returns 501 Not Implemented per prompt guidelines
+    # 3. AICTE Admin with dry_run=False executes rollover progression per Task B7 item 6
     exec_resp = client.post(
         "/v1/admin/rollover",
         headers=aicte_headers,
         json={"from_academic_year": "2025-26", "to_academic_year": "2026-27", "dry_run": False},
     )
-    assert exec_resp.status_code == 501
-    assert exec_resp.json()["code"] == "NOT_IMPLEMENTED"
+    assert exec_resp.status_code == 200
+    exec_data = exec_resp.json()
+    assert exec_data["dry_run"] is False
+    assert "rolled_over" in exec_data

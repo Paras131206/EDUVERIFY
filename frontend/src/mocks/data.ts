@@ -19,6 +19,15 @@ import {
   RolloverDryRunResult,
   TrustListItem,
 } from '@/features/aicte/types';
+import {
+  StudentOwnRecord,
+  StudentVersionHistoryItem,
+  ConsentPurposeSetting,
+  ConsentHistoryRecord,
+  StudentCredentialItem,
+  DabGraduateItem,
+} from '@/features/student/types';
+import { ReportItem } from '@/features/reports/types';
 
 
 export const mockUsers: Record<string, User> = {
@@ -49,6 +58,15 @@ export const mockUsers: Record<string, User> = {
     dab_id: null,
     student_apaar_hash: null,
   },
+  'aicte.analyst@demo.local': {
+    id: 'usr-aicte-analyst-1',
+    email: 'aicte.analyst@demo.local',
+    full_name: 'Dr. Vivek Mehra (AICTE Senior Data Analyst)',
+    role: 'AICTE_ANALYST',
+    institution_aicte_id: null,
+    dab_id: null,
+    student_apaar_hash: null,
+  },
   'aicte.viewer@demo.local': {
     id: 'usr-aicte-viewer-1',
     email: 'aicte.viewer@demo.local',
@@ -58,13 +76,22 @@ export const mockUsers: Record<string, User> = {
     dab_id: null,
     student_apaar_hash: null,
   },
+  'dab.admin@demo.local': {
+    id: 'usr-dab-admin-1',
+    email: 'dab.admin@demo.local',
+    full_name: 'Dr. R. K. Mukherjee (Registrar, State Technological University)',
+    role: 'DAB_ADMIN',
+    institution_aicte_id: null,
+    dab_id: 'DAB-101',
+    student_apaar_hash: null,
+  },
   'dab.member@demo.local': {
     id: 'usr-dab-1',
     email: 'dab.member@demo.local',
     full_name: 'Hon. K. M. Joseph (DAB Chairman)',
     role: 'DAB_MEMBER',
     institution_aicte_id: null,
-    dab_id: 'dab-north-01',
+    dab_id: 'DAB-101',
     student_apaar_hash: null,
   },
   'student@demo.local': {
@@ -2103,4 +2130,345 @@ export const mockMasterAcademicYears = [
   { academic_year: '2025-26', is_current: false, admission_window_start: '2025-06-01', admission_window_end: '2025-10-31' },
   { academic_year: '2024-25', is_current: false, admission_window_start: '2024-06-01', admission_window_end: '2024-10-31' },
 ];
+
+/* =========================================================================
+   TASK A6: TRUST UIS MOCK DATA (Student Record, Consent, Credentials, DAB)
+   ========================================================================= */
+
+export const mockStudentOwnRecord: StudentOwnRecord = {
+  apaar_id: '984512349012',
+  institution_aicte_id: '1-10928374',
+  institution_name: 'Delhi College of Engineering & Technology',
+  institution_student_id: '2026/UG/CSE/042',
+  full_name: 'Rahul Sharma',
+  dob: '2004-05-14',
+  gender: 'M',
+  category: 'GEN',
+  email: 'rahul.sharma@delhi-tech.ac.in',
+  mobile: '+91 98765 43210',
+  program_code: 'UG-CSE',
+  program_name: 'B.Tech Computer Science & Engineering',
+  course_level: 'UG',
+  department: 'Computer Science & Engineering',
+  academic_year: '2026-27',
+  year_of_study: 1,
+  admission_date: '2026-08-01',
+  admission_type: 'REGULAR',
+  expected_graduation_year: 2030,
+  seat_type: 'REGULAR',
+  supernumerary_scheme: null,
+  quota: 'NONE',
+  nationality: 'IN',
+  enrolment_status: 'ACTIVE',
+  record_version: 1,
+  updated_at: '2026-08-01T10:00:00Z',
+};
+
+export const mockStudentVersionHistory: StudentVersionHistoryItem[] = [
+  {
+    version: 1,
+    changed_at: '2026-08-01T10:00:00Z',
+    changed_by: 'inst.admin@demo.local (Delhi College of Engg & Tech)',
+    change_reason: 'Initial admission batch committed to AICTE Central Repository.',
+    changes: {
+      enrolment_status: { old_val: null, new_val: 'ACTIVE' },
+      record_version: { old_val: null, new_val: 1 },
+      academic_year: { old_val: null, new_val: '2026-27' },
+      program_code: { old_val: null, new_val: 'UG-CSE' },
+    },
+  },
+];
+
+export const mockConsentPurposes: ConsentPurposeSetting[] = [
+  {
+    purpose: 'REPOSITORY',
+    title: 'Statutory Central Repository Record Keeping',
+    title_hi: 'एआईसीटीई केंद्रीय रिपॉजिटरी में सांविधिक भंडारण',
+    description: 'Mandatory retention and academic progression tracking of your verified student record in the AICTE Apex Central Repository per Section 8.4.',
+    consequences: 'Statutory compliance requirement for approved admissions. In accordance with DPDP regulations, personal contact details are pseudonymised if institutional exit occurs.',
+    is_granted: true,
+    can_toggle: false,
+  },
+  {
+    purpose: 'VERIFICATION_SHARE',
+    title: 'Verifiable Credential Presentations & Employer Share',
+    title_hi: 'तृतीय-पक्ष सत्यापन और चयनात्मक प्रमाण-पत्र साझाकरण',
+    description: 'Permits verified employers, academic institutions, and regulators to validate your credentials via SD-JWT presentation.',
+    consequences: 'Withdrawing this consent immediately SUSPENDS all your credentials on the national status list and prevents any verifier from validating your claims.',
+    is_granted: true,
+    can_toggle: true,
+    warning_on_withdraw: 'Withdrawing VERIFICATION_SHARE immediately suspends your verifiable credentials on the AICTE status list. Any employer verifying your credentials will receive a SUSPENDED response until consent is re-granted.',
+  },
+  {
+    purpose: 'ANALYTICS_AGGREGATE',
+    title: 'Anonymised National Education Analytics',
+    title_hi: 'अनामित राष्ट्रीय शिक्षा विश्लेषण',
+    description: 'Includes your anonymised metrics in regional seat fulfillment, gender balance, and national workforce development analytics.',
+    consequences: 'Used only for aggregated macro planning without any student identification or individual disclosure.',
+    is_granted: true,
+    can_toggle: true,
+  },
+];
+
+export const mockConsentHistory: ConsentHistoryRecord[] = [
+  {
+    id: 'cst-001',
+    purpose: 'REPOSITORY',
+    action: 'GRANTED',
+    timestamp: '2026-08-01T10:05:00Z',
+    actor: 'Student (Rahul Sharma via DigiLocker Auth)',
+    notes: 'Initial statutory admission consent captured during enrollment.',
+  },
+  {
+    id: 'cst-002',
+    purpose: 'VERIFICATION_SHARE',
+    action: 'GRANTED',
+    timestamp: '2026-08-01T10:05:00Z',
+    actor: 'Student (Rahul Sharma)',
+    notes: 'Enabled credential issuance and selective disclosure sharing.',
+  },
+  {
+    id: 'cst-003',
+    purpose: 'ANALYTICS_AGGREGATE',
+    action: 'GRANTED',
+    timestamp: '2026-08-01T10:05:00Z',
+    actor: 'Student (Rahul Sharma)',
+    notes: 'Opted in for national policy and gender balance statistics.',
+  },
+];
+
+// Pre-computed standard SD-JWT with disclosures
+const MOCK_ISSUER_JWT =
+  'eyJhbGciOiJFZERTQSIsInR5cCI6InZjK3NkK2p3dCJ9.' +
+  'eyJpc3MiOiJkaWQ6d2ViOmRlbGhpLXRlY2guZWR1LmluIiwic3ViIjoiOTg0NTEyMzQ5MDEyIiwiaWF0IjoxNzg1NTAwMDAwLCJleHAiOjE4ODAwMDAwMDAsInZjdCI6Imh0dHBzOi8vZWR1dmVyaWZ5LmFpY3RlLWluZGlhLm9yZy9zY2hlbWFzL2NyZWRlbnRpYWxzL2Vucm9sbWVudCIsInN0YXR1cyI6eyJ1cmkiOiIvdjEvY3JlZGVudGlhbHMvc3RhdHVzLWxpc3QvMSIsImlkeCI6NDIsInN0YXR1c190eXBlIjoic3VzcGVuc2lvbiJ9fQ.' +
+  'mock_ed25519_apex_sig';
+
+const MOCK_DISCLOSURES = [
+  'WyJzYWx0X2ZuXzEiLCJmdWxsX25hbWUiLCJSYWh1bCBTaGFybWEiXQ',
+  'WyJzYWx0X2FwYWFyXzEiLCJhcGFhcl9pZCIsIjk4NDUxMjM0OTAxMiJd',
+  'WyJzYWx0X3Byb2dfMSIsInByb2dyYW1fbmFtZSIsIkIuVGVjaCBDb21wdXRlciBTY2llbmNlICYgRW5naW5lZXJpbmciXQ',
+  'WyJzYWx0X2luc3RfMSIsImluc3RpdHV0aW9uX25hbWUiLCJEZWxoaSBDb2xsZWdlIG9mIEVuZ2luZWVyaW5nICYgVGVjaG5vbG9neSJd',
+  'WyJzYWx0X3JvbGxfMSIsImluc3RpdHV0aW9uX3N0dWRlbnRfaWQiLCIyMDI2L1VHL0NTRS8wNDIiXQ',
+  'WyJzYWx0X3N0YXR1c18xIiwiZW5yb2xtZW50X3N0YXR1cyIsIkFDVElWRSJd',
+  'WyJzYWx0X2RvYl8xIiwiZG9iIiwiMjAwNC0wNS0xNCJd',
+  'WyJzYWx0X2NhdF8xIiwiY2F0ZWdvcnkiLCJHRU4iXQ',
+  'WyJzYWx0X2FjYWRfMSIsImFjYWRlbWljX3llYXIiLCIyMDI2LTI3Ild',
+  'WyJzYWx0X2xldmVsXzEiLCJjb3Vyc2VfbGV2ZWwiLCJVRyJd',
+];
+
+const MOCK_RAW_SD_JWT = `${MOCK_ISSUER_JWT}~${MOCK_DISCLOSURES.join('~')}~`;
+
+export const mockStudentCredentials: StudentCredentialItem[] = [
+  {
+    id: 'cred-enrol-2026-001',
+    credential_type: 'ENROLMENT_CREDENTIAL',
+    title: 'B.Tech Enrolment Verifiable Credential',
+    title_hi: 'बी.टेक नामांकन सत्यापन योग्य प्रमाण-पत्र',
+    issuer_name: 'Delhi College of Engineering & Technology',
+    issuer_did: 'did:web:delhi-tech.edu.in',
+    issued_at: '2026-08-02T11:00:00Z',
+    expires_at: '2030-07-31T23:59:59Z',
+    status: 'VALID',
+    record_version: 1,
+    raw_sd_jwt: MOCK_RAW_SD_JWT,
+    disclosable_claims: [
+      { key: 'full_name', label: 'Full Name', value: 'Rahul Sharma', default_selected: true },
+      { key: 'program_name', label: 'Degree & Program', value: 'B.Tech Computer Science & Engineering', default_selected: true },
+      { key: 'enrolment_status', label: 'Enrolment Status', value: 'ACTIVE', default_selected: true },
+      { key: 'institution_name', label: 'Issuing Institution', value: 'Delhi College of Engineering & Technology', default_selected: false },
+      { key: 'institution_student_id', label: 'Student PRN / Roll No', value: '2026/UG/CSE/042', default_selected: false },
+      { key: 'apaar_id', label: 'APAAR ID (12 digits)', value: '984512349012', default_selected: false },
+      { key: 'dob', label: 'Date of Birth', value: '2004-05-14', default_selected: false },
+      { key: 'category', label: 'Reservation Category', value: 'GEN', default_selected: false },
+      { key: 'academic_year', label: 'Academic Year', value: '2026-27', default_selected: false },
+      { key: 'course_level', label: 'Course Level', value: 'UG', default_selected: false },
+    ],
+  },
+  {
+    id: 'cred-degree-2026-088',
+    credential_type: 'DEGREE_CERTIFICATE',
+    title: 'Official Bachelor of Technology Degree Certificate',
+    title_hi: 'आधिकारिक बैचलर ऑफ टेक्नोलॉजी उपाधि प्रमाण-पत्र',
+    issuer_name: 'Delhi Technological University (DTU)',
+    issuer_did: 'did:web:dtu.ac.in',
+    issued_at: '2026-06-25T14:30:00Z',
+    expires_at: '2099-12-31T23:59:59Z',
+    status: 'VALID',
+    record_version: 1,
+    raw_sd_jwt: MOCK_RAW_SD_JWT,
+    disclosable_claims: [
+      { key: 'full_name', label: 'Full Name', value: 'Rahul Sharma', default_selected: true },
+      { key: 'program_name', label: 'Conferred Degree', value: 'B.Tech Computer Science & Engineering', default_selected: true },
+      { key: 'course_level', label: 'Course Level', value: 'UG', default_selected: true },
+      { key: 'institution_name', label: 'Affiliated Institution', value: 'Delhi College of Engineering & Technology', default_selected: false },
+      { key: 'institution_student_id', label: 'University Roll Number', value: '2026/UG/CSE/042', default_selected: false },
+      { key: 'apaar_id', label: 'APAAR ID', value: '984512349012', default_selected: false },
+      { key: 'academic_year', label: 'Graduation Year', value: '2026-27', default_selected: false },
+    ],
+  },
+];
+
+export const mockDabGraduates: DabGraduateItem[] = [
+  {
+    student_id: 'stu-grad-001',
+    apaar_id: '984512349012',
+    full_name: 'Rahul Sharma',
+    institution_aicte_id: '1-10928374',
+    institution_name: 'Delhi College of Engineering & Technology',
+    program_code: 'UG-CSE',
+    program_name: 'B.Tech Computer Science & Engineering',
+    course_level: 'UG',
+    graduation_year: '2026',
+    cgpa: 8.92,
+    enrolment_status: 'COMPLETED',
+    credential_status: 'PENDING',
+  },
+  {
+    student_id: 'stu-grad-002',
+    apaar_id: '984588129944',
+    full_name: 'Priya K. Patel',
+    institution_aicte_id: '1-10928374',
+    institution_name: 'Delhi College of Engineering & Technology',
+    program_code: 'UG-ECE',
+    program_name: 'B.Tech Electronics & Communication',
+    course_level: 'UG',
+    graduation_year: '2026',
+    cgpa: 9.14,
+    enrolment_status: 'COMPLETED',
+    credential_status: 'ISSUED',
+    issued_credential_id: 'cred-degree-2026-002',
+    issued_at: '2026-06-28T10:00:00Z',
+  },
+  {
+    student_id: 'stu-grad-003',
+    apaar_id: '984572912301',
+    full_name: 'Amit Vikram Kumar',
+    institution_aicte_id: '1-100010001',
+    institution_name: 'Maharashtra Institute of Technology Pune',
+    program_code: 'PG-MBA',
+    program_name: 'Master of Business Administration',
+    course_level: 'PG',
+    graduation_year: '2026',
+    cgpa: 8.76,
+    enrolment_status: 'COMPLETED',
+    credential_status: 'PENDING',
+  },
+  {
+    student_id: 'stu-grad-004',
+    apaar_id: '984511223344',
+    full_name: 'Sneha R. Nair',
+    institution_aicte_id: '1-100010010',
+    institution_name: 'Bengaluru Institute of Technology & Science',
+    program_code: 'UG-MECH',
+    program_name: 'B.Tech Mechanical Engineering',
+    course_level: 'UG',
+    graduation_year: '2026',
+    cgpa: 9.42,
+    enrolment_status: 'GRADUATED',
+    credential_status: 'ISSUED',
+    issued_credential_id: 'cred-degree-2026-004',
+    issued_at: '2026-06-15T12:00:00Z',
+  },
+];
+
+export const mockReportItems: ReportItem[] = [
+  {
+    id: 'REP-POL-2026-001',
+    title: 'AICTE National Seat Intake & Policy Audit 2026-27',
+    title_hi: 'अखिल भारतीय तकनीकी शिक्षा परिषद राष्ट्रीय सीट प्रवेश एवं नीति लेखापरीक्षा',
+    report_type: 'POLICY',
+    format: 'PDF',
+    academic_year: '2026-27',
+    state: 'Maharashtra',
+    program: 'ALL',
+    category: 'ALL',
+    status: 'READY',
+    generated_at: '2026-10-24T14:30:00Z',
+    generated_by: 'aicte.analyst@demo.local',
+    file_size: '2.4 MB',
+    download_url: '/v1/reports/REP-POL-2026-001/download',
+    summary: {
+      total_institutions: 48,
+      total_students: 14250,
+      approved_intake: 14000,
+      enrolled_count: 14250,
+      excess_seats: 250,
+      compliance_score: 96.4,
+    },
+  },
+  {
+    id: 'REP-ACC-2026-002',
+    title: 'NBA Accreditation Multi-Program Intake Reconciliation',
+    title_hi: 'एनबीए प्रत्यायन बहु-कार्यक्रम प्रवेश समाधान विवरण',
+    report_type: 'ACCREDITATION',
+    format: 'XLSX',
+    academic_year: '2026-27',
+    state: 'ALL',
+    program: 'B.Tech Computer Science & Engineering',
+    category: 'ALL',
+    status: 'READY',
+    generated_at: '2026-10-24T11:15:00Z',
+    generated_by: 'inst.admin@demo.local',
+    file_size: '1.8 MB',
+    download_url: '/v1/reports/REP-ACC-2026-002/download',
+    summary: {
+      total_institutions: 1,
+      total_students: 480,
+      approved_intake: 480,
+      enrolled_count: 480,
+      excess_seats: 0,
+      compliance_score: 100.0,
+    },
+  },
+  {
+    id: 'REP-MON-2026-003',
+    title: 'Regional Seat Utilization & Supernumerary Quota Monitoring',
+    title_hi: 'क्षेत्रीय सीट उपयोगिता एवं अधिसंख्य कोटा निगरानी रिपोर्ट',
+    report_type: 'MONITORING',
+    format: 'PDF',
+    academic_year: '2026-27',
+    state: 'Delhi',
+    program: 'ALL',
+    category: 'ALL',
+    status: 'READY',
+    generated_at: '2026-10-23T16:45:00Z',
+    generated_by: 'aicte.admin@demo.local',
+    file_size: '3.1 MB',
+    download_url: '/v1/reports/REP-MON-2026-003/download',
+    summary: {
+      total_institutions: 32,
+      total_students: 9800,
+      approved_intake: 10500,
+      enrolled_count: 9800,
+      excess_seats: 0,
+      compliance_score: 98.1,
+    },
+  },
+  {
+    id: 'REP-REG-2026-004',
+    title: 'Statutory Reservation (SC/ST/OBC/EWS) & NRI Quota Compliance',
+    title_hi: 'सांविधिक आरक्षण एवं एनआरआई कोटा अनुपालन प्रतिवेदन',
+    report_type: 'REGULATORY',
+    format: 'PDF',
+    academic_year: '2025-26',
+    state: 'ALL',
+    program: 'ALL',
+    category: 'OBC',
+    status: 'READY',
+    generated_at: '2026-10-22T09:20:00Z',
+    generated_by: 'aicte.analyst@demo.local',
+    file_size: '4.2 MB',
+    download_url: '/v1/reports/REP-REG-2026-004/download',
+    summary: {
+      total_institutions: 112,
+      total_students: 34500,
+      approved_intake: 35000,
+      enrolled_count: 34500,
+      excess_seats: 120,
+      compliance_score: 95.8,
+    },
+  },
+];
+
+
 

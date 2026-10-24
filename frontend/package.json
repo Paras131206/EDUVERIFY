@@ -14,12 +14,15 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@sd-jwt/core": "^0.23.1",
     "@tanstack/react-query": "^5.62.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "html5-qrcode": "^2.3.8",
     "i18next": "^24.2.0",
     "lucide-react": "^0.468.0",
     "openapi-fetch": "^0.13.4",
+    "qrcode.react": "^4.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.3.5",
@@ -38,6 +41,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.17.0",
+    "fake-indexeddb": "^6.2.6",
     "jsdom": "^25.0.1",
     "msw": "^2.7.0",
     "openapi-typescript": "^7.4.3",

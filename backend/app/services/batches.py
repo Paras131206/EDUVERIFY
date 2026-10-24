@@ -60,7 +60,31 @@ logger = logging.getLogger(__name__)
 
 # Advisory lock registry for (institution_aicte_id, academic_year)
 _institution_year_locks: dict[tuple[str, str], threading.Lock] = {}
+_batch_locks: dict[str, threading.Lock] = {}
 _locks_mutex = threading.Lock()
+
+
+@contextlib.contextmanager
+def _batch_commit_lock(batch_id: str):
+    """Early non-blocking lock to prevent concurrent workers from touching DB during commit."""
+    with _locks_mutex:
+        if batch_id not in _batch_locks:
+            _batch_locks[batch_id] = threading.Lock()
+        lock = _batch_locks[batch_id]
+        acquired = lock.acquire(blocking=False)
+
+    if not acquired:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={
+                "code": "CONCURRENT_COMMIT",
+                "message": "Commit currently in progress for this batch",
+            },
+        )
+    try:
+        yield
+    finally:
+        lock.release()
 
 
 @contextlib.contextmanager
@@ -540,15 +564,16 @@ def commit_batch_service(
             },
         )
 
-    with _locks_mutex:
-        batch = db.scalars(select(Batch).where(Batch.batch_id == batch_id)).first()
-        if not batch:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Batch not found")
-        inst_id = batch.institution_aicte_id
-        acad_year = batch.academic_year
+    with _batch_commit_lock(batch_id):
+        with _locks_mutex:
+            batch = db.scalars(select(Batch).where(Batch.batch_id == batch_id)).first()
+            if not batch:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Batch not found")
+            inst_id = batch.institution_aicte_id
+            acad_year = batch.academic_year
 
-    with _advisory_lock(db, inst_id, acad_year):
-        return _execute_commit(db, batch=batch, version=version, principal=principal)
+        with _advisory_lock(db, inst_id, acad_year):
+            return _execute_commit(db, batch=batch, version=version, principal=principal)
 
 
 def _execute_commit(

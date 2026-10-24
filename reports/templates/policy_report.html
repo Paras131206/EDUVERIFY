@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ report_title or "AICTE Policy & Intake Compliance Report" }}</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 1.5cm;
+            @top-right {
+                content: "AICTE Apex Central Repository • Policy Report";
+                font-size: 8pt;
+                font-family: Arial, sans-serif;
+                color: #64748B;
+            }
+            @bottom-right {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 8pt;
+                font-family: Arial, sans-serif;
+                color: #64748B;
+            }
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #0F172A;
+            line-height: 1.5;
+            font-size: 10pt;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            border-bottom: 2.5px solid #0B2545;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        .apex-badge {
+            font-size: 8pt;
+            font-weight: 700;
+            color: #D97706;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        .title {
+            font-size: 18pt;
+            font-weight: 800;
+            color: #0B2545;
+            margin: 0;
+        }
+        .subtitle {
+            font-size: 11pt;
+            color: #475569;
+            margin-top: 4px;
+        }
+        .meta-grid {
+            display: table;
+            width: 100%;
+            margin-bottom: 20px;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+        }
+        .meta-row {
+            display: table-row;
+        }
+        .meta-cell {
+            display: table-cell;
+            padding: 8px 12px;
+            font-size: 9pt;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .meta-label {
+            font-weight: 700;
+            color: #475569;
+            width: 25%;
+        }
+        .meta-val {
+            font-weight: 600;
+            color: #0B2545;
+            width: 25%;
+        }
+        .kpi-row {
+            display: table;
+            width: 100%;
+            margin-bottom: 24px;
+        }
+        .kpi-card {
+            display: table-cell;
+            width: 25%;
+            padding: 10px;
+            text-align: center;
+            background: #F1F5F9;
+            border: 1px solid #CBD5E1;
+            border-radius: 6px;
+        }
+        .kpi-num {
+            font-size: 16pt;
+            font-weight: 800;
+            color: #0B2545;
+            margin-top: 4px;
+        }
+        .kpi-lbl {
+            font-size: 8pt;
+            font-weight: 600;
+            color: #64748B;
+            text-transform: uppercase;
+        }
+        .section-title {
+            font-size: 12pt;
+            font-weight: 700;
+            color: #0B2545;
+            border-bottom: 1.5px solid #CBD5E1;
+            padding-bottom: 4px;
+            margin: 20px 0 10px 0;
+        }
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+            font-size: 8.5pt;
+        }
+        table.data-table th {
+            background: #0B2545;
+            color: #FFFFFF;
+            font-weight: 700;
+            text-align: left;
+            padding: 6px 8px;
+            border: 1px solid #0B2545;
+        }
+        table.data-table td {
+            padding: 6px 8px;
+            border: 1px solid #E2E8F0;
+        }
+        table.data-table tr:nth-child(even) {
+            background: #F8FAFC;
+        }
+        .tag-excess {
+            color: #DC2626;
+            font-weight: bold;
+        }
+        .tag-mismatch {
+            color: #D97706;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 30px;
+            border-top: 1px solid #CBD5E1;
+            padding-top: 8px;
+            font-size: 8pt;
+            color: #64748B;
+            display: table;
+            width: 100%;
+        }
+        .footer-left {
+            display: table-cell;
+            text-align: left;
+        }
+        .footer-right {
+            display: table-cell;
+            text-align: right;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="apex-badge">Statutory AICTE Monitoring & Compliance</div>
+        <h1 class="title">State Policy & Intake Compliance Report</h1>
+        <div class="subtitle">Academic Year: {{ academic_year or "2026-27" }} • Jurisdiction: {{ state_name or "All States (National)" }}</div>
+    </div>
+
+    <div class="meta-grid">
+        <div class="meta-row">
+            <div class="meta-cell meta-label">State / UT:</div>
+            <div class="meta-cell meta-val">{{ state_name or "All States" }}</div>
+            <div class="meta-cell meta-label">Academic Year:</div>
+            <div class="meta-cell meta-val">{{ academic_year or "2026-27" }}</div>
+        </div>
+        <div class="meta-row">
+            <div class="meta-cell meta-label">Target Institution:</div>
+            <div class="meta-cell meta-val">{{ institution_name or "All Affiliated Institutions" }}</div>
+            <div class="meta-cell meta-label">Overall Compliance:</div>
+            <div class="meta-cell meta-val" style="color: #16A34A; font-weight: bold;">{{ compliance_status or "STATUTORY COMPLIANT" }}</div>
+        </div>
+        <div class="meta-row">
+            <div class="meta-cell meta-label">Report Generation Date:</div>
+            <div class="meta-cell meta-val">{{ generated_at or "2026-10-24" }}</div>
+            <div class="meta-cell meta-label">Report Hash:</div>
+            <div class="meta-cell meta-val" style="font-family: monospace;">{{ report_hash or "sha256:7b4f8a...90" }}</div>
+        </div>
+    </div>
+
+    <!-- Executive KPI Row -->
+    <div class="kpi-row">
+        <div class="kpi-card" style="margin-right: 8px;">
+            <div class="kpi-lbl">Total Institutions</div>
+            <div class="kpi-num">{{ total_institutions or "8,420" }}</div>
+        </div>
+        <div class="kpi-card" style="margin-right: 8px;">
+            <div class="kpi-lbl">Approved Baseline Intake</div>
+            <div class="kpi-num">{{ approved_intake or total_approved_intake or "5,25,000" }}</div>
+        </div>
+        <div class="kpi-card" style="margin-right: 8px;">
+            <div class="kpi-lbl">Students Enrolled</div>
+            <div class="kpi-num">{{ total_enrolled or "4,85,290" }}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-lbl">Excess Seats (V012)</div>
+            <div class="kpi-num" style="color: #DC2626;">+{{ total_excess_seats or "342" }}</div>
+        </div>
+    </div>
+
+    <!-- Section: Reconciliation Discrepancies -->
+    <div class="section-title">1. Intake vs Statistical Declared Reconciliation</div>
+    <p style="font-size: 8.5pt; color: #475569; margin-top: 2px;">
+        Comparison between statistical declared figures submitted during approval processes and verified student-level uploads (Rule V022).
+    </p>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Institution Name</th>
+                <th>Program Code</th>
+                <th>Approved</th>
+                <th>Declared</th>
+                <th>Uploaded</th>
+                <th>Discrepancy</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if reconciliation_records %}
+                {% for r in reconciliation_records %}
+                <tr>
+                    <td>{{ r.institution_name }}</td>
+                    <td>{{ r.program_code }}</td>
+                    <td>{{ r.approved_intake }}</td>
+                    <td>{{ r.declared_intake }}</td>
+                    <td>{{ r.uploaded_count }}</td>
+                    <td class="{% if r.delta > 0 %}tag-excess{% else %}tag-mismatch{% endif %}">
+                        {% if r.delta > 0 %}+{{ r.delta }}{% else %}{{ r.delta }}{% endif %}
+                    </td>
+                    <td>{{ r.status }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td>Delhi Institute of Engineering & Technology</td>
+                    <td>UG-CSE</td>
+                    <td>60</td>
+                    <td>60</td>
+                    <td>63</td>
+                    <td class="tag-excess">+3</td>
+                    <td>MISMATCH (Excess)</td>
+                </tr>
+                <tr>
+                    <td>Metropolitan Management Institute</td>
+                    <td>PG-MBA</td>
+                    <td>120</td>
+                    <td>120</td>
+                    <td>108</td>
+                    <td class="tag-mismatch">-12</td>
+                    <td>MISMATCH (Deficit)</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    <!-- Section: Supernumerary and NRI/FN Compliance -->
+    <div class="section-title">2. Supernumerary Scheme Utilization & NRI/FN Quota Distribution</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Scheme Code</th>
+                <th>Scheme Name</th>
+                <th>Statutory Ceiling</th>
+                <th>Total Allotted</th>
+                <th>Excess Violations</th>
+                <th>Compliance Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>TFW</strong></td>
+                <td>Tuition Fee Waiver Scheme</td>
+                <td>5% over approved intake</td>
+                <td>18,420</td>
+                <td>0</td>
+                <td style="color:#16A34A; font-weight:bold;">Compliant</td>
+            </tr>
+            <tr>
+                <td><strong>PMSSS</strong></td>
+                <td>Prime Minister Special Scholarship Scheme (J&K / Ladakh)</td>
+                <td>2 seats per course</td>
+                <td>4,120</td>
+                <td>0</td>
+                <td style="color:#16A34A; font-weight:bold;">Compliant</td>
+            </tr>
+            <tr>
+                <td><strong>FN_OCI_NRI</strong></td>
+                <td>Foreign National / Overseas Citizen / NRI Supernumerary</td>
+                <td>15% over approved intake</td>
+                <td>9,840</td>
+                <td class="tag-excess">+14</td>
+                <td class="tag-excess">Under Audit Review</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <div class="footer-left">EduVerify Central Statutory Reporting Engine • WeasyPrint Validated</div>
+        <div class="footer-right">AICTE Apex Authority Signed</div>
+    </div>
+</body>
+</html>

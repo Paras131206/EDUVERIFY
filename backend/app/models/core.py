@@ -583,6 +583,10 @@ class Webhook(Base):
         nullable=False,
     )
 
+    deliveries: Mapped[list["WebhookDelivery"]] = relationship(
+        "WebhookDelivery", back_populates="webhook", cascade="all, delete-orphan"
+    )
+
 
 class WebhookDelivery(Base):
     """Webhook dispatch delivery attempt log."""
@@ -604,6 +608,8 @@ class WebhookDelivery(Base):
     delivered_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
     )
+
+    webhook: Mapped["Webhook"] = relationship("Webhook", back_populates="deliveries")
 
 
 class NotificationOutbox(Base):
@@ -700,6 +706,92 @@ class MockApaarRegistry(Base):
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
     dob: Mapped[date] = mapped_column(Date, nullable=False)
     gender: Mapped[str] = mapped_column(String(10), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
+
+
+class IssuerKey(Base):
+    """Ed25519 issuer private/public key storage encrypted at rest."""
+
+    __tablename__ = "issuer_keys"
+
+    issuer_id: Mapped[str] = mapped_column(String(100), primary_key=True)
+    did: Mapped[str] = mapped_column(String(255), nullable=False)
+    key_id: Mapped[str] = mapped_column(String(100), nullable=False, default="key-1")
+    encrypted_private_key: Mapped[str] = mapped_column(Text, nullable=False)
+    public_key_jwk_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
+
+
+class HolderKey(Base):
+    """Registered student browser WebCrypto public JWK for SD-JWT key binding."""
+
+    __tablename__ = "holder_keys"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    apaar_id: Mapped[str] = mapped_column(String(12), nullable=False, index=True)
+    apaar_hash: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    jwk_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
+
+
+class VerificationNonce(Base):
+    """Short-lived challenge nonce for replay protection."""
+
+    __tablename__ = "verification_nonces"
+
+    nonce: Mapped[str] = mapped_column(String(64), primary_key=True)
+    aud: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
+
+
+class ShortLink(Base):
+    """Short-lived 24-hour presentation short links for compact QR codes."""
+
+    __tablename__ = "short_links"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    credential_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    presentation_data: Mapped[str] = mapped_column(Text, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
+
+
+class ReportRecord(Base):
+    """Generated regulatory, policy, accreditation, and monitoring reports."""
+
+    __tablename__ = "reports"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid.uuid4())
+    )
+    report_type: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
+    format: Mapped[str] = mapped_column(String(10), nullable=False)
+    academic_year: Mapped[str] = mapped_column(String(20), nullable=False)
+    state: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    program: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    category: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="READY")
+    generated_by: Mapped[str] = mapped_column(String(255), nullable=False)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    title_hi: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    file_bytes: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
+    file_size: Mapped[str] = mapped_column(String(50), nullable=False, default="0 KB")
+    summary_json: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
     )

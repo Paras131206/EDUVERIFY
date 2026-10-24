@@ -6,6 +6,7 @@ Complies with agents.md §9 and prompt B1.
 import hashlib
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from typing import Any
 
 import jwt
 from app.db import get_db
@@ -131,11 +132,35 @@ def get_current_principal(
     )
 
 
-def require_roles(*allowed_roles: str):
+def get_current_principal_optional(
+    request: Request,
+    authorization: str | None = Header(None),
+    x_api_key: str | None = Header(None, alias="X-API-Key"),
+    db: Session = Depends(get_db),
+) -> Principal | None:
+    """Optional dependency resolving authenticated principal if credentials exist, else None."""
+    if not authorization and not x_api_key:
+        return None
+    try:
+        return get_current_principal(
+            request=request, authorization=authorization, x_api_key=x_api_key, db=db
+        )
+    except HTTPException:
+        return None
+
+
+def require_roles(*allowed_roles: Any):
     """Factory creating an endpoint dependency enforcing allowed user roles."""
+    flat_roles: set[str] = set()
+    for r in allowed_roles:
+        if isinstance(r, (list, tuple, set)):
+            for item in r:
+                flat_roles.add(item.value if hasattr(item, "value") else str(item))
+        else:
+            flat_roles.add(r.value if hasattr(r, "value") else str(r))
 
     def role_checker(principal: Principal = Depends(get_current_principal)) -> Principal:
-        if principal.role not in allowed_roles:
+        if principal.role not in flat_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail={

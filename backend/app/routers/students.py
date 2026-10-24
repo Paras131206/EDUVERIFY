@@ -1,6 +1,7 @@
 """
-Student records router: retrieve student details and execute manual administrative corrections.
-Complies with contracts/openapi.yaml and prompt B3 item 7.
+Student records router: retrieve student details, execute manual administrative corrections,
+and manage lifecycle state transitions with DPDP Act 2023 PII masking.
+Complies with contracts/openapi.yaml, agents.md §8.1, §8.4, and prompt B5.
 """
 
 from app.db import get_db
@@ -10,15 +11,67 @@ from app.schemas.students import (
     StudentRecordResponse,
     StudentUpdateRequest,
 )
-from app.security.crypto import decrypt_field
+from app.security.crypto import decrypt_field, keyed_apaar_hash
 from app.security.deps import Principal, get_current_principal
+from app.services.audit import append_audit_log
 from app.services.batches import update_student_service
 from app.services.students import transition_student_service
+from eduverify_engine.masking import mask_apaar, mask_email, mask_mobile
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/v1/students", tags=["Students"])
+
+
+def serialize_student_record(
+    student: StudentRecord,
+    principal: Principal,
+    db: Session,
+    purpose: str = "STUDENT_RECORD_READ",
+) -> StudentRecordResponse:
+    """
+    Serializes student record applying DPDP Act 2023 PII masking rules:
+    - apaar_id, email, and mobile are masked UNLESS principal is the record's student
+      or the institution admin of the student's enrolled institution.
+    - AICTE_ANALYST is always masked.
+    - Every unmasked read logs a tamper-evident audit row with access purpose.
+    """
+    is_self = principal.role == "STUDENT" and (
+        principal.student_apaar_hash in (student.apaar_hash, keyed_apaar_hash(student.apaar_id))
+    )
+    is_inst_admin = (
+        principal.role == "INSTITUTION_ADMIN"
+        and principal.institution_aicte_id == student.institution_aicte_id
+    )
+    can_view_unmasked = (is_self or is_inst_admin) and principal.role != "AICTE_ANALYST"
+
+    raw_email = decrypt_field(student.email_enc) if student.email_enc else None
+    raw_mobile = decrypt_field(student.mobile_enc) if student.mobile_enc else None
+
+    resp = StudentRecordResponse.model_validate(student)
+
+    if can_view_unmasked:
+        append_audit_log(
+            db,
+            action="PII_UNMASKED_READ",
+            actor_type="API_KEY" if principal.is_api_key else "USER",
+            actor_id=principal.id,
+            role=principal.role,
+            resource="STUDENT_RECORD",
+            resource_id=student.apaar_id,
+            payload={"purpose": purpose},
+        )
+        db.commit()
+        resp.apaar_id = student.apaar_id
+        resp.email = raw_email
+        resp.mobile = raw_mobile
+    else:
+        resp.apaar_id = mask_apaar(student.apaar_id)
+        resp.email = mask_email(raw_email) if raw_email else None
+        resp.mobile = mask_mobile(raw_mobile) if raw_mobile else None
+
+    return resp
 
 
 @router.get(
@@ -31,28 +84,40 @@ def get_student(
     principal: Principal = Depends(get_current_principal),
     db: Session = Depends(get_db),
 ) -> StudentRecordResponse:
-    """Retrieves student record by 12-digit APAAR ID."""
+    """
+    Retrieves student record by 12-digit APAAR ID.
+    Enforces authorization, PII masking, and unmasked read audit trail.
+    """
     student = db.scalars(select(StudentRecord).where(StudentRecord.apaar_id == apaar_id)).first()
     if not student:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Student record not found"
         )
 
-    # Access check: AICTE roles can read all; institutions can read their enrolled students
-    if principal.role != "AICTE_ADMIN" and principal.role != "AICTE_ANALYST":
+    # Authorization checks
+    if principal.role in ("AICTE_ADMIN", "AICTE_ANALYST"):
+        pass  # Global platform administrative access
+    elif principal.role in ("INSTITUTION_ADMIN", "INSTITUTION_STAFF"):
         if (
             principal.institution_aicte_id
             and principal.institution_aicte_id != student.institution_aicte_id
         ):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    elif principal.role == "STUDENT":
+        if principal.student_apaar_hash not in (
+            student.apaar_hash,
+            keyed_apaar_hash(apaar_id),
+        ):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
-    resp = StudentRecordResponse.model_validate(student)
-    # Decrypt contact fields if present
-    if student.email_enc:
-        resp.email = decrypt_field(student.email_enc)
-    if student.mobile_enc:
-        resp.mobile = decrypt_field(student.mobile_enc)
-    return resp
+    return serialize_student_record(
+        student,
+        principal=principal,
+        db=db,
+        purpose="STUDENT_RECORD_INSPECTION",
+    )
 
 
 @router.put(
@@ -75,12 +140,12 @@ def update_student(
         update_data=body.model_dump(exclude_unset=True),
         principal=principal,
     )
-    resp = StudentRecordResponse.model_validate(updated_student)
-    if updated_student.email_enc:
-        resp.email = decrypt_field(updated_student.email_enc)
-    if updated_student.mobile_enc:
-        resp.mobile = decrypt_field(updated_student.mobile_enc)
-    return resp
+    return serialize_student_record(
+        updated_student,
+        principal=principal,
+        db=db,
+        purpose="STUDENT_RECORD_UPDATE",
+    )
 
 
 @router.post(
@@ -107,9 +172,9 @@ def create_student_transition(
         evidence_ref=body.evidence_ref,
         principal=principal,
     )
-    resp = StudentRecordResponse.model_validate(updated_student)
-    if updated_student.email_enc:
-        resp.email = decrypt_field(updated_student.email_enc)
-    if updated_student.mobile_enc:
-        resp.mobile = decrypt_field(updated_student.mobile_enc)
-    return resp
+    return serialize_student_record(
+        updated_student,
+        principal=principal,
+        db=db,
+        purpose="STUDENT_LIFECYCLE_TRANSITION",
+    )
