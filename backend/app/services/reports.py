@@ -34,7 +34,7 @@ def generate_report_pdf(report: BatchReport, academic_year: str = "2026-27") -> 
 
         pdf_bytes = HTML(string=html_str).write_pdf()
         if pdf_bytes is not None:
-            return bytes(pdf_bytes)
+            return pdf_bytes
         return _generate_fallback_pdf(report)
     except Exception as exc:  # pragma: no cover
         logger.warning(

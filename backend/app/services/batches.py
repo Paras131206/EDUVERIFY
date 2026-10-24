@@ -645,7 +645,7 @@ def _execute_commit(
 
     # 6. Upsert valid student rows
     committed_count = 0
-    excluded_rows_list = sorted([int(r) for r in error_row_indices if r is not None])
+    excluded_rows_list = sorted([r for r in error_row_indices if r is not None])
     now = datetime.now(UTC)
 
     for idx, row in working_df.iterrows():
