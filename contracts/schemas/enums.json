@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eduverify.aicte-india.org/schemas/enums.json",
+  "title": "EduVerify Canonical Enums",
+  "description": "Standard enumerated types for EduVerify data contracts per agents.md §5.1, §7, §9.",
+  "type": "object",
+  "properties": {
+    "gender": {
+      "type": "string",
+      "enum": ["M", "F", "T"],
+      "description": "Gender: M (Male), F (Female), T (Transgender)"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["GEN", "EWS", "OBC-NCL", "SC", "ST"],
+      "description": "Social reservation category"
+    },
+    "course_level": {
+      "type": "string",
+      "enum": ["DIPLOMA", "UG", "PG", "PGDM", "PHD"],
+      "description": "Educational course level"
+    },
+    "admission_type": {
+      "type": "string",
+      "enum": ["REGULAR", "LATERAL", "TRANSFER_IN"],
+      "description": "Type of admission"
+    },
+    "seat_type": {
+      "type": "string",
+      "enum": ["REGULAR", "SUPERNUMERARY"],
+      "description": "Seat classification"
+    },
+    "supernumerary_scheme": {
+      "type": "string",
+      "enum": ["TFW", "PMSSS", "JK", "NE", "FN_OCI_NRI", "PWD", "OTHER"],
+      "description": "Specific supernumerary scheme if seat_type is SUPERNUMERARY"
+    },
+    "quota": {
+      "type": "string",
+      "enum": ["NONE", "NRI", "OCI", "FN", "PIO", "CIWG"],
+      "description": "Quota / residency category"
+    },
+    "enrolment_status": {
+      "type": "string",
+      "enum": ["ACTIVE", "WITHDRAWN", "DEFERRED", "TRANSFERRED_OUT", "COMPLETED", "GRADUATED"],
+      "description": "Current lifecycle state of the student"
+    },
+    "consent_status": {
+      "type": "string",
+      "enum": ["GRANTED", "REFUSED", "WITHDRAWN"],
+      "description": "Status of student consent under DPDP Act"
+    },
+    "onboarding_level": {
+      "type": "string",
+      "enum": ["FULL", "AGGREGATE_ONLY"],
+      "description": "Institution onboarding level"
+    },
+    "institution_type": {
+      "type": "string",
+      "enum": ["CENTRAL_UNIVERSITY", "STATE_UNIVERSITY", "DEEMED_UNIVERSITY", "PRIVATE_UNIVERSITY", "AUTONOMOUS_INSTITUTION", "AFFILIATED_COLLEGE"],
+      "description": "AICTE Institution type"
+    },
+    "dab_type": {
+      "type": "string",
+      "enum": ["UNIVERSITY", "DEEMED", "AUTONOMOUS_INSTITUTION"],
+      "description": "Degree Awarding Body type"
+    },
+    "batch_status": {
+      "type": "string",
+      "enum": ["UPLOADED", "MAPPING", "VALIDATING", "VALIDATED", "IN_REVIEW", "COMMITTED", "REJECTED", "SUPERSEDED", "FAILED"],
+      "description": "Batch processing status"
+    },
+    "issue_severity": {
+      "type": "string",
+      "enum": ["ERROR", "WARN", "INFO"],
+      "description": "Validation issue severity"
+    },
+    "issue_priority": {
+      "type": "string",
+      "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"],
+      "description": "Validation issue priority"
+    },
+    "issue_bucket": {
+      "type": "string",
+      "enum": ["AUTO_FLAG", "HUMAN_REVIEW", "INFO"],
+      "description": "Review routing bucket"
+    },
+    "transfer_status": {
+      "type": "string",
+      "enum": ["PENDING", "APPROVED", "REJECTED", "CANCELLED", "OVERRIDDEN"],
+      "description": "Status of an inter-institution student transfer"
+    },
+    "credential_status": {
+      "type": "string",
+      "enum": ["VALID", "REVOKED", "SUPERSEDED", "SUSPENDED"],
+      "description": "Credential verification status"
+    },
+    "user_role": {
+      "type": "string",
+      "enum": ["AICTE_ADMIN", "AICTE_ANALYST", "DAB_ADMIN", "INSTITUTION_ADMIN", "INSTITUTION_STAFF", "VERIFIER", "STUDENT"],
+      "description": "User RBAC role"
+    }
+  }
+}
