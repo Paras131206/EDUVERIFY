@@ -1,5 +1,8 @@
 .env
 .venv/
+venv/
+ENV/
+env/
 __pycache__/
 *.pyc
 node_modules/
@@ -10,3 +13,5 @@ data/raw/
 *.sqlite3
 playwright-report/
 test-results/
+.vite/
+*.tsbuildinfo
