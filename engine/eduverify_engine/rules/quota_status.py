@@ -37,7 +37,7 @@ def validate_v014_quota_nationality(df: pd.DataFrame, ctx: RuleContext) -> list[
     """
     issues: list[Issue] = []
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
 
@@ -109,7 +109,7 @@ def validate_v015_seat_type_and_scheme(df: pd.DataFrame, ctx: RuleContext) -> li
     """
     issues: list[Issue] = []
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
 
@@ -171,7 +171,7 @@ def validate_v018_consent(df: pd.DataFrame, ctx: RuleContext) -> list[Issue]:
     """
     issues: list[Issue] = []
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
 
@@ -277,7 +277,7 @@ def validate_v021_lifecycle_transition(df: pd.DataFrame, ctx: RuleContext) -> li
         "GRADUATED": {"GRADUATED"},
     }
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
         aid = str(row.get("apaar_id", "")).strip()

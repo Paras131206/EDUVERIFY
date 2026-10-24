@@ -22,7 +22,7 @@ def validate_v019_program_approval(df: pd.DataFrame, ctx: RuleContext) -> list[I
     if "program_code" not in df.columns:
         return issues
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
         prog_code = str(row.get("program_code", "")).strip()
@@ -88,9 +88,9 @@ def validate_v033_dab_affiliation(df: pd.DataFrame, ctx: RuleContext) -> list[Is
     Cross-checks institution's affiliated_dab_id against institutions and degree_awarding_bodies master.
     """
     issues: list[Issue] = []
-    raw = ctx.raw_df if ctx.raw_df is not None else df
+    raw_records = ctx.get_records(ctx.raw_df) if ctx.raw_df is not None else None
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
         inst_id = str(row.get("institution_aicte_id", ctx.institution_aicte_id)).strip()
@@ -101,12 +101,12 @@ def validate_v033_dab_affiliation(df: pd.DataFrame, ctx: RuleContext) -> list[Is
         # Check raw_df or working_df for stated DAB
         stated_dab = ""
         for col in ["affiliated_dab_id", "degree_awarding_body", "university_id", "dab_id"]:
-            if col in raw.columns:
-                val = str(raw.loc[idx, col]).strip()
+            if raw_records is not None and ctx.raw_df is not None and col in ctx.raw_df.columns:
+                val = str(raw_records[idx].get(col, "")).strip()
                 if val and val.lower() not in ("nan", "none", "null"):
                     stated_dab = val
                     break
-            elif col in df.columns:
+            elif col in row:
                 val = str(row.get(col, "")).strip()
                 if val and val.lower() not in ("nan", "none", "null"):
                     stated_dab = val
@@ -168,7 +168,7 @@ def validate_v035_batch_institution_mismatch(df: pd.DataFrame, ctx: RuleContext)
     if not auth_inst or "institution_aicte_id" not in df.columns:
         return issues
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
         row_inst = str(row.get("institution_aicte_id", "")).strip()

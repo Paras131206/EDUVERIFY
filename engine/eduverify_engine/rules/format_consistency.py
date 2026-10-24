@@ -42,7 +42,7 @@ def validate_v006_invalid_format(df: pd.DataFrame, ctx: RuleContext) -> list[Iss
         or {"GRANTED", "REFUSED", "WITHDRAWN"},
     }
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
 
@@ -169,7 +169,7 @@ def validate_v024_unparseable_date(df: pd.DataFrame, ctx: RuleContext) -> list[I
     issues: list[Issue] = []
     date_fields = ["dob", "admission_date", "consent_date"]
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
 
@@ -219,7 +219,7 @@ def validate_v031_formatting_inconsistency(df: pd.DataFrame, ctx: RuleContext) -
     if "full_name" not in df.columns:
         return issues
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
         name = row.get("full_name")

@@ -51,8 +51,9 @@ from .rules.registry import make_issue, rule
 
 logger = logging.getLogger(__name__)
 
-# Christen (2012) maximum candidate block size
-MAX_BLOCK_SIZE = 250
+# Christen (2012) maximum candidate block size and pair budget
+MAX_BLOCK_SIZE = 80
+MAX_CANDIDATE_PAIRS = 25000
 
 # Fellegi-Sunter baseline weights
 DEFAULT_WEIGHTS = {
@@ -334,7 +335,7 @@ def _detect_duplicates_rapidfuzz(
 
     # Pre-extract record representations
     batch_records: list[dict[str, Any]] = []
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         raw_apaar = row.get("apaar_id")
         clean_apaar = (
@@ -483,6 +484,12 @@ def _detect_duplicates_rapidfuzz(
                     if i > j:
                         i, j = j, i
                     candidate_pairs.add((i, j))
+                    if len(candidate_pairs) >= MAX_CANDIDATE_PAIRS:
+                        break
+                if len(candidate_pairs) >= MAX_CANDIDATE_PAIRS:
+                    break
+        if len(candidate_pairs) >= MAX_CANDIDATE_PAIRS:
+            break
 
     for i, j in candidate_pairs:
         rec_a = batch_records[i]
@@ -549,7 +556,7 @@ def _detect_duplicates_rapidfuzz(
         approved_transfers: set[str] = set()
         open_transfers: dict[str, str] = {}
         if not transfers_df.empty and "apaar_id" in transfers_df.columns:
-            for _, t_row in transfers_df.iterrows():
+            for t_row in transfers_df.to_dict(orient="records"):
                 t_apaar = str(t_row.get("apaar_id") or "").strip()
                 t_status = str(t_row.get("status") or "").strip().upper()
                 if t_status == "APPROVED":
@@ -563,7 +570,7 @@ def _detect_duplicates_rapidfuzz(
         )
         year_col = "academic_year" if "academic_year" in snap_df.columns else ""
 
-        for s_idx, s_row in snap_df.iterrows():
+        for s_idx, s_row in enumerate(snap_df.to_dict(orient="records")):
             s_inst = str(s_row.get(inst_col) or "").strip()
             s_year = str(s_row.get(year_col) or acad_year).strip()
             if s_inst == inst_id or (year_col and s_year != acad_year):

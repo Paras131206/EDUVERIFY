@@ -19,6 +19,8 @@ def test_devserver_healthz():
     data = response.json()
     assert data["status"] == "ok"
     assert data["service"] == "eduverify_engine_devserver"
+    assert data["engine_version"] == "1.0.0"
+    assert data["catalog_version"] == "1.0.0"
 
 
 def test_devserver_catalog():

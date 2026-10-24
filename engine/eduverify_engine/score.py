@@ -64,11 +64,9 @@ def calculate_deequ_metrics(
 
     for col in df.columns:
         series = df[col]
-        # Treat NaN, None, and empty string as blank
-        non_blank_mask = (
-            series.notna()
-            & (series.astype(str).str.strip() != "")
-            & (~series.astype(str).str.strip().str.lower().isin(["nan", "none", "null"]))
+        series_clean = series.dropna().astype(str).str.strip()
+        non_blank_mask = (series_clean != "") & (
+            ~series_clean.str.lower().isin(["nan", "none", "null"])
         )
         non_blank_count = int(non_blank_mask.sum())
 
@@ -82,7 +80,7 @@ def calculate_deequ_metrics(
 
         # 3. Uniqueness
         if non_blank_count > 0:
-            distinct_count = int(series[non_blank_mask].astype(str).nunique())
+            distinct_count = int(series_clean[non_blank_mask].nunique())
             uniqueness[col] = round(float(distinct_count / non_blank_count), 3)
         else:
             uniqueness[col] = 1.0

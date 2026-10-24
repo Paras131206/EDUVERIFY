@@ -25,7 +25,7 @@ def validate_v023_excel_mangled(df, ctx: RuleContext) -> list[Issue]:
     if "apaar_id" not in df.columns:
         return issues
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
         raw_val = row.get("apaar_id", "")
@@ -46,7 +46,7 @@ def validate_v023_excel_mangled(df, ctx: RuleContext) -> list[Issue]:
                     reason=f"Detected spreadsheet corruption: {defect} in value '{raw_val}'",
                     evidence={
                         "original": str(raw_val),
-                        "cleaned": norm_val,
+                        "cleaned": mask_apaar(norm_val),
                         "defect": defect,
                     },
                     suggested_fix=fix,
@@ -70,7 +70,7 @@ def validate_v002_apaar_format(df, ctx: RuleContext) -> list[Issue]:
     if "apaar_id" not in df.columns:
         return issues
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
         raw_val = row.get("apaar_id", "")
@@ -115,7 +115,7 @@ def validate_v003_apaar_in_registry(df, ctx: RuleContext) -> list[Issue]:
     if "apaar_id" not in df.columns or ctx.registry.empty:
         return issues
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
         raw_val = row.get("apaar_id", "")
@@ -132,8 +132,8 @@ def validate_v003_apaar_in_registry(df, ctx: RuleContext) -> list[Issue]:
                         record_key=rec_key,
                         field="apaar_id",
                         message="APAAR ID not found in national verification registry",
-                        reason=f"APAAR number '{norm_val}' does not exist in national APAAR registry.",
-                        evidence={"apaar_id": norm_val, "registry_checked": True},
+                        reason=f"APAAR number '{mask_apaar(norm_val)}' does not exist in national APAAR registry.",
+                        evidence={"apaar_id": mask_apaar(norm_val), "registry_checked": True},
                         value_masked=mask_apaar(norm_val),
                         severity="ERROR",
                         priority="CRITICAL",
@@ -157,7 +157,7 @@ def validate_v004_registry_fuzzy_mismatch(df, ctx: RuleContext) -> list[Issue]:
     has_name = "full_name" in df.columns
     has_dob = "dob" in df.columns
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
         raw_val = row.get("apaar_id", "")
