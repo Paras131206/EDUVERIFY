@@ -5,6 +5,7 @@ Pure Python package (no DB, no HTTP in library).
 
 __version__ = "0.0.1"
 
+from .mapping import suggest_mapping
 from .masking import mask_apaar, mask_email, mask_mobile
 from .models import (
     Anomaly,
@@ -19,21 +20,37 @@ from .models import (
     SchemaDrift,
     SuggestedFix,
 )
+from .normalize import normalize_apaar, normalize_boolean, normalize_date, normalize_name
+from .parse import ParsedFile, parse_file
+from .report import compare_reports, export_report
+from .validate import RegistryEntry, RegistryProtocol, validate_batch
 
 __all__ = [
     "__version__",
+    "Anomaly",
     "BatchReport",
     "ColumnMapping",
     "DQComparison",
-    "Issue",
-    "SuggestedFix",
     "DuplicateCluster",
     "DuplicateMember",
-    "SchemaDrift",
-    "Anomaly",
     "IntakeSummary",
+    "Issue",
+    "ParsedFile",
     "ReconciliationRow",
+    "RegistryEntry",
+    "RegistryProtocol",
+    "SchemaDrift",
+    "SuggestedFix",
+    "compare_reports",
+    "export_report",
     "mask_apaar",
     "mask_email",
     "mask_mobile",
+    "normalize_apaar",
+    "normalize_boolean",
+    "normalize_date",
+    "normalize_name",
+    "parse_file",
+    "suggest_mapping",
+    "validate_batch",
 ]
