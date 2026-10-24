@@ -40,10 +40,10 @@ The engine exposes a clean, frozen Python interface:
 from eduverify_engine import validate_batch
 
 report = validate_batch(
-    file_or_df="batch_upload.xlsx",          # File path, bytes, BytesIO, or pd.DataFrame
-    mapping=None,                            # Optional list[ColumnMapping] overrides
-    institution_aicte_id="1-100010001",      # Authenticated uploader AICTE ID
-    academic_year="2026-27",                 # Academic calendar year
+    file_or_df="batch_upload.xlsx",  # File path, bytes, BytesIO, or pd.DataFrame
+    mapping=None,  # Optional list[ColumnMapping] overrides
+    institution_aicte_id="1-100010001",  # Authenticated uploader AICTE ID
+    academic_year="2026-27",  # Academic calendar year
 )
 
 print(f"Quality Score: {report.quality_score:.1f}%")
@@ -202,6 +202,7 @@ Create or add to the appropriate module in `engine/eduverify_engine/rules/`:
 from eduverify_engine.rules import RuleContext, rule, make_issue
 from eduverify_engine.models import Issue
 
+
 @rule("V036")
 def validate_v036_sample_rule(df, ctx: RuleContext) -> list[Issue]:
     issues: list[Issue] = []
@@ -213,7 +214,7 @@ def validate_v036_sample_rule(df, ctx: RuleContext) -> list[Issue]:
                     rule_id="V036",
                     ctx=ctx,
                     row=int(idx) + 2,
-                    record_key=str(row.get("institution_student_id", f"row-{idx+2}")),
+                    record_key=str(row.get("institution_student_id", f"row-{idx + 2}")),
                     field="some_field",
                     message="Explanation of failure",
                     reason="Detailed statutory rationale.",

@@ -39,13 +39,23 @@ class RuleCatalog(BaseModel):
 
 
 def get_default_catalog_path() -> Path:
-    """Finds contracts/rule_catalog.yaml relative to package or repo root."""
+    """Finds contracts/rule_catalog.yaml relative to package, venv or repo root."""
     current = Path(__file__).resolve()
-    # Check parent traversals
-    for parent in [current.parent.parent.parent, current.parent.parent, current.parent]:
+    # Check parent traversals of __file__ up to 6 levels (handles site-packages inside .venv)
+    p = current
+    for _ in range(6):
+        p = p.parent
+        candidate = p / "contracts" / "rule_catalog.yaml"
+        if candidate.exists():
+            return candidate
+
+    # Also check cwd and parents of cwd (e.g. when run from backend/ or engine/)
+    cwd = Path.cwd().resolve()
+    for parent in [cwd, cwd.parent, cwd.parent.parent]:
         candidate = parent / "contracts" / "rule_catalog.yaml"
         if candidate.exists():
             return candidate
+
     return Path("contracts/rule_catalog.yaml")
 
 
