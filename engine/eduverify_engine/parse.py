@@ -6,6 +6,7 @@ Never crashes on bad rows, detects encoding, guards file size.
 
 import io
 from pathlib import Path
+from typing import Any
 
 import charset_normalizer
 import openpyxl
@@ -46,6 +47,21 @@ def normalize_header(header: str) -> str:
     if header is None:
         return ""
     return str(header).strip()
+
+
+def _dedup_headers(cols: list[Any]) -> list[str]:
+    """Ensures all column headers are non-empty and unique."""
+    seen: dict[str, int] = {}
+    unique_cols: list[str] = []
+    for idx, c in enumerate(cols):
+        c_str = str(c).strip() if c is not None and str(c).strip() != "" else f"col_{idx}"
+        if c_str in seen:
+            seen[c_str] += 1
+            unique_cols.append(f"{c_str}_{seen[c_str]}")
+        else:
+            seen[c_str] = 0
+            unique_cols.append(c_str)
+    return unique_cols
 
 
 def parse_csv(data: bytes, encoding: str) -> tuple[pd.DataFrame, list[str], list[Issue]]:
@@ -94,7 +110,8 @@ def parse_csv(data: bytes, encoding: str) -> tuple[pd.DataFrame, list[str], list
                 rows.append([p.strip() for p in parts])
         df = pd.DataFrame(rows, columns=headers, dtype=str)
 
-    headers = [str(col).strip() for col in df.columns]
+    df.columns = _dedup_headers(list(df.columns))
+    headers = list(df.columns)
     # Trim all string values in DataFrame
     for col in df.columns:
         df[col] = df[col].astype(str).str.strip()
@@ -106,43 +123,62 @@ def parse_xlsx(data: bytes) -> tuple[pd.DataFrame, list[str], dict[str, str], li
     """Reads XLSX using openpyxl in data_only mode, preserving raw string representations."""
     issues: list[Issue] = []
     cell_types: dict[str, str] = {}
-    wb = openpyxl.load_workbook(io.BytesIO(data), data_only=True, read_only=False)
-    sheet = wb.active
-    if not sheet:
-        return pd.DataFrame(), [], cell_types, issues
 
-    rows_iter = sheet.iter_rows(values_only=False)
     try:
-        header_row = next(rows_iter)
-    except StopIteration:
+        wb = openpyxl.load_workbook(io.BytesIO(data), data_only=True, read_only=False)
+        sheet = wb.active
+        if not sheet:
+            return pd.DataFrame(), [], cell_types, issues
+
+        rows_iter = sheet.iter_rows(values_only=False)
+        try:
+            header_row = next(rows_iter)
+        except StopIteration:
+            return pd.DataFrame(), [], cell_types, issues
+
+        raw_headers = [
+            str(cell.value).strip() if cell.value is not None else f"col_{idx}"
+            for idx, cell in enumerate(header_row)
+        ]
+        headers = _dedup_headers(raw_headers)
+
+        # Map column cell types based on first data rows
+        data_rows = []
+        for _row_idx, row in enumerate(rows_iter, start=2):
+            row_vals = []
+            for col_idx, cell in enumerate(row):
+                col_name = headers[col_idx] if col_idx < len(headers) else f"col_{col_idx}"
+                if cell.data_type and col_name not in cell_types:
+                    cell_types[col_name] = cell.data_type
+
+                val = cell.value
+                if val is None:
+                    str_val = ""
+                elif isinstance(val, float) and val.is_integer():
+                    str_val = str(int(val))
+                else:
+                    str_val = str(val).strip()
+                row_vals.append(str_val)
+            data_rows.append(row_vals)
+
+        df = pd.DataFrame(data_rows, columns=headers, dtype=str)
+        return df, headers, cell_types, issues
+    except Exception as e:
+        issues.append(
+            Issue(
+                issue_id="parse-xlsx-corrupt",
+                row=1,
+                field="file",
+                rule_id="V001",
+                severity="ERROR",
+                priority="CRITICAL",
+                bucket="AUTO_FLAG",
+                message="Corrupted or invalid XLSX spreadsheet file",
+                reason=f"Failed to read workbook archive: {type(e).__name__}: {e}",
+                evidence={"error": str(e)},
+            )
+        )
         return pd.DataFrame(), [], cell_types, issues
-
-    headers = [
-        str(cell.value).strip() if cell.value is not None else f"col_{idx}"
-        for idx, cell in enumerate(header_row)
-    ]
-
-    # Map column cell types based on first data rows
-    data_rows = []
-    for _row_idx, row in enumerate(rows_iter, start=2):
-        row_vals = []
-        for col_idx, cell in enumerate(row):
-            col_name = headers[col_idx] if col_idx < len(headers) else f"col_{col_idx}"
-            if cell.data_type and col_name not in cell_types:
-                cell_types[col_name] = cell.data_type
-
-            val = cell.value
-            if val is None:
-                str_val = ""
-            elif isinstance(val, float) and val.is_integer():
-                str_val = str(int(val))
-            else:
-                str_val = str(val).strip()
-            row_vals.append(str_val)
-        data_rows.append(row_vals)
-
-    df = pd.DataFrame(data_rows, columns=headers, dtype=str)
-    return df, headers, cell_types, issues
 
 
 def parse_file(file_input: str | Path | bytes | io.BytesIO | pd.DataFrame) -> ParsedFile:
@@ -151,7 +187,8 @@ def parse_file(file_input: str | Path | bytes | io.BytesIO | pd.DataFrame) -> Pa
     Enforces size guards and returns ParsedFile with string-only DataFrame.
     """
     if isinstance(file_input, pd.DataFrame):
-        df = file_input.astype(str)
+        df = file_input.copy()
+        df.columns = _dedup_headers(list(df.columns))
         return ParsedFile(
             df=df,
             original_headers=[str(c) for c in df.columns],
@@ -183,13 +220,33 @@ def parse_file(file_input: str | Path | bytes | io.BytesIO | pd.DataFrame) -> Pa
     # Detect format: check zip magic for xlsx (PK\x03\x04)
     is_xlsx = filename.endswith(".xlsx") or file_bytes.startswith(b"PK\x03\x04")
 
-    if is_xlsx:
-        df, headers, cell_types, issues = parse_xlsx(file_bytes)
-        encoding = "binary"
-    else:
-        encoding = detect_file_encoding(file_bytes)
-        df, headers, issues = parse_csv(file_bytes, encoding)
-        cell_types = {h: "string" for h in headers}
+    try:
+        if is_xlsx:
+            df, headers, cell_types, issues = parse_xlsx(file_bytes)
+            encoding = "binary"
+        else:
+            encoding = detect_file_encoding(file_bytes)
+            df, headers, issues = parse_csv(file_bytes, encoding)
+            cell_types = {h: "string" for h in headers}
+    except Exception as e:
+        encoding = "unknown"
+        headers = []
+        cell_types = {}
+        df = pd.DataFrame()
+        issues = [
+            Issue(
+                issue_id="parse-file-error",
+                row=1,
+                field="file",
+                rule_id="V001",
+                severity="ERROR",
+                priority="CRITICAL",
+                bucket="AUTO_FLAG",
+                message="Failed to parse file structure",
+                reason=f"Parser exception: {type(e).__name__}: {e}",
+                evidence={"error": str(e)},
+            )
+        ]
 
     if len(df) > MAX_ROWS:
         raise ValueError(f"Row count exceeds 100,000 limit ({len(df)} rows)")

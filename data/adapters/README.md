@@ -14,3 +14,7 @@ These adapters transform research datasets into the canonical EduVerify schema f
 2. **SynEdu-HEDL** (`drsanjayagal/SynEdu-HEDL` / Zenodo 10.5281/zenodo.18884938):
    - Features: Relational student records and multi-year enrolments.
    - Adapter: `synedu.py`
+
+3. **neuralsorcerer/student-performance** (HuggingFace, CC0):
+   - Features: 26-column student performance, demographics, and load-test sample.
+   - Adapter: `neuralsorcerer.py`

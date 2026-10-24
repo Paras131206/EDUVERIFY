@@ -49,13 +49,22 @@ def get_default_catalog_path() -> Path:
     return Path("contracts/rule_catalog.yaml")
 
 
+_CATALOG_CACHE: dict[str, RuleCatalog] = {}
+
+
 def load_rule_catalog(catalog_path: Path | str | None = None) -> RuleCatalog:
     """Loads and validates the rule catalog YAML file."""
     path = Path(catalog_path) if catalog_path else get_default_catalog_path()
+    cache_key = str(path.resolve())
+    if cache_key in _CATALOG_CACHE:
+        return _CATALOG_CACHE[cache_key]
+
     if not path.exists():
         raise FileNotFoundError(f"Rule catalog not found at {path}")
 
     with open(path, "r", encoding="utf-8") as f:
         data: dict[str, Any] = yaml.safe_load(f)
 
-    return RuleCatalog(**data)
+    catalog = RuleCatalog(**data)
+    _CATALOG_CACHE[cache_key] = catalog
+    return catalog

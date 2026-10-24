@@ -54,10 +54,13 @@ class ParseResponse(BaseModel):
 @app.get("/healthz")
 def healthz() -> dict[str, str]:
     """Healthcheck endpoint for engine dev harness."""
+    catalog = load_rule_catalog()
     return {
         "status": "ok",
         "service": "eduverify_engine_devserver",
         "version": __version__,
+        "engine_version": __version__,
+        "catalog_version": catalog.catalog_version,
     }
 
 

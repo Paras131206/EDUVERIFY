@@ -38,7 +38,7 @@ def validate_v016_implausible_age(df: pd.DataFrame, ctx: RuleContext) -> list[Is
     if "dob" not in df.columns:
         return issues
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
         raw_dob = row.get("dob")
@@ -107,7 +107,7 @@ def validate_v017_admission_date_window(df: pd.DataFrame, ctx: RuleContext) -> l
     if "admission_date" not in df.columns:
         return issues
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
         raw_adm = row.get("admission_date")
@@ -158,7 +158,7 @@ def validate_v025_expected_graduation_year(df: pd.DataFrame, ctx: RuleContext) -
     if "expected_graduation_year" not in df.columns:
         return issues
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
         raw_grad = row.get("expected_graduation_year")
@@ -258,10 +258,10 @@ def validate_v026_conflicting_student_rows(df: pd.DataFrame, ctx: RuleContext) -
         return issues
 
     groups: dict[str, list[tuple[int, dict]]] = {}
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         sid = str(row.get(id_col, "")).strip()
         if sid and sid.lower() not in ("nan", "none", "null"):
-            groups.setdefault(sid, []).append((int(idx) + 2, row.to_dict()))
+            groups.setdefault(sid, []).append((int(idx) + 2, row))
 
     for sid, row_list in groups.items():
         if len(row_list) > 1:
@@ -315,7 +315,7 @@ def validate_v027_year_of_study_bounds(df: pd.DataFrame, ctx: RuleContext) -> li
     if "year_of_study" not in df.columns:
         return issues
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
         raw_yos = row.get("year_of_study")
