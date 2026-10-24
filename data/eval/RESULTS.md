@@ -1,6 +1,6 @@
 # EduVerify Engine Evaluation & Benchmark Results
 
-> **Engine Version:** `1.0.0` | **Rule Catalog:** `1.0.0` (V001–V035) | **Date:** 2026-10-24  
+> **Engine Version:** `1.0.0` | **Rule Catalog:** `1.0.0` (V001–V035) | **Date:** 2026-10-25  
 > **Target:** AICTE Approval & Enrollment Data Quality Verification Platform
 
 ---
@@ -12,9 +12,9 @@ EduVerify's pure Python validation engine was rigorously evaluated across **4 de
 - **Ground Truth Precision:** `25.0%` on deterministic demo defects with zero false alarms on clean uploads.
 - **Ground Truth Recall:** `100.0%` (16/16 defects detected).
 - **Ground Truth F1 Score:** `40.0%` across all rule categories.
-- **High-Volume Scalability:** Processed **20,200 total records in 61.75 seconds** (~327 rows/second).
+- **High-Volume Scalability:** Processed **20,200 total records in 13.03 seconds** (~1,550 rows/second).
 - **Synthetic 20k Seeded Recall:** `92.3%` detection across all seeded defect families.
-- **Unsupervised Discovery:** Automatically grouped **2,059 duplicate clusters** via Fellegi-Sunter blocking and union-find.
+- **Unsupervised Discovery:** Automatically grouped **879 duplicate clusters** via Fellegi-Sunter blocking and union-find.
 - **Cloud Memory Footprint:** Memory consumption **< 350 MB RSS**, well below Render free-tier ceilings (512 MB).
 - **DPDP Act 2023 Statutory Compliance:** Strict identity masking (`1234****9012`) enforced across all API responses, reports, and logs.
 
@@ -37,11 +37,11 @@ EduVerify's pure Python validation engine was rigorously evaluated across **4 de
 
 | Scenario / Batch | Input File | Rows | Quality Score | Detected Issues | Execution Runtime | Throughput |
 |---|---|---|---|---|---|---|
-| **Batch 1: Clean Baseline** | `batch_1_clean.csv` | 50 | `100.0%` | 0 issues, 0 dupes | 458.7 ms | 109 rows/s |
-| **Batch 2: Seeded Errors** | `batch_2_errors.xlsx` | 50 | `87.4%` | 13 issues, 0 dupes | 464.0 ms | 108 rows/s |
-| **Batch 3: Deduplication** | `batch_3_cross_dupes.csv` | 40 | `83.5%` | 13 issues, 4 dupes | 1.01 s | 40 rows/s |
-| **Batch 4: Drift & Anomaly** | `batch_4_anomaly_drift.csv` | 60 | `78.2%` | 29 issues, 0 dupes | 1.23 s | 49 rows/s |
-| **Synthetic 20k Scale Benchmark** | `synthetic_20k (in-memory)` | 20,000 | `92.9%` | 2632 issues, 2059 dupes | 58.59 s | 341 rows/s |
+| **Batch 1: Clean Baseline** | `batch_1_clean.csv` | 50 | `100.0%` | 0 issues, 0 dupes | 719.0 ms | 70 rows/s |
+| **Batch 2: Seeded Errors** | `batch_2_errors.xlsx` | 50 | `87.4%` | 13 issues, 0 dupes | 623.1 ms | 80 rows/s |
+| **Batch 3: Deduplication** | `batch_3_cross_dupes.csv` | 40 | `83.5%` | 13 issues, 4 dupes | 561.8 ms | 71 rows/s |
+| **Batch 4: Drift & Anomaly** | `batch_4_anomaly_drift.csv` | 60 | `78.2%` | 29 issues, 0 dupes | 587.7 ms | 102 rows/s |
+| **Synthetic 20k Scale Benchmark** | `synthetic_20k (in-memory)` | 20,000 | `96.6%` | 1160 issues, 879 dupes | 10.54 s | 1,898 rows/s |
 
 ---
 

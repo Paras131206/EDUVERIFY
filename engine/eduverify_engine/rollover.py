@@ -51,7 +51,7 @@ def rollover_preview(
             code = str(p["program_code"]).strip()
             val = p.get(dur_col, 4)
             try:
-                prog_durations[code] = int(val)
+                prog_durations[code] = int(str(val)) if val is not None else 4
             except (ValueError, TypeError):
                 prog_durations[code] = 4
 
@@ -69,7 +69,8 @@ def rollover_preview(
         duration = prog_durations.get(prog, default_dur)
 
         try:
-            current_yos = int(row.get("year_of_study", 1))
+            yos_raw = row.get("year_of_study")
+            current_yos = int(str(yos_raw)) if yos_raw is not None else 1
         except (ValueError, TypeError):
             current_yos = 1
 

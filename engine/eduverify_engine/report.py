@@ -199,6 +199,7 @@ def export_report(report: BatchReport | DQComparison, fmt: str = "json") -> byte
     # Sheet 1: Summary
     # -------------------------------------------------------------
     ws_summary = wb.active
+    assert ws_summary is not None
     ws_summary.title = "Summary"
 
     if isinstance(report, BatchReport):
@@ -698,7 +699,7 @@ def export_report(report: BatchReport | DQComparison, fmt: str = "json") -> byte
     for ws in wb.worksheets:
         for col in ws.columns:
             max_len = 0
-            col_letter = get_column_letter(col[0].column)
+            col_letter = get_column_letter(int(col[0].column or 1))
             for cell in col:
                 val = cell.value
                 if val is not None:

@@ -101,7 +101,8 @@ def generate_profile(df: pd.DataFrame, ctx: RuleContext | None = None) -> dict[s
     }
 
     for col in columns:
-        series = df[col]
+        raw_series = df[col]
+        series = raw_series.iloc[:, 0] if isinstance(raw_series, pd.DataFrame) else raw_series
         # Treat NaN, None, empty string, and literal "null"/"nan" as null
         as_str = series.fillna("").astype(str).str.strip().str.lower()
         is_null_mask = (series.isna()) | (as_str.isin(["", "nan", "none", "null"]))

@@ -70,6 +70,7 @@ try:
 
     _HAS_INDIC_SOUNDEX = True
 except ImportError:
+    indic_soundex = None  # type: ignore[assignment]
     _HAS_INDIC_SOUNDEX = False
 
 
@@ -77,7 +78,7 @@ def _get_phonetic_key(word: str) -> str:
     """Generates phonetic code using indic-soundex if available, falling back to jellyfish metaphone."""
     if not word:
         return ""
-    if _HAS_INDIC_SOUNDEX:
+    if _HAS_INDIC_SOUNDEX and indic_soundex is not None:
         try:
             return str(indic_soundex.soundex(word))
         except Exception as exc:
@@ -299,13 +300,12 @@ def _compare_demographics(
 
 def _is_splink_available() -> bool:
     """Checks if splink and duckdb are available in environment."""
-    try:
-        import duckdb  # noqa: F401
-        import splink  # noqa: F401
+    import importlib.util
 
-        return True
-    except ImportError:
-        return False
+    return (
+        importlib.util.find_spec("duckdb") is not None
+        and importlib.util.find_spec("splink") is not None
+    )
 
 
 def _detect_duplicates_splink(
@@ -873,7 +873,10 @@ def _get_rule_issues(rule_id: str, df: pd.DataFrame, ctx: RuleContext) -> list[I
         }
         ctx._duplicate_clusters = clusters
 
-    return ctx._dedup_cache["grouped_issues"].get(rule_id, [])
+    cache_val = ctx._dedup_cache
+    if cache_val is not None and "grouped_issues" in cache_val:
+        return cache_val["grouped_issues"].get(rule_id, [])
+    return []
 
 
 @rule("V007")

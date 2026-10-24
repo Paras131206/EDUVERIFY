@@ -41,8 +41,6 @@ def test_schemathesis_spec_loads(repo_root):
     if exp and hasattr(exp, "OPEN_API_3_1"):
         exp.OPEN_API_3_1.enable()
 
-
-
     # Schemathesis 4.x moves loaders under schemathesis.openapi;
     # Schemathesis 3.x has them on top-level or schemathesis.openapi.
     loader = getattr(schemathesis, "openapi", None)

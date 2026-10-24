@@ -1,7 +1,14 @@
 import csv
 import hashlib
+import sys
 import tempfile
 from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+DEMO_DIR = REPO_ROOT / "data" / "demo"
 
 # pyrefly: ignore[missing-import]
 from data.generator.generate import generate_dataset
@@ -38,7 +45,7 @@ def test_generator_determinism():
 
 def test_ground_truth_row_counts():
     """Verifies that ground truth contains seeded defect records."""
-    gt_path = Path("data/demo/ground_truth.csv")
+    gt_path = DEMO_DIR / "ground_truth.csv"
     assert gt_path.exists(), "Ground truth file missing"
 
     with open(gt_path, "r", encoding="utf-8") as f:
@@ -52,10 +59,9 @@ def test_ground_truth_row_counts():
 
 
 def test_demo_batches_exist():
-    demo_dir = Path("data/demo")
-    assert (demo_dir / "batch_1_clean.csv").exists()
-    assert (demo_dir / "batch_2_errors.xlsx").exists()
-    assert (demo_dir / "batch_3_cross_dupes.csv").exists()
-    assert (demo_dir / "batch_4_anomaly_drift.csv").exists()
-    assert (demo_dir / "demo_registry.csv").exists()
-    assert (demo_dir / "demo_intake.csv").exists()
+    assert (DEMO_DIR / "batch_1_clean.csv").exists()
+    assert (DEMO_DIR / "batch_2_errors.xlsx").exists()
+    assert (DEMO_DIR / "batch_3_cross_dupes.csv").exists()
+    assert (DEMO_DIR / "batch_4_anomaly_drift.csv").exists()
+    assert (DEMO_DIR / "demo_registry.csv").exists()
+    assert (DEMO_DIR / "demo_intake.csv").exists()

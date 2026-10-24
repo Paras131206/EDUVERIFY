@@ -1,5 +1,8 @@
 from pathlib import Path
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DEMO_DIR = REPO_ROOT / "data" / "demo"
+
 from eduverify_engine.mapping import suggest_mapping
 from eduverify_engine.normalize import (
     normalize_apaar,
@@ -13,9 +16,9 @@ from eduverify_engine.validate import validate_batch
 
 def test_batch_2_mapping():
     """batch_2_errors.xlsx maps PRN->institution_student_id, DOB->dob, Dept->department >= 0.9."""
-    b2_path = Path("data/demo/batch_2_errors.xlsx")
+    b2_path = DEMO_DIR / "batch_2_errors.xlsx"
     if not b2_path.exists():
-        b2_path = Path("../data/demo/batch_2_errors.xlsx")
+        b2_path = Path("data/demo/batch_2_errors.xlsx")
     assert b2_path.exists(), "batch_2_errors.xlsx missing"
 
     parsed = parse_file(b2_path)
@@ -96,12 +99,14 @@ def test_apaar_mangling_detection():
     clean_dot, defect_dot, fix_dot = normalize_apaar("123456789012.0")
     assert clean_dot == "123456789012"
     assert defect_dot == "FLOAT_SUFFIX"
+    assert fix_dot is not None
     assert fix_dot.value == "123456789012"
 
     # Dropped leading zero (11 digits)
     clean_pad, defect_pad, fix_pad = normalize_apaar("12345678901")
     assert defect_pad == "DROPPED_LEADING_ZERO"
     assert clean_pad == "012345678901"
+    assert fix_pad is not None
     assert fix_pad.value == "012345678901"
 
 
@@ -116,9 +121,9 @@ def test_boolean_normalization():
 
 def test_minimal_validate_batch_clean():
     """Validates batch_1_clean.csv with 0 errors and 100 quality score."""
-    b1_path = Path("data/demo/batch_1_clean.csv")
+    b1_path = DEMO_DIR / "batch_1_clean.csv"
     if not b1_path.exists():
-        b1_path = Path("../data/demo/batch_1_clean.csv")
+        b1_path = Path("data/demo/batch_1_clean.csv")
     report = validate_batch(b1_path)
     assert report.rows_total == 50
     assert report.rows_error == 0
@@ -127,9 +132,9 @@ def test_minimal_validate_batch_clean():
 
 def test_minimal_validate_batch_errors():
     """Validates batch_2_errors.xlsx with detected seeded errors."""
-    b2_path = Path("data/demo/batch_2_errors.xlsx")
+    b2_path = DEMO_DIR / "batch_2_errors.xlsx"
     if not b2_path.exists():
-        b2_path = Path("../data/demo/batch_2_errors.xlsx")
+        b2_path = Path("data/demo/batch_2_errors.xlsx")
     report = validate_batch(b2_path)
     assert report.rows_total == 50
     rule_ids = {iss.rule_id for iss in report.issues}

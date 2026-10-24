@@ -97,6 +97,7 @@ def test_models_roundtrip():
     reloaded = BatchReport(**dumped)
     assert reloaded.batch_id == "batch-uuid-1"
     assert reloaded.issues[0].rule_id == "V025"
+    assert reloaded.issues[0].suggested_fix is not None
     assert reloaded.issues[0].suggested_fix.value == 2030
 
 

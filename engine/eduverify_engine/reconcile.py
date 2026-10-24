@@ -76,11 +76,11 @@ def reconcile_batch(
 
     for _, d_row in inst_declared.iterrows():
         prog = str(d_row["program_code"]).strip()
-        declared_total = int(d_row.get("declared_enrolment", 0))
-        declared_super = int(d_row.get("declared_supernumerary", 0))
-        declared_nri = int(d_row.get("declared_nri", 0))
-        declared_oci = int(d_row.get("declared_oci", 0))
-        declared_fn = int(d_row.get("declared_fn", 0))
+        declared_total = int(str(d_row.get("declared_enrolment") or 0))
+        declared_super = int(str(d_row.get("declared_supernumerary") or 0))
+        declared_nri = int(str(d_row.get("declared_nri") or 0))
+        declared_oci = int(str(d_row.get("declared_oci") or 0))
+        declared_fn = int(str(d_row.get("declared_fn") or 0))
 
         uploaded_total = 0
         uploaded_super = 0
@@ -231,12 +231,12 @@ def reconcile_aggregate(
                     break
         for _, s in sub_df.iterrows():
             p = str(s["program_code"]).strip()
-            val = int(s.get(cnt_col, 0))
+            val = int(str(s.get(cnt_col) or 0))
             sub_lookup[p] = val
 
     for _, d in dec_df.iterrows():
         p = str(d["program_code"]).strip()
-        decl = int(d.get("declared_enrolment", 0))
+        decl = int(str(d.get("declared_enrolment") or 0))
         subm = sub_lookup.get(p, 0)
         delta = subm - decl
         tolerance = max(tolerance_abs, int(round(tolerance_pct * decl)))
