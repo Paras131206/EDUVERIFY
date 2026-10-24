@@ -83,7 +83,7 @@ def detect_anomalies(
             if metric not in inst_history.columns:
                 continue
 
-            series = pd.to_numeric(inst_history[metric], errors="coerce").dropna()
+            series = pd.Series(pd.to_numeric(inst_history[metric], errors="coerce")).dropna()
             if len(series) < 3:
                 continue
 
@@ -162,7 +162,7 @@ def detect_anomalies(
                 .fillna(0.0)
                 .values
             )
-            model = IsolationForest(random_state=42, contamination=0.1)
+            model = IsolationForest(random_state=42, contamination=0.1)  # pyright: ignore[reportArgumentType]
             model.fit(X_hist)
 
             curr_vector = [float(current_metrics.get(c, 0.0)) for c in available_features]

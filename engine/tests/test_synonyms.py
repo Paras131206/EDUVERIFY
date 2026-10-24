@@ -2,11 +2,13 @@ from pathlib import Path
 
 import yaml
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
 
 def test_column_synonyms_loads():
-    syn_file = Path("contracts/column_synonyms.yaml")
+    syn_file = REPO_ROOT / "contracts" / "column_synonyms.yaml"
     if not syn_file.exists():
-        syn_file = Path("../contracts/column_synonyms.yaml")
+        syn_file = Path("contracts/column_synonyms.yaml")
     assert syn_file.exists(), f"Synonyms file not found at {syn_file}"
 
     with open(syn_file, "r", encoding="utf-8") as f:

@@ -138,6 +138,16 @@ class RuleContext:
         self.previous_batch_profile = previous_batch_profile
         self.previous_year_records = previous_year_records
 
+        # Internal caches and results for deduplication, drift, anomaly, reconcile
+        self._dedup_cache: dict[str, Any] | None = None
+        self._duplicate_clusters: list[Any] = []
+        self._anomaly_cache: Any = None
+        self._anomalies: list[Any] = []
+        self._drift_cache: Any = None
+        self._schema_drift: list[Any] = []
+        self._reconcile_cache: Any = None
+        self._reconciliation: list[Any] = []
+
         # Load or use provided master tables
         self.master = master if master is not None else load_master_tables(self.repo_root)
 

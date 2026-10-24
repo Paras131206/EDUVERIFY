@@ -43,7 +43,9 @@ def validate_v012_regular_intake_exceeded(df: pd.DataFrame, ctx: RuleContext) ->
 
     prog_counts = active_regular.groupby(df["program_code"].astype(str).str.strip()).size()
 
-    for prog_code, enrolled_count in prog_counts.items():
+    for raw_prog_code, raw_count in prog_counts.items():
+        prog_code = str(raw_prog_code)
+        enrolled_count = int(str(raw_count))
         if not prog_code or prog_code.lower() in ("nan", "none", "null"):
             continue
 
@@ -116,7 +118,10 @@ def validate_v013_supernumerary_quota_exceeded(df: pd.DataFrame, ctx: RuleContex
         ]
     ).size()
 
-    for (prog_code, scheme), count in grouped.items():
+    for key, raw_count in grouped.items():
+        prog_code = str(key[0]) if isinstance(key, tuple) and len(key) > 0 else str(key)
+        scheme = str(key[1]) if isinstance(key, tuple) and len(key) > 1 else ""
+        count = int(str(raw_count))
         if not prog_code or not scheme or scheme in ("NAN", "NONE", "NULL", ""):
             continue
 

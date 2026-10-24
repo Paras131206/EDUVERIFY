@@ -72,7 +72,7 @@ def generate_20k_synthetic_batch(
         if "apaar_id" in snap_df.columns:
             snap_apaars = set(snap_df["apaar_id"].dropna().str.strip())
 
-    df_reg_clean = df_reg[~df_reg["apaar_id"].isin(snap_apaars)].copy()
+    df_reg_clean = df_reg[~df_reg["apaar_id"].isin(list(snap_apaars))].copy()
     num_rows = 20000
     if len(df_reg_clean) < num_rows:
         repeats = (num_rows // len(df_reg_clean)) + 1
@@ -169,13 +169,14 @@ def generate_20k_synthetic_batch(
 def evaluate_demo_defects(
     report: BatchReport,
     ground_truth: list[dict[str, Any]],
-    batch_filename: str,
+    batch_filename: str | Path,
 ) -> tuple[int, int, int, dict[str, dict[str, int]]]:
     """
     Evaluates detected issues against ground truth for demo batches.
     Returns: (tp, fp, fn, per_family_counts)
     """
-    batch_truth = [t for t in ground_truth if t["file"] == batch_filename]
+    fname = Path(batch_filename).name
+    batch_truth = [t for t in ground_truth if t["file"] == fname]
 
     detected_pairs: set[tuple[str, int]] = set()
     for iss in report.issues:
@@ -259,7 +260,7 @@ def run_evaluation() -> None:
     ground_truth_path = demo_dir / "ground_truth.csv"
     demo_truth = load_ground_truth(ground_truth_path)
 
-    batch_configs = [
+    batch_configs: list[dict[str, Any]] = [
         {
             "name": "Batch 1: Clean Baseline",
             "file": "batch_1_clean.csv",
@@ -299,7 +300,7 @@ def run_evaluation() -> None:
         report = validate_batch(cfg["path"])
         runtime = time.perf_counter() - t0
 
-        tp, fp, fn, fam_stats = evaluate_demo_defects(report, demo_truth, cfg["file"])
+        tp, fp, fn, fam_stats = evaluate_demo_defects(report, demo_truth, str(cfg["file"]))
 
         for fam, s in fam_stats.items():
             demo_family_stats[fam]["tp"] += s["tp"]

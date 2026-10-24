@@ -194,7 +194,7 @@ def generate_dataset(
     registry_records = []
     student_pool = []
 
-    for i in range(num_students):
+    for _ in range(num_students):
         apaar = generate_apaar_id(rng)
         is_male = rng.random() < 0.55
         if is_male:
@@ -230,7 +230,7 @@ def generate_dataset(
     institutions = [f"1-1000100{i:02d}" for i in range(1, 41)]
 
     for inst in institutions:
-        for prog_code, level, dur, lat in PROGRAM_CODES:
+        for prog_code, level, _dur, _lat in PROGRAM_CODES:
             approved = rng.choice([60, 120, 180, 240] if level == "UG" else [30, 60])
             schemes = {
                 "TFW": int(approved * 0.05),
@@ -270,7 +270,7 @@ def generate_dataset(
     print("Generating declared totals...")
     declared_records = []
     for inst in institutions:
-        for prog_code, level, dur, lat in PROGRAM_CODES:
+        for prog_code, level, _dur, _lat in PROGRAM_CODES:
             # Baseline close to intake
             approved = 60 if level != "UG" else 120
             # Some deliberate discrepancies for reconciliation testing
@@ -608,7 +608,8 @@ def generate_dataset(
     demo_pool_idx += 100
 
     # BATCH 2: Errors & Excel with non-standard headers (50 rows)
-    # Headers: PRN (institution_student_id), DOB (dob), Dept (department), APAAR No (apaar_id), Candidate Name (full_name)...
+    # Headers: PRN (institution_student_id), DOB (dob), Dept (department),
+    # APAAR No (apaar_id), Candidate Name (full_name)...
     # Seeded defects: V002, V005, V014, V015, V018, V023, V024, V025, V027
     batch_2_rows = []
     ground_truth = []
@@ -762,12 +763,16 @@ def generate_dataset(
 
     # BATCH 3: Deduplication & Cross-institution (40 rows)
     # Seeded:
-    # 1. Intra-batch fuzzy duplicate (Row 2 & Row 3: "Rahul Sharma" vs "Rahul S. Sharma", same DOB/gender, different APAAR => V009)
-    # 2. Transliteration dup (Row 6 & Row 7: "Lakshmi Iyer" vs "Laxmi Iyer", same DOB => V009)
-    # 3. Cross-institution ACTIVE dup (Row 10 has APAAR from central_snapshot with no transfer => V010)
-    # 4. Approved transfer student (Row 14 has APAAR from transfers with status APPROVED => must NOT be flagged V010!)
+    # 1. Intra-batch fuzzy duplicate (Row 2 & 3: "Rahul Sharma" vs "Rahul S. Sharma",
+    #    same DOB/gender, different APAAR => V009)
+    # 2. Transliteration dup (Row 6 & 7: "Lakshmi Iyer" vs "Laxmi Iyer", same DOB => V009)
+    # 3. Cross-institution ACTIVE dup (Row 10 has APAAR from central_snapshot
+    #    with no transfer => V010)
+    # 4. Approved transfer student (Row 14 has APAAR from transfers with status
+    #    APPROVED => must NOT be flagged V010!)
     # 5. Open/Pending transfer student (Row 18 has APAAR from transfers with status OPEN => V032)
-    # 6. Twins case (Row 22 & Row 23: same DOB, same last name, different first names "Amit" vs "Sumit" => NOT auto-flagged!)
+    # 6. Twins case (Row 22 & 23: same DOB, same last name, different first names
+    #    "Amit" vs "Sumit" => NOT auto-flagged!)
     batch_3_rows = []
 
     # Base 40 clean students
