@@ -38,7 +38,14 @@ def test_schemathesis_spec_loads(repo_root):
     if hasattr(schemathesis, "experimental") and hasattr(schemathesis.experimental, "OPEN_API_3_1"):
         schemathesis.experimental.OPEN_API_3_1.enable()
 
-    schema = schemathesis.from_path(str(spec_path))
+    # Schemathesis 4.x moves loaders under schemathesis.openapi;
+    # Schemathesis 3.x has them on top-level or schemathesis.openapi.
+    loader = getattr(schemathesis, "openapi", None)
+    load_from_path = getattr(loader, "from_path", None) if loader else None
+    if not load_from_path:
+        load_from_path = getattr(schemathesis, "from_path")  # noqa: B009
+
+    schema = load_from_path(str(spec_path))
     operations = list(schema.get_all_operations())
     assert len(operations) > 50, f"Expected >50 operations, got {len(operations)}"
 
