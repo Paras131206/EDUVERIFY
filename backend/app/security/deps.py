@@ -29,6 +29,10 @@ class Principal:
     is_api_key: bool = False
 
 
+# Alias for backwards compatibility with earlier prompts / IDE cache
+AuthenticatedPrincipal = Principal
+
+
 def get_current_principal(
     request: Request,
     authorization: str | None = Header(None),

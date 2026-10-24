@@ -25,9 +25,11 @@ export const resetAuthMock = () => {
 };
 
 let batches: BatchItem[] = [...mockBatches] as unknown as BatchItem[];
+let currentBatchReport = JSON.parse(JSON.stringify(mockBatchReport));
 
 export const resetBatchMock = () => {
   batches = [...mockBatches] as unknown as BatchItem[];
+  currentBatchReport = JSON.parse(JSON.stringify(mockBatchReport));
 };
 
 export const handlers = [
@@ -351,8 +353,25 @@ export const handlers = [
     return HttpResponse.json(batch);
   }),
 
-  http.get('*/v1/batches/:id/report', () => {
-    return HttpResponse.json(mockBatchReport);
+  http.get('*/v1/batches/:id/report', ({ params }) => {
+    const report = {
+      ...currentBatchReport,
+      batch_id: (params.id as string) || currentBatchReport.batch_id,
+      issues: currentBatchReport.issues.map((iss: typeof currentBatchReport.issues[0]) => ({
+        ...iss,
+        rule_name:
+          iss.rule_id === 'V002'
+            ? 'apaar_id missing or not 12 digits'
+            : iss.rule_id === 'V004'
+            ? 'Registry name/DOB fuzzy mismatch'
+            : iss.rule_id === 'V021'
+            ? 'Intake sanction ceiling exceeded'
+            : iss.rule_id === 'V030'
+            ? 'Canonical enum value mismatch'
+            : `Validation Rule ${iss.rule_id}`,
+      })),
+    };
+    return HttpResponse.json(report);
   }),
 
   http.get('*/v1/batches/:id/report.xlsx', () => {
@@ -373,6 +392,33 @@ export const handlers = [
     });
   }),
 
+  http.get('*/v1/batches/:id/records/:row', ({ params }) => {
+    const rowNum = Number(params.row) || 8;
+    return HttpResponse.json({
+      row: rowNum,
+      apaar_id: rowNum === 8 ? '98457291230' : '984572912301',
+      institution_aicte_id: '1-1234567890',
+      institution_student_id: `PRN-2026-0${rowNum < 10 ? '0' + rowNum : rowNum}`,
+      full_name: rowNum === 8 ? 'Rahul Sharma' : rowNum === 15 ? 'Priya Singh' : 'Aarav Patel',
+      dob: '2004-05-12',
+      gender: 'M',
+      category: 'GEN',
+      program_code: rowNum === 42 ? 'BTECH-MECH' : 'BTECH-CSE',
+      course_level: 'UG',
+      department: rowNum === 50 ? ' computer science' : 'Computer Science',
+      academic_year: '2026-27',
+      admission_date: '2026-08-01',
+      admission_type: 'REGULAR',
+      seat_type: 'REGULAR',
+      quota: 'NONE',
+      nationality: 'IN',
+      enrolment_status: 'ACTIVE',
+      consent_status: 'GRANTED',
+      email: 'student@example.edu.in',
+      mobile: '+91 98765 43210',
+    });
+  }),
+
   http.get('*/v1/batches/:id/mapping', () => {
     return HttpResponse.json(mockBatchReport.column_mapping);
   }),
@@ -390,25 +436,232 @@ export const handlers = [
   }),
 
   http.get('*/v1/batches/:id/issues', () => {
-    return HttpResponse.json(mockBatchReport.issues);
-  }),
-
-  http.post('*/v1/batches/:id/commit', () => {
-    return HttpResponse.json({
-      ...mockBatches[1],
-      status: 'COMMITTED',
-      quality_score_after: 96.5,
-    });
+    return HttpResponse.json(currentBatchReport.issues);
   }),
 
   http.post('*/v1/issues/:id/decide', async ({ params, request }) => {
-    const body = (await request.json()) as { decision: string };
-    const issue = mockBatchReport.issues.find((i) => i.issue_id === params.id);
-    return HttpResponse.json({
+    const body = (await request.json()) as {
+      decision: string;
+      override_value?: string;
+      remarks?: string;
+      user_role?: string;
+    };
+    const issueIndex = currentBatchReport.issues.findIndex(
+      (i: typeof currentBatchReport.issues[0]) => i.issue_id === params.id
+    );
+
+    if (issueIndex === -1) {
+      return HttpResponse.json({ detail: 'Issue not found' }, { status: 404 });
+    }
+
+    const issue = currentBatchReport.issues[issueIndex];
+    let newStatus = issue.status;
+    let proposedVal = issue.proposed_value;
+    let valMasked = issue.value_masked;
+
+    if (body.decision === 'ACCEPT_FIX' || body.decision === 'ACCEPT_SUGGESTION') {
+      newStatus = 'FIXED';
+      if (issue.suggested_fix?.value) {
+        valMasked = String(issue.suggested_fix.value);
+      }
+    } else if (body.decision === 'EDIT_VALUE' || body.decision === 'OVERRIDE_VALUE') {
+      newStatus = 'FIXED';
+      if (body.override_value) {
+        valMasked = body.override_value;
+      }
+    } else if (body.decision === 'DISMISS') {
+      newStatus = 'DISMISSED';
+    } else if (body.decision === 'PROPOSE_FIX') {
+      newStatus = 'PROPOSED';
+      proposedVal = issue.suggested_fix?.value ? String(issue.suggested_fix.value) : undefined;
+    } else if (body.decision === 'PROPOSE_EDIT') {
+      newStatus = 'PROPOSED';
+      proposedVal = body.override_value;
+    } else if (body.decision === 'PROPOSE_DISMISS') {
+      newStatus = 'PROPOSED';
+    }
+
+    const updatedIssue = {
       ...issue,
-      status: body.decision === 'ACCEPT_FIX' ? 'FIXED' : 'DISMISSED',
+      status: newStatus,
+      decision_note: body.remarks || issue.decision_note,
+      proposed_value: proposedVal,
+      value_masked: valMasked,
+      decided_by: body.user_role || 'INSTITUTION_ADMIN',
+    };
+
+    currentBatchReport.issues[issueIndex] = updatedIssue;
+    return HttpResponse.json(updatedIssue);
+  }),
+
+  http.post('*/v1/batches/:id/issues/bulk-decide', async ({ request }) => {
+    const body = (await request.json()) as {
+      action: 'ACCEPT_INFO' | 'DISMISS_SELECTED';
+      issue_ids?: string[];
+      remarks?: string;
+    };
+
+    if (body.action === 'ACCEPT_INFO') {
+      currentBatchReport.issues = currentBatchReport.issues.map(
+        (iss: typeof currentBatchReport.issues[0]) => {
+          if (iss.severity === 'INFO' || iss.bucket === 'INFO') {
+            return {
+              ...iss,
+              status: 'FIXED',
+              value_masked: iss.suggested_fix?.value ? String(iss.suggested_fix.value) : iss.value_masked,
+              decision_note: 'Bulk accepted standard normalisation',
+            };
+          }
+          return iss;
+        }
+      );
+    } else if (body.action === 'DISMISS_SELECTED' && Array.isArray(body.issue_ids)) {
+      currentBatchReport.issues = currentBatchReport.issues.map(
+        (iss: typeof currentBatchReport.issues[0]) => {
+          if (body.issue_ids?.includes(iss.issue_id)) {
+            return {
+              ...iss,
+              status: 'DISMISSED',
+              decision_note: body.remarks || 'Bulk dismissed with justification',
+            };
+          }
+          return iss;
+        }
+      );
+    }
+
+    return HttpResponse.json({
+      success: true,
+      issues: currentBatchReport.issues,
+      count: currentBatchReport.issues.length,
     });
   }),
+
+  http.post('*/v1/duplicates/:id/resolve', async ({ params, request }) => {
+    const body = (await request.json()) as { resolution: string; remarks?: string };
+    const clusterIndex = currentBatchReport.duplicate_clusters.findIndex(
+      (c: typeof currentBatchReport.duplicate_clusters[0]) => c.cluster_id === params.id
+    );
+
+    let status = 'RESOLVED_SAME';
+    if (body.resolution === 'DIFFERENT_PEOPLE' || body.resolution === 'FALSE_POSITIVE_DIFFERENT_PERSONS') {
+      status = 'RESOLVED_DIFFERENT';
+    } else if (body.resolution === 'TRANSFER' || body.resolution === 'TRANSFER_PENDING') {
+      status = 'RESOLVED_TRANSFER';
+    }
+
+    if (clusterIndex !== -1) {
+      currentBatchReport.duplicate_clusters[clusterIndex].status = status;
+      return HttpResponse.json(currentBatchReport.duplicate_clusters[clusterIndex]);
+    }
+
+    return HttpResponse.json({ cluster_id: params.id, status });
+  }),
+
+  http.post('*/v1/batches/:id/revalidate', ({ params }) => {
+    const batchId = (params.id as string) || currentBatchReport.batch_id;
+    const initialScore = 74.0;
+    const totalIssues = currentBatchReport.issues.length;
+    const resolvedIssues = currentBatchReport.issues.filter(
+      (i: typeof currentBatchReport.issues[0]) => i.status === 'FIXED' || i.status === 'DISMISSED'
+    ).length;
+    const pendingIssues = totalIssues - resolvedIssues;
+
+    // Recalculate score from 74% up towards 96.5% proportionally
+    const scoreBoost = totalIssues > 0 ? (resolvedIssues / totalIssues) * 22.5 : 0;
+    const newScore = Math.min(100, Math.round((initialScore + scoreBoost) * 10) / 10);
+
+    currentBatchReport.quality_score_before = initialScore;
+    currentBatchReport.quality_score = newScore;
+    currentBatchReport.quality_score_after = newScore;
+
+    // Recalculate priority summaries
+    const critOpen = currentBatchReport.issues.filter((i: typeof currentBatchReport.issues[0]) => i.priority === 'CRITICAL' && i.status === 'OPEN').length;
+    const highOpen = currentBatchReport.issues.filter((i: typeof currentBatchReport.issues[0]) => i.priority === 'HIGH' && i.status === 'OPEN').length;
+    const medOpen = currentBatchReport.issues.filter((i: typeof currentBatchReport.issues[0]) => i.priority === 'MEDIUM' && i.status === 'OPEN').length;
+    const lowOpen = currentBatchReport.issues.filter((i: typeof currentBatchReport.issues[0]) => i.priority === 'LOW' && i.status === 'OPEN').length;
+
+    const result = {
+      batch_id: batchId,
+      quality_score_before: initialScore,
+      quality_score_after: newScore,
+      resolved_count: resolvedIssues,
+      pending_count: pendingIssues,
+      priority_deltas: [
+        { priority: 'CRITICAL', before: 1, after: critOpen, delta: critOpen - 1 },
+        { priority: 'HIGH', before: 3, after: highOpen, delta: highOpen - 3 },
+        { priority: 'MEDIUM', before: 0, after: medOpen, delta: medOpen - 0 },
+        { priority: 'LOW', before: 1, after: lowOpen, delta: lowOpen - 1 },
+      ],
+      rule_deltas: [
+        {
+          rule_id: 'V002',
+          rule_name: 'apaar_id missing or not 12 digits',
+          before: 1,
+          after: currentBatchReport.issues.filter((i: typeof currentBatchReport.issues[0]) => i.rule_id === 'V002' && i.status === 'OPEN').length,
+          delta: currentBatchReport.issues.filter((i: typeof currentBatchReport.issues[0]) => i.rule_id === 'V002' && i.status === 'OPEN').length - 1,
+        },
+        {
+          rule_id: 'V004',
+          rule_name: 'Registry name/DOB fuzzy mismatch',
+          before: 1,
+          after: currentBatchReport.issues.filter((i: typeof currentBatchReport.issues[0]) => i.rule_id === 'V004' && i.status === 'OPEN').length,
+          delta: currentBatchReport.issues.filter((i: typeof currentBatchReport.issues[0]) => i.rule_id === 'V004' && i.status === 'OPEN').length - 1,
+        },
+        {
+          rule_id: 'V021',
+          rule_name: 'Intake sanction ceiling exceeded',
+          before: 1,
+          after: currentBatchReport.issues.filter((i: typeof currentBatchReport.issues[0]) => i.rule_id === 'V021' && i.status === 'OPEN').length,
+          delta: currentBatchReport.issues.filter((i: typeof currentBatchReport.issues[0]) => i.rule_id === 'V021' && i.status === 'OPEN').length - 1,
+        },
+        {
+          rule_id: 'V030',
+          rule_name: 'Canonical enum value mismatch',
+          before: 1,
+          after: currentBatchReport.issues.filter((i: typeof currentBatchReport.issues[0]) => i.rule_id === 'V030' && i.status === 'OPEN').length,
+          delta: currentBatchReport.issues.filter((i: typeof currentBatchReport.issues[0]) => i.rule_id === 'V030' && i.status === 'OPEN').length - 1,
+        },
+      ],
+    };
+
+    return HttpResponse.json(result);
+  }),
+
+  http.post('*/v1/batches/:id/commit', ({ params }) => {
+    // Check if any open issues have CRITICAL priority
+    const hasOpenCritical = currentBatchReport.issues.some(
+      (i: typeof currentBatchReport.issues[0]) => i.priority === 'CRITICAL' && (i.status === 'OPEN' || i.status === 'PROPOSED')
+    );
+
+    if (hasOpenCritical) {
+      return HttpResponse.json(
+        {
+          detail: 'Cannot commit batch: 1 unresolved CRITICAL issue remaining (V002 on row 8). All critical issues must be resolved or dismissed before committing.',
+          code: 'UNRESOLVED_CRITICAL_ISSUES',
+        },
+        { status: 409 }
+      );
+    }
+
+    const batchId = (params.id as string) || 'batch-demo-2';
+    batches = batches.map((b) =>
+      b.id === batchId || b.id === 'batch-demo-2'
+        ? { ...b, status: 'COMMITTED' as const, quality_score: 96.5, quality_score_after: 96.5 }
+        : b
+    );
+
+    return HttpResponse.json({
+      batch_id: batchId,
+      status: 'COMMITTED',
+      committed_records: 64,
+      excluded_records: 1,
+      quality_score_before: 74.0,
+      quality_score_after: 96.5,
+      committed_at: new Date().toISOString(),
+    });
+  }),
+
 
   http.get('*/v1/dashboards/aicte/summary', () => {
     return HttpResponse.json(mockAicteSummary);
