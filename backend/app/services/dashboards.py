@@ -204,17 +204,21 @@ def get_aicte_map_metric_service(db: Session, metric: str = "coverage") -> Aicte
                 Institution,
                 Batch.institution_aicte_id == Institution.institution_aicte_id,
             )
+            .where(
+                func.coalesce(Batch.quality_score_after, Batch.quality_score_before).is_not(None)
+            )
             .group_by(Institution.state_code)
         ).all()
-        if row[0] is not None
+        if row[0] is not None and row[1] is not None
     }
 
     state_metrics: list[StateMetric] = []
     total_val = 0.0
     for s in states:
-        inst_cnt = inst_counts.get(s.lgd_state_code, 0)
-        stu_cnt = student_counts.get(s.lgd_state_code, 0)
-        dq_val = round(float(dq_scores.get(s.lgd_state_code, 100.0)), 2)
+        inst_cnt = int(inst_counts.get(s.lgd_state_code) or 0)
+        stu_cnt = int(student_counts.get(s.lgd_state_code) or 0)
+        raw_dq = dq_scores.get(s.lgd_state_code)
+        dq_val = round(float(raw_dq), 2) if raw_dq is not None else 100.0
         fill = round((stu_cnt / max(1, inst_cnt * 120)) * 100.0, 2)
         excess = max(0, stu_cnt - (inst_cnt * 100))
 
