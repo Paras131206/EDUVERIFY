@@ -1,3 +1,4 @@
+
 """
 Database connection and session factory for SQLAlchemy 2.
 Supports SQLite for tests/local dev and PostgreSQL 16 (psycopg 3) for production.
@@ -8,12 +9,12 @@ from collections.abc import Generator
 
 from app.config import get_settings
 from sqlalchemy import create_engine, text
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
-# Engine creation with connection pooling
 # Engine creation with connection pooling
 connect_args = {}
 
@@ -40,13 +41,26 @@ SessionLocal = sessionmaker(
 )
 
 
+class Base(DeclarativeBase):
+    pass
+
+
+def get_db() -> Generator[Session, None, None]:
+    """Dependency yielding a transactional SQLAlchemy session."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 def check_db_health() -> str:
     """Validate database connectivity with bounded PostgreSQL timeouts."""
     try:
         with engine.connect() as connection:
             connection.execute(text("SELECT 1"))
         return "connected"
-    except Exception as exc:
+    except SQLAlchemyError as exc:
         logger.warning(
             "Database health check failed: %s",
             type(exc).__name__,
