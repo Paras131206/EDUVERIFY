@@ -9,11 +9,7 @@ import {
   MapPin,
   Search,
   Building,
-  Layers,
-  ArrowUpDown,
   X,
-  ExternalLink,
-  ChevronRight,
   Info,
 } from 'lucide-react';
 

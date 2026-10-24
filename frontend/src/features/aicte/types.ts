@@ -11,9 +11,12 @@ export interface AicteConsoleSummary {
   excess_seats_count: number;
   avg_quality_score: number;
   cross_institution_duplicates: number;
+  cross_institution_dupes_count?: number;
   unresolved_duplicates: number;
   flagged_issues_count: number;
 }
+
+export type { DuplicateClusterItem } from '@/features/institution/types';
 
 export interface SseTickerEvent {
   id: string;

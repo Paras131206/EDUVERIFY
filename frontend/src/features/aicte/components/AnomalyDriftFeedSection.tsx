@@ -2,12 +2,8 @@ import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { AnomalyFeedItem } from '../types';
 import {
-  AlertTriangle,
   Activity,
-  ArrowUpRight,
-  Sparkles,
   ExternalLink,
-  ShieldAlert,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

@@ -3,12 +3,9 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { LeaderboardItem } from '../types';
 import {
   Trophy,
-  AlertTriangle,
   Flame,
   ShieldAlert,
-  ArrowRight,
   TrendingDown,
-  Building,
 } from 'lucide-react';
 
 interface LeaderboardsSectionProps {

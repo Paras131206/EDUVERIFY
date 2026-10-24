@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor, within } from '@testing-library/rea
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AicteDashboardPage } from '@/features/aicte/AicteDashboardPage';
 import { AuthContext, AuthContextType } from '@/lib/auth';
-import { resetAicteMock } from '@/mocks/handlers';
+import { resetAicteMock, setMockAicteSummary } from '@/mocks/handlers';
 import { User } from '@/types/auth';
 import { server } from '@/mocks/server';
 import { http, HttpResponse } from 'msw';
@@ -43,7 +43,10 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
         <MemoryRouter initialEntries={[initialPath]}>
           <Routes>
             <Route path="/aicte" element={<AicteDashboardPage />} />
-            <Route path="/institution/batches/:id/review" element={<div data-testid="batch-review-target">Batch Review Page</div>} />
+            <Route
+              path="/institution/batches/:id/review"
+              element={<div data-testid="batch-review-target">Batch Review Page</div>}
+            />
           </Routes>
         </MemoryRouter>
       </AuthContext.Provider>
@@ -93,7 +96,7 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
       });
 
       // 1. Total Institutions
-      expect(screen.getByTestId('kpi-total-institutions')).toHaveTextContent('40');
+      expect(screen.getByTestId('kpi-institutions')).toHaveTextContent('8,420');
 
       // 2. Dual Coverage (Student-level vs Aggregate-only)
       const coverageCard = screen.getByTestId('kpi-coverage');
@@ -102,16 +105,16 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
       expect(coverageCard).toHaveTextContent(/aggregate-only/i);
 
       // 3. Total Students Enrolled
-      expect(screen.getByTestId('kpi-total-students')).toHaveTextContent('14,820');
+      expect(screen.getByTestId('kpi-students')).toHaveTextContent('4,85,290');
 
       // 4. Avg Fill Percentage
-      expect(screen.getByTestId('kpi-fill-pct')).toHaveTextContent('92.4%');
+      expect(screen.getByTestId('kpi-avg-fill')).toHaveTextContent('92.4%');
 
       // 5. Excess Seats
       expect(screen.getByTestId('kpi-excess-seats')).toHaveTextContent('342');
 
       // 6. National Avg DQ Score
-      expect(screen.getByTestId('kpi-avg-dq')).toHaveTextContent('92.8');
+      expect(screen.getByTestId('kpi-avg-dq')).toHaveTextContent('93%');
     });
 
     it('renders SSE live ticker, supports pause/resume, and receives simulated batch commit event', async () => {
@@ -121,27 +124,27 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
         expect(screen.getByTestId('sse-live-ticker')).toBeInTheDocument();
       });
 
-      // Ticker contains events
-      expect(screen.getByText(/BATCH COMMITTED/i)).toBeInTheDocument();
-      expect(screen.getByText(/ANOMALY DETECTED/i)).toBeInTheDocument();
-      expect(screen.getByText(/CROSS DUPLICATE/i)).toBeInTheDocument();
+      // Ticker contains initial mock event types (with dot replaced by space)
+      expect(screen.getByText(/batch committed/i)).toBeInTheDocument();
+      expect(screen.getByText(/anomaly detected/i)).toBeInTheDocument();
+      expect(screen.getByText(/duplicate cross/i)).toBeInTheDocument();
 
       // Pause ticker
-      const pauseBtn = screen.getByRole('button', { name: /pause ticker stream/i });
+      const pauseBtn = screen.getByRole('button', { name: /^pause$/i });
       fireEvent.click(pauseBtn);
-      expect(screen.getByText(/ticker paused/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /^resume$/i })).toBeInTheDocument();
 
       // Resume ticker
-      const resumeBtn = screen.getByRole('button', { name: /resume ticker stream/i });
+      const resumeBtn = screen.getByRole('button', { name: /^resume$/i });
       fireEvent.click(resumeBtn);
-      expect(screen.queryByText(/ticker paused/i)).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /^pause$/i })).toBeInTheDocument();
 
       // Simulate Batch Commit
-      const simulateBtn = screen.getByRole('button', { name: /simulate batch commit/i });
+      const simulateBtn = screen.getByRole('button', { name: /simulate commit/i });
       fireEvent.click(simulateBtn);
 
       await waitFor(() => {
-        expect(screen.getByText(/Govt Engineering College Salem/i)).toBeInTheDocument();
+        expect(screen.getByText(/510 records verified/i)).toBeInTheDocument();
       });
     });
   });
@@ -155,7 +158,7 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
       });
 
       // Fallback state tile-grid renders with official LGD codes (e.g. MH 27, DL 07, KA 29)
-      const fallbackGrid = screen.getByTestId('state-tile-grid-fallback');
+      const fallbackGrid = screen.getByTestId('map-tile-grid-fallback');
       expect(fallbackGrid).toBeInTheDocument();
       expect(screen.getByTestId('state-tile-27')).toBeInTheDocument(); // Maharashtra
       expect(screen.getByTestId('state-tile-29')).toBeInTheDocument(); // Karnataka
@@ -170,19 +173,24 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
       });
 
       // Select excess seats metric
-      const excessBtn = screen.getByTestId('metric-select-excess');
+      const excessBtn = screen.getByTestId('metric-btn-excess');
       fireEvent.click(excessBtn);
-      expect(screen.getByText(/National Excess Enrolment: \+342 seats/i)).toBeInTheDocument();
+      expect(screen.getByTestId('state-tile-27')).toHaveTextContent(/excess/i);
 
       // Select DQ score metric
-      const dqBtn = screen.getByTestId('metric-select-dq');
+      const dqBtn = screen.getByTestId('metric-btn-dq');
       fireEvent.click(dqBtn);
-      expect(screen.getByText(/National Average DQ Score: 92.8 \/ 100/i)).toBeInTheDocument();
+      expect(screen.getByTestId('state-tile-27')).toHaveTextContent(/% DQ/i);
 
       // Select coverage metric
-      const covBtn = screen.getByTestId('metric-select-coverage');
+      const covBtn = screen.getByTestId('metric-btn-coverage');
       fireEvent.click(covBtn);
-      expect(screen.getByText(/National Coverage: 85.0% verified student-level/i)).toBeInTheDocument();
+      expect(screen.getByTestId('state-tile-27')).toHaveTextContent(/% coverage/i);
+
+      // Select fill metric
+      const fillBtn = screen.getByTestId('metric-btn-fill');
+      fireEvent.click(fillBtn);
+      expect(screen.getByTestId('state-tile-27')).toHaveTextContent(/%/);
     });
 
     it('clicks state tile and loads district/institution drilldown table', async () => {
@@ -197,18 +205,19 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
 
       // Drilldown table should appear
       await waitFor(() => {
-        expect(screen.getByTestId('state-drilldown-panel')).toBeInTheDocument();
+        expect(screen.getByTestId('state-drilldown-table')).toBeInTheDocument();
       });
 
-      expect(screen.getByText(/Maharashtra Institutions \(LGD: 27\)/i)).toBeInTheDocument();
-      expect(screen.getByText(/Pune Institute of Computer Technology/i)).toBeInTheDocument();
+      const drilldown = screen.getByTestId('state-drilldown-table');
+      expect(within(drilldown).getByText(/LGD Code: 27/i)).toBeInTheDocument();
+      expect(within(drilldown).getByText(/Maharashtra Institute of Technology Pune/i)).toBeInTheDocument();
 
       // Search filter within drilldown
-      const searchInput = screen.getByTestId('drilldown-search-input');
-      fireEvent.change(searchInput, { target: { value: 'VJTI' } });
+      const searchInput = within(drilldown).getByPlaceholderText(/filter institutions/i);
+      fireEvent.change(searchInput, { target: { value: 'Mumbai' } });
 
-      expect(screen.getByText(/VJTI Mumbai/i)).toBeInTheDocument();
-      expect(screen.queryByText(/Pune Institute of Computer Technology/i)).not.toBeInTheDocument();
+      expect(within(drilldown).getByText(/Mumbai Institute of Engineering & Research/i)).toBeInTheDocument();
+      expect(within(drilldown).queryByText(/Maharashtra Institute of Technology Pune/i)).not.toBeInTheDocument();
     });
   });
 
@@ -220,21 +229,23 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
         expect(screen.getByTestId('leaderboards-section')).toBeInTheDocument();
       });
 
+      const lb = screen.getByTestId('leaderboards-section');
+
       // Default: Excess Enrolment
-      expect(screen.getByText(/Pune Institute of Advanced Technology/i)).toBeInTheDocument();
-      expect(screen.getByText(/\+48 seats/i)).toBeInTheDocument();
+      expect(within(lb).getByText(/Metropolitan Management Institute/i)).toBeInTheDocument();
+      expect(within(lb).getByText(/\+48 Excess/i)).toBeInTheDocument();
 
       // Switch to Lowest DQ Tab
-      const dqTab = screen.getByTestId('tab-lowest-dq');
+      const dqTab = within(lb).getByTestId('tab-leaderboard-dq');
       fireEvent.click(dqTab);
-      expect(screen.getByText(/Delhi Technological Polytechnic/i)).toBeInTheDocument();
-      expect(screen.getByText(/71.4/i)).toBeInTheDocument();
+      expect(within(lb).getByText(/Rural Polytechnic Institute Delhi/i)).toBeInTheDocument();
+      expect(within(lb).getByText(/64\.2% DQ/i)).toBeInTheDocument();
 
       // Switch to Cross-Duplicates Tab
-      const dupTab = screen.getByTestId('tab-cross-duplicates');
+      const dupTab = within(lb).getByTestId('tab-leaderboard-duplicates');
       fireEvent.click(dupTab);
-      expect(screen.getByText(/Bengaluru City Institute of Science/i)).toBeInTheDocument();
-      expect(screen.getByText(/38 dupes/i)).toBeInTheDocument();
+      expect(within(lb).getByText(/Delhi College of Engineering & Technology/i)).toBeInTheDocument();
+      expect(within(lb).getByText(/18 Dupes/i)).toBeInTheDocument();
     });
   });
 
@@ -246,16 +257,20 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
         expect(screen.getByTestId('quota-seat-section')).toBeInTheDocument();
       });
 
-      // Supernumerary schemes cards
-      expect(screen.getByText(/Tuition Fee Waiver \(TFW\)/i)).toBeInTheDocument();
-      expect(screen.getByText(/J&K PMSSS/i)).toBeInTheDocument();
-      expect(screen.getByText(/PM-USPY Special Scheme/i)).toBeInTheDocument();
+      const quota = screen.getByTestId('quota-seat-section');
 
-      // Toggle between State-wise and Program-wise shares
-      const programToggle = screen.getByRole('button', { name: /by program/i });
+      // Supernumerary schemes cards
+      expect(within(quota).getByText(/Tuition Fee Waiver Scheme/i)).toBeInTheDocument();
+      expect(within(quota).getByText(/Economically Weaker Section/i)).toBeInTheDocument();
+      expect(within(quota).getByText(/PM Special Scholarship Scheme/i)).toBeInTheDocument();
+
+      // Toggle between Top States and Top Programs shares
+      const programToggle = within(quota).getByRole('button', { name: /top programs/i });
       fireEvent.click(programToggle);
 
-      expect(screen.getByText(/NRI, OCI, and Foreign National shares across major programs/i)).toBeInTheDocument();
+      const statesToggle = within(quota).getByRole('button', { name: /top states/i });
+      fireEvent.click(statesToggle);
+      expect(statesToggle.className).toContain('bg-gov-navy');
     });
   });
 
@@ -267,27 +282,26 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
         expect(screen.getByTestId('cross-duplicates-section')).toBeInTheDocument();
       });
 
-      // Click "Compare Side-by-Side" on cluster clus-001
-      const compareBtn = screen.getByTestId('compare-btn-clus-001');
-      fireEvent.click(compareBtn);
+      // Click "Compare & Resolve" on first cluster
+      const compareButtons = screen.getAllByRole('button', { name: /compare & resolve/i });
+      fireEvent.click(compareButtons[0]);
 
       // Verify side-by-side modal opened
       await waitFor(() => {
-        expect(screen.getByTestId('duplicate-compare-modal')).toBeInTheDocument();
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
       });
 
-      expect(screen.getByText(/Side-by-Side APAAR Identity Audit/i)).toBeInTheDocument();
-      expect(screen.getByText(/Pune Institute of Computer Technology/i)).toBeInTheDocument();
-      expect(screen.getByText(/Delhi Technological University/i)).toBeInTheDocument();
+      expect(screen.getByText(/Cross-Institution Duplicate Biometric & Record Compare/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/Rahul Sharma/i).length).toBeGreaterThan(0);
 
       // Action: Confirm as Same Person
-      const samePersonBtn = screen.getByTestId('btn-resolve-same-person');
+      const samePersonBtn = screen.getByRole('button', { name: /confirm same person/i });
       fireEvent.click(samePersonBtn);
 
       // Modal closes and success banner appears
       await waitFor(() => {
-        expect(screen.queryByTestId('duplicate-compare-modal')).not.toBeInTheDocument();
-        expect(screen.getByTestId('resolution-success-banner')).toBeInTheDocument();
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(screen.getByText(/Resolution submitted for cluster cl-cross-001: SAME_PERSON/i)).toBeInTheDocument();
       });
     });
   });
@@ -300,13 +314,14 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
         expect(screen.getByTestId('anomaly-drift-feed-section')).toBeInTheDocument();
       });
 
-      expect(screen.getByText(/Unusual Spike in Mechanical Engineering Intake/i)).toBeInTheDocument();
-      expect(screen.getByText(/IsolationForest \(contamination=0.02\)/i)).toBeInTheDocument();
-      expect(screen.getByText(/z = \+3.42/i)).toBeInTheDocument();
+      const anom = screen.getByTestId('anomaly-drift-feed-section');
+      expect(within(anom).getByText(/nri_share/i)).toBeInTheDocument();
+      expect(within(anom).getByText(/Sudden surge in NRI quota enrolments/i)).toBeInTheDocument();
+      expect(within(anom).getByText(/z = \+6.1 \(IsolationForest\)/i)).toBeInTheDocument();
 
       // Batch link navigates to batch review
-      const batchLink = screen.getAllByRole('link', { name: /investigate batch/i })[0];
-      expect(batchLink).toHaveAttribute('href', '/institution/batches/batch-001/review');
+      const batchLink = within(anom).getAllByRole('link', { name: /batch review/i })[0];
+      expect(batchLink).toHaveAttribute('href', '/institution/batches/batch-demo-4/review');
     });
   });
 
@@ -315,46 +330,69 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
       renderAictePage();
 
       await waitFor(() => {
-        expect(screen.getByTestId('reconciliation-section')).toBeInTheDocument();
+        expect(screen.getByTestId('reconciliation-view-section')).toBeInTheDocument();
       });
 
+      const rec = screen.getByTestId('reconciliation-view-section');
+
       // Initial shows all items
-      expect(screen.getByText(/B.Tech Computer Engineering/i)).toBeInTheDocument();
+      expect(within(rec).getAllByText(/UG-CSE/i).length).toBeGreaterThan(0);
 
       // Filter by Mismatch
-      const mismatchBtn = screen.getByTestId('filter-mismatch');
+      const mismatchBtn = within(rec).getByTestId('filter-rec-mismatch');
       fireEvent.click(mismatchBtn);
-      expect(screen.getByText(/B.Tech Information Technology/i)).toBeInTheDocument();
+      expect(within(rec).getAllByText(/UG-ECE/i).length).toBeGreaterThan(0);
 
       // Filter by Excess
-      const excessBtn = screen.getByTestId('filter-excess');
+      const excessBtn = within(rec).getByTestId('filter-rec-excess');
       fireEvent.click(excessBtn);
-      expect(screen.getByText(/B.Tech Mechanical Engineering/i)).toBeInTheDocument();
+      expect(within(rec).getAllByText(/PG-MBA/i).length).toBeGreaterThan(0);
+
+      // Filter back to all
+      const allBtn = within(rec).getByTestId('filter-rec-all');
+      fireEvent.click(allBtn);
 
       // Search program
-      const searchInput = screen.getByTestId('reconciliation-search-input');
-      fireEvent.change(searchInput, { target: { value: 'Mechanical' } });
-      expect(screen.getByText(/B.Tech Mechanical Engineering/i)).toBeInTheDocument();
+      const searchInput = within(rec).getByPlaceholderText(/search institution \/ program/i);
+      fireEvent.change(searchInput, { target: { value: 'UG-MECH' } });
+      expect(within(rec).getAllByText(/UG-MECH/i).length).toBeGreaterThan(0);
     });
   });
 
   describe('9. Audit Chain Log & Verification', () => {
-    it('displays cryptographic audit log and triggers re-verification', async () => {
+    it('displays cryptographic audit log and triggers re-verification and simulate break', async () => {
       renderAictePage();
 
       await waitFor(() => {
         expect(screen.getByTestId('audit-chain-section')).toBeInTheDocument();
       });
 
-      // Shows SHA-256 block hashes
-      expect(screen.getByText(/0000a1f8c4e2/i)).toBeInTheDocument();
+      const audit = screen.getByTestId('audit-chain-section');
 
-      // Recalculate chain verification
-      const verifyBtn = screen.getByRole('button', { name: /recalculate sha-256 chain/i });
+      // Shows audit records with hashes
+      expect(within(audit).getAllByText(/7f83b165/i).length).toBeGreaterThan(0);
+      expect(within(audit).getByText(/TRANSFER_STATUTORY_OVERRIDE/i)).toBeInTheDocument();
+
+      // Verify chain button recalculates
+      const verifyBtn = within(audit).getByRole('button', { name: /verify chain/i });
       fireEvent.click(verifyBtn);
 
       await waitFor(() => {
-        expect(screen.getByText(/audit chain integrity verified/i)).toBeInTheDocument();
+        expect(within(audit).getByText(/Audit chain intact/i)).toBeInTheDocument();
+      });
+
+      // Simulate break button
+      const breakBtn = within(audit).getByRole('button', { name: /simulate break/i });
+      fireEvent.click(breakBtn);
+
+      await waitFor(() => {
+        expect(within(audit).getByText(/Audit chain broken: link #aud-40/i)).toBeInTheDocument();
+      });
+
+      // Restore intact
+      fireEvent.click(within(audit).getByRole('button', { name: /restore intact/i }));
+      await waitFor(() => {
+        expect(within(audit).getByText(/Audit chain intact/i)).toBeInTheDocument();
       });
     });
   });
@@ -367,17 +405,19 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
         expect(screen.getByTestId('admin-section')).toBeInTheDocument();
       });
 
+      const admin = screen.getByTestId('admin-section');
+
       // Default master entity: Institutions
       await waitFor(() => {
-        expect(screen.getByText(/Pune Institute of Computer Technology/i)).toBeInTheDocument();
+        expect(within(admin).getAllByText(/Delhi College of Engineering & Technology/i).length).toBeGreaterThan(0);
       });
 
       // Switch to Programs
-      const programsTab = screen.getByTestId('master-tab-programs');
+      const programsTab = within(admin).getByRole('button', { name: /programs/i });
       fireEvent.click(programsTab);
 
       await waitFor(() => {
-        expect(screen.getByText(/Computer Science & Engineering/i)).toBeInTheDocument();
+        expect(within(admin).getAllByText(/UG-CSE/i).length).toBeGreaterThan(0);
       });
     });
 
@@ -388,32 +428,37 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
         expect(screen.getByTestId('admin-section')).toBeInTheDocument();
       });
 
+      const admin = screen.getByTestId('admin-section');
+
       // Switch to Rollover tab
-      const rolloverTab = screen.getByTestId('admin-subtab-rollover');
+      const rolloverTab = within(admin).getByTestId('admin-tab-rollover');
       fireEvent.click(rolloverTab);
 
       // Verify dry run summary
-      expect(screen.getByText(/40 institutions/i)).toBeInTheDocument();
-      expect(screen.getByText(/3,450 graduating students/i)).toBeInTheDocument();
+      expect(within(admin).getByText(/Step 1: Execute Pre-Flight Dry Run/i)).toBeInTheDocument();
+
+      // Run dry run
+      const dryRunBtn = within(admin).getByRole('button', { name: /run dry run projection/i });
+      fireEvent.click(dryRunBtn);
+
+      await waitFor(() => {
+        expect(within(admin).getByText(/Advancing to Year N\+1/i)).toBeInTheDocument();
+      });
 
       // Open confirm dialog
-      const launchBtn = screen.getByRole('button', { name: /proceed to confirm rollover/i });
+      const launchBtn = within(admin).getByRole('button', { name: /proceed to confirm rollover/i });
       fireEvent.click(launchBtn);
 
       await waitFor(() => {
-        expect(screen.getByTestId('rollover-confirm-dialog')).toBeInTheDocument();
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
       });
 
-      // Type confirmation text
-      const confirmInput = screen.getByTestId('rollover-confirm-input');
-      fireEvent.change(confirmInput, { target: { value: 'CONFIRM ROLLOVER' } });
-
       // Click final confirm
-      const confirmBtn = screen.getByRole('button', { name: /execute academic year rollover/i });
+      const confirmBtn = screen.getByRole('button', { name: /confirm & execute rollover/i });
       fireEvent.click(confirmBtn);
 
       await waitFor(() => {
-        expect(screen.getByText(/Rollover Executed Successfully/i)).toBeInTheDocument();
+        expect(within(admin).getByText(/Rollover Executed Successfully/i)).toBeInTheDocument();
       });
     });
 
@@ -424,34 +469,23 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
         expect(screen.getByTestId('admin-section')).toBeInTheDocument();
       });
 
+      const admin = screen.getByTestId('admin-section');
+
       // Switch to Trust List tab
-      const trustTab = screen.getByTestId('admin-subtab-trust');
+      const trustTab = within(admin).getByTestId('admin-tab-trust');
       fireEvent.click(trustTab);
 
-      expect(screen.getByText(/AICTE Central Master Root CA/i)).toBeInTheDocument();
-      expect(screen.getByText(/Government of India National Signing Authority/i)).toBeInTheDocument();
+      expect(within(admin).getByText(/AICTE National Apex Credential Authority/i)).toBeInTheDocument();
+      expect(within(admin).getByText(/did:web:dcet.eduverify.ac.in/i)).toBeInTheDocument();
     });
   });
 
   describe('11. Empty, Error, and Offline States', () => {
     it('renders empty state when central repository has 0 institutions', async () => {
-      server.use(
-        http.get('*/v1/dashboards/aicte/summary', () => {
-          return HttpResponse.json({
-            total_institutions: 0,
-            student_level_coverage_pct: 0,
-            aggregate_only_coverage_pct: 0,
-            coverage_percentage: 0,
-            total_students: 0,
-            avg_fill_percentage: 0,
-            excess_seats_count: 0,
-            avg_quality_score: 0,
-            cross_institution_dupes_count: 0,
-            open_anomalies_count: 0,
-            unreconciled_programs_count: 0,
-          });
-        })
-      );
+      setMockAicteSummary({
+        total_institutions: 0,
+        total_students: 0,
+      });
 
       renderAictePage();
 

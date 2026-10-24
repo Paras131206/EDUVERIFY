@@ -11,7 +11,7 @@ import {
   Tooltip,
   Legend,
 } from 'recharts';
-import { PieChart, Layers, Users, Globe2, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Layers, Globe2, AlertTriangle, ShieldCheck } from 'lucide-react';
 
 interface QuotaSeatSectionProps {
   schemes: SupernumerarySchemeStat[];

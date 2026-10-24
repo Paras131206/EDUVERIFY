@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { QualityScoreGauge } from '@/components/shared/QualityScoreGauge';
 import { AicteConsoleSummary, SseTickerEvent } from '../types';
 import { API_BASE_URL } from '@/lib/api';
 import {
   Building2,
-  Users,
   ShieldCheck,
   AlertTriangle,
   Radio,
   Pause,
   Play,
-  RotateCw,
   ExternalLink,
   Layers,
   Sparkles,

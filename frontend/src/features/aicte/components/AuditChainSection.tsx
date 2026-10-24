@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
@@ -10,10 +10,6 @@ import {
   RotateCw,
   Lock,
   Link as LinkIcon,
-  CheckCircle2,
-  XCircle,
-  FileText,
-  Clock,
 } from 'lucide-react';
 
 interface AuditChainSectionProps {
@@ -26,7 +22,7 @@ export const AuditChainSection: React.FC<AuditChainSectionProps> = ({
   initialLogs,
 }) => {
   const [verdict, setVerdict] = useState<AuditVerificationVerdict>(initialVerdict);
-  const [logs, setLogs] = useState<AuditLogEntry[]>(initialLogs);
+  const [logs] = useState<AuditLogEntry[]>(initialLogs);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const [isBrokenSimulated, setIsBrokenSimulated] = useState<boolean>(false);
 

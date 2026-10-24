@@ -11,9 +11,7 @@ import {
   SseTickerEvent,
   StateMetricRecord,
   InstitutionDrilldownItem,
-  LeaderboardItem,
   SupernumerarySchemeStat,
-  QuotaShareStat,
   AnomalyFeedItem,
   ReconciliationRecordItem,
   AuditVerificationVerdict,
@@ -1737,7 +1735,7 @@ export const mockCrossDuplicates: DuplicateClusterItem[] = [
     matched_fields: { apaar: 1.0, full_name: 0.98, dob: 1.0, gender: 1.0 },
     scope: 'CROSS_INSTITUTION',
     bucket: 'AUTO_FLAG',
-    status: 'PENDING_REVIEW',
+    status: 'OPEN',
     members: [
       {
         row: 8,
@@ -1767,7 +1765,7 @@ export const mockCrossDuplicates: DuplicateClusterItem[] = [
     matched_fields: { apaar: 0.0, full_name: 0.94, dob: 1.0, gender: 1.0 },
     scope: 'CROSS_INSTITUTION',
     bucket: 'HUMAN_REVIEW',
-    status: 'PENDING_REVIEW',
+    status: 'OPEN',
     members: [
       {
         row: 22,

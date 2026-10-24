@@ -6,7 +6,6 @@ import { ReconciliationRecordItem } from '../types';
 import {
   Scale,
   Search,
-  Filter,
   CheckCircle2,
   AlertTriangle,
   Flame,
@@ -19,7 +18,7 @@ interface ReconciliationViewSectionProps {
 export const ReconciliationViewSection: React.FC<ReconciliationViewSectionProps> = ({
   initialItems,
 }) => {
-  const [items, setItems] = useState<ReconciliationRecordItem[]>(initialItems);
+  const [items] = useState<ReconciliationRecordItem[]>(initialItems);
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'MISMATCH' | 'EXCESS' | 'MATCH'>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
 

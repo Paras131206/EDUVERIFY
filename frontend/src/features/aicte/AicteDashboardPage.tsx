@@ -525,16 +525,17 @@ export const AicteDashboardPage: React.FC = () => {
 
       {/* Empty State Fallback */}
       {isDataEmpty ? (
-        <EmptyState
-          data-testid="aicte-empty-state"
-          title="No Institution Records Available"
-          description="Central repository contains no enrolled institutions or submitted batches for the current academic year."
-          action={
-            <Button onClick={loadAllData} size="sm">
-              Reload National Data
-            </Button>
-          }
-        />
+        <div data-testid="aicte-empty-state">
+          <EmptyState
+            title="No Institution Records Available"
+            description="Central repository contains no enrolled institutions or submitted batches for the current academic year."
+            action={
+              <Button onClick={loadAllData} size="sm">
+                Reload National Data
+              </Button>
+            }
+          />
+        </div>
       ) : (
         /* Tab Sections Rendering */
         <div className="space-y-8">

@@ -48,10 +48,6 @@ import {
 } from '@/features/institution/types';
 import {
   SseTickerEvent,
-  StateMetricRecord,
-  InstitutionDrilldownItem,
-  LeaderboardItem,
-  AnomalyFeedItem,
   AuditVerificationVerdict,
   AuditLogEntry,
   ReconciliationRecordItem,
@@ -78,6 +74,10 @@ export const resetAicteMock = () => {
   auditVerificationState = JSON.parse(JSON.stringify(mockAuditVerification));
   auditLogState = JSON.parse(JSON.stringify(mockAuditLog));
   aicteReconciliationState = JSON.parse(JSON.stringify(mockAicteReconciliation));
+};
+
+export const setMockAicteSummary = (summary: Partial<typeof mockAicteSummary>) => {
+  aicteSummaryState = { ...aicteSummaryState, ...summary };
 };
 
 export const resetOperationsMock = () => {

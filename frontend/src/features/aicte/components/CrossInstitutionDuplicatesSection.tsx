@@ -5,13 +5,11 @@ import { MaskedValue } from '@/components/shared/MaskedValue';
 import { DuplicateClusterItem } from '@/features/institution/types';
 import { API_BASE_URL } from '@/lib/api';
 import {
-  Users,
   ShieldAlert,
   ArrowRightLeft,
   CheckCircle2,
   XCircle,
   FileCheck2,
-  Layers,
   Building,
 } from 'lucide-react';
 
@@ -47,11 +45,11 @@ export const CrossInstitutionDuplicatesSection: React.FC<CrossInstitutionDuplica
         setClusters((prev) =>
           prev.map((c) => (c.cluster_id === clusterId ? { ...c, status: updated.status } : c))
         );
-        setResolutionSuccess(`Cluster ${clusterId} marked as ${decision}`);
+        setActiveCluster(null);
+        setResolutionSuccess(`Resolution submitted for cluster ${clusterId}: ${decision}`);
         setTimeout(() => {
           setResolutionSuccess(null);
-          setActiveCluster(null);
-        }, 1200);
+        }, 4000);
       }
     } catch (err) {
       console.error('Failed to resolve cross-institution dupe:', err);
@@ -74,7 +72,7 @@ export const CrossInstitutionDuplicatesSection: React.FC<CrossInstitutionDuplica
         </div>
 
         <span className="text-xs font-mono font-bold px-2.5 py-1 rounded bg-purple-100 text-purple-800 border border-purple-200">
-          {clusters.filter((c) => !c.status || c.status === 'PENDING_REVIEW').length} Pending Inspection
+          {clusters.filter((c) => !c.status || c.status === 'OPEN').length} Pending Inspection
         </span>
       </CardHeader>
 

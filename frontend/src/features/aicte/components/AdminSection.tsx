@@ -8,7 +8,6 @@ import { API_BASE_URL } from '@/lib/api';
 import {
   Database,
   Calendar,
-  ShieldCheck,
   RotateCw,
   Search,
   CheckCircle2,
@@ -16,8 +15,6 @@ import {
   ArrowRight,
   Sparkles,
   Key,
-  Building,
-  GraduationCap,
 } from 'lucide-react';
 
 interface AdminSectionProps {
@@ -36,14 +33,14 @@ export const AdminSection: React.FC<AdminSectionProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Rollover state
-  const [rolloverResult, setRolloverResult] = useState<RolloverDryRunResult | null>(null);
+  const [rolloverResult, setRolloverResult] = useState<RolloverDryRunResult | null>(initialRollover);
   const [isDryRunning, setIsDryRunning] = useState<boolean>(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
   const [rolloverSuccess, setRolloverSuccess] = useState<string | null>(null);
   const [isExecutingRollover, setIsExecutingRollover] = useState<boolean>(false);
 
   // Trust list state
-  const [trustList, setTrustList] = useState<TrustListItem[]>(initialTrustList);
+  const [trustList] = useState<TrustListItem[]>(initialTrustList);
 
   // Load master data on entity change
   useEffect(() => {
