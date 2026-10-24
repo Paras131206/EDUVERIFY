@@ -69,3 +69,16 @@ class StudentUpdateRequest(BaseModel):
     email: str | None = None
     mobile: str | None = None
     reason: str = Field(default="Administrative correction", description="Audit reason for update")
+
+
+class LifecycleTransitionRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    to_status: str = Field(
+        ...,
+        description="Target status: WITHDRAWN, DEFERRED, COMPLETED, GRADUATED, etc.",
+    )
+    effective_date: date = Field(..., description="Date transition takes legal effect")
+    reason: str = Field(..., description="Justification and regulatory basis for transition")
+    evidence_ref: str | None = Field(
+        default=None, description="Document/order reference supporting lifecycle change"
+    )

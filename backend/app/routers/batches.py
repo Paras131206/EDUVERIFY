@@ -4,6 +4,7 @@ Complies with contracts/openapi.yaml and prompt B3.
 """
 
 import json
+from typing import Any
 
 from app.db import get_db
 from app.models.core import Batch, BatchFile, Issue
@@ -21,6 +22,8 @@ from app.services.batches import (
     commit_batch_service,
     confirm_mapping_service,
     create_batch_service,
+    get_dq_comparison_service,
+    revalidate_batch_service,
 )
 from app.services.events import broadcaster
 from app.services.reports import generate_report_pdf
@@ -236,6 +239,86 @@ def get_batch_report(
     else:
         return Response(
             content=json.dumps(report.model_dump(), default=str),
+            media_type="application/json",
+        )
+
+
+@router.post(
+    "/{id}/revalidate",
+    summary="Re-runs validation engine on batch with approved corrections applied",
+)
+def revalidate_batch(
+    id: str,
+    principal: Principal = Depends(get_current_principal),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """
+    Applies all approved corrections onto raw file dataset and re-runs validation.
+    Computes before/after comparison and updates quality_score_after.
+    """
+    return revalidate_batch_service(db, batch_id=id, principal=principal)
+
+
+@router.get(
+    "/{id}/dq-comparison",
+    summary="Get before/after data quality comparison and score delta",
+)
+def get_dq_comparison(
+    id: str,
+    format: str = Query("json", description="Export format: json, xlsx, or pdf"),
+    principal: Principal = Depends(get_current_principal),
+    db: Session = Depends(get_db),
+) -> Response:
+    """
+    Returns DQ improvement comparison.
+    Until engine-v0.5 lands, returns score delta and comparison metrics.
+    Supports format=json, xlsx, pdf.
+    """
+    comp_data = get_dq_comparison_service(db, batch_id=id, principal=principal)
+    fmt = format.lower()
+    if fmt == "xlsx":
+        import io
+
+        import openpyxl
+
+        wb = openpyxl.Workbook()
+        ws = wb.active or wb.create_sheet()
+        ws.title = "DQ Comparison"
+        ws.append(["Metric", "Value"])
+        for k, v in comp_data.items():
+            if not isinstance(v, dict):
+                ws.append([k, str(v)])
+        out = io.BytesIO()
+        wb.save(out)
+        return Response(
+            content=out.getvalue(),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f'attachment; filename="dq_comparison_{id}.xlsx"'},
+        )
+    elif fmt == "pdf":
+        html = (
+            f"<html><body><h1>EduVerify Data Quality Comparison</h1>"
+            f"<p>Batch ID: {id}</p>"
+            f"<p>Quality Score Before: {comp_data['quality_score_before']}</p>"
+            f"<p>Quality Score After: {comp_data['quality_score_after']}</p>"
+            f"<p>Score Delta: +{comp_data['score_delta']}</p>"
+            f"<p>Resolved Issues: {comp_data['resolved_count']}</p>"
+            f"<p>Pending Issues: {comp_data['pending_count']}</p></body></html>"
+        )
+        try:
+            from weasyprint import HTML
+
+            pdf_bytes = HTML(string=html).write_pdf()
+        except Exception:
+            pdf_bytes = html.encode("utf-8")
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f'attachment; filename="dq_comparison_{id}.pdf"'},
+        )
+    else:
+        return Response(
+            content=json.dumps(comp_data, default=str),
             media_type="application/json",
         )
 
