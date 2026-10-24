@@ -1228,9 +1228,9 @@ def revalidate_batch_service(
         if corr.apaar_id:
             apaar_src = target_to_source.get("apaar_id", "apaar_id")
             if apaar_src in df.columns:
-                mask = df[apaar_src].astype(str).str.strip() == str(corr.apaar_id).strip()
+                mask = df[apaar_src].astype(str).str.strip() == corr.apaar_id.strip()
                 if mask.any():
-                    df.loc[mask, source_col] = str(new_val)
+                    df.loc[mask, source_col] = new_val
                     applied = True
 
         # Match row by issue_id if present
@@ -1239,7 +1239,7 @@ def revalidate_batch_service(
             if iss and iss.row_index and iss.row_index > 1:
                 row_idx = iss.row_index - 2  # 0-indexed in DataFrame
                 if 0 <= row_idx < len(df):
-                    df.iloc[row_idx, df.columns.get_loc(source_col)] = str(new_val)
+                    df.loc[df.index[row_idx], source_col] = new_val
 
     # 5. Build RuleContext from database
     context_data = _build_context_from_db(db, batch)
