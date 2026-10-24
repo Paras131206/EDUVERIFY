@@ -66,9 +66,13 @@ describe('Upload Wizard & Column Mapping (Task A2)', () => {
       fireEvent.click(proceedBtn);
 
       // Should advance to Step 2 Mapping
-      await waitFor(() => {
-        expect(screen.getByText(/step 2: smart column mapping/i)).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByText(/step 2: smart column mapping/i)).toBeInTheDocument();
+        },
+        { timeout: 4000 }
+      );
+      expect(screen.getByText(/2\. map columns/i)).toBeInTheDocument();
     });
 
     it('handles open batch conflict (HTTP 409) with link to the open batch', async () => {

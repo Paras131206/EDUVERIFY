@@ -105,7 +105,10 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
     setErrorMessage(null);
     setOpenBatchConflict(null);
 
-    const idempotencyKey = crypto.randomUUID();
+    const idempotencyKey =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const formData = new FormData();
     formData.append('file', file);
     formData.append('academic_year', academicYear);
@@ -143,7 +146,7 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
       setIsUploading(false);
       onSuccess({
         id: createdBatch.id,
-        filename: createdBatch.filename || file.name,
+        filename: file.name || createdBatch.filename || 'uploaded_batch.csv',
         academic_year: createdBatch.academic_year || academicYear,
       });
     } catch (err: unknown) {

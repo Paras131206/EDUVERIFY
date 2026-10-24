@@ -308,17 +308,6 @@ export const Step2Mapping: React.FC<Step2MappingProps> = ({
     );
   };
 
-  if (isLoading) {
-    return (
-      <Card className="p-8 text-center space-y-3">
-        <RefreshCw className="w-8 h-8 animate-spin mx-auto text-gov-navy" />
-        <p className="text-xs font-semibold text-slate-700">
-          Analyzing spreadsheet headers with smart synonym dictionary...
-        </p>
-      </Card>
-    );
-  }
-
   return (
     <div className="space-y-6">
       {/* Header Info */}
@@ -343,12 +332,21 @@ export const Step2Mapping: React.FC<Step2MappingProps> = ({
         </div>
       </div>
 
-      {loadError && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-md text-xs text-red-700 flex items-center gap-2">
-          <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
-          <span>{loadError}</span>
-        </div>
-      )}
+      {isLoading ? (
+        <Card className="p-8 text-center space-y-3">
+          <RefreshCw className="w-8 h-8 animate-spin mx-auto text-gov-navy" />
+          <p className="text-xs font-semibold text-slate-700">
+            Analyzing spreadsheet headers with smart synonym dictionary...
+          </p>
+        </Card>
+      ) : (
+        <>
+          {loadError && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-md text-xs text-red-700 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
+              <span>{loadError}</span>
+            </div>
+          )}
 
       {/* V001 Explanation Banner if required fields unmapped */}
       {unmappedRequiredFields.length > 0 && (
@@ -532,6 +530,8 @@ export const Step2Mapping: React.FC<Step2MappingProps> = ({
           </div>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 };

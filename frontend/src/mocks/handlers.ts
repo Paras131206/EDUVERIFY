@@ -258,7 +258,7 @@ export const handlers = [
     let filename = 'uploaded_batch.csv';
     let triggerConflict = false;
 
-    const url = new URL(request.url);
+    const url = new URL(request.url, 'http://localhost:8000');
     if (url.searchParams.get('conflict') === 'true') {
       triggerConflict = true;
     }
@@ -277,12 +277,26 @@ export const handlers = [
           triggerConflict = true;
         }
       } else {
-        const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
-        academicYear = (body.academic_year as string) || academicYear;
-        supersedesBatchId = (body.supersedes_batch_id as string) || null;
-        filename = (body.filename as string) || filename;
-        if (body.trigger_conflict || filename.includes('conflict')) {
-          triggerConflict = true;
+        // In JSDOM test runner, FormData may arrive without standard multipart header
+        try {
+          const formData = await request.formData();
+          academicYear = (formData.get('academic_year') as string) || academicYear;
+          supersedesBatchId = (formData.get('supersedes_batch_id') as string) || null;
+          const file = formData.get('file');
+          if (file && typeof file === 'object' && 'name' in file) {
+            filename = (file as File).name;
+          }
+          if (formData.get('trigger_conflict') === 'true' || filename.includes('conflict')) {
+            triggerConflict = true;
+          }
+        } catch {
+          const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
+          academicYear = (body.academic_year as string) || academicYear;
+          supersedesBatchId = (body.supersedes_batch_id as string) || null;
+          filename = (body.filename as string) || filename;
+          if (body.trigger_conflict || filename.includes('conflict')) {
+            triggerConflict = true;
+          }
         }
       }
     } catch {
