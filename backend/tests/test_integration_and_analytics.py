@@ -489,6 +489,8 @@ def test_notifications_worker_processing(db_session: Session):
 def test_notifications_me_endpoint(client: TestClient, db_session: Session):
     """Verifies GET /v1/notifications/me returns current user's notifications."""
     inst_user = db_session.query(User).filter(User.email == "inst.admin@demo.local").first()
+    assert inst_user is not None
+    assert inst_user.email is not None
     headers = make_auth_headers(inst_user)
 
     # Enqueue a notification for this user
