@@ -313,7 +313,7 @@ def build_holder_presentation(
                 claim_name = disc_obj[1]
                 if claims_filter is None or claim_name in claims_filter:
                     selected_disclosures.append(disc_b64)
-        except (ValueError, json.JSONDecodeError, UnicodeDecodeError):
+        except ValueError:
             pass
 
     presentation_without_kb = f"{issuer_jwt}~{'~'.join(selected_disclosures)}"
