@@ -181,12 +181,13 @@ def get_aicte_quotas(
     from app.models.core import StudentRecord
     from sqlalchemy import func
 
-    quota_counts = dict(
+    rows = (
         db.query(StudentRecord.quota, func.count(StudentRecord.id))
         .filter(StudentRecord.enrolment_status == "ACTIVE")
         .group_by(StudentRecord.quota)
         .all()
     )
+    quota_counts = {str(q): int(cnt) for q, cnt in rows if q is not None}
 
     tfw_count = quota_counts.get("TFW", 0)
     ews_count = quota_counts.get("EWS", 0)

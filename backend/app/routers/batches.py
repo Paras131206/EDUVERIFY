@@ -438,15 +438,13 @@ def bulk_decide_batch_issues(
                 iss.status = "FIXED"
                 iss.decided_by = principal.id
                 iss.decided_at = now
-                iss.decision_note = "Bulk accepted standard normalisation"
                 updated_count += 1
     elif action == "DISMISS_SELECTED" and isinstance(issue_ids, list):
         for iss in all_issues:
-            if iss.id in issue_ids or iss.issue_id in issue_ids:
+            if iss.id in issue_ids:
                 iss.status = "DISMISSED"
                 iss.decided_by = principal.id
                 iss.decided_at = now
-                iss.decision_note = remarks or "Bulk dismissed with justification"
                 updated_count += 1
 
     report_record = db.scalars(
@@ -533,7 +531,7 @@ def get_batch_record_by_row(
     try:
         from eduverify_engine.parse import parse_file
 
-        parsed = parse_file(batch_file.file_data, filename=batch_file.filename)
+        parsed = parse_file(batch_file.file_data)
         df = parsed.df
         row_idx = row - 1 if row > 0 else 0
         if 0 <= row_idx < len(df):
