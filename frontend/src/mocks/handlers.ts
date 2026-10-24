@@ -8,9 +8,41 @@ import {
   mockBatchReport,
   mockAicteSummary,
   mockInstitutionSummary,
+  mockStudents,
+  mockTransfers,
+  mockAggregates,
+  mockReconciliationStatus,
+  mockWebhooks,
+  mockDqTrend,
+  mockIntakeDistribution,
+  mockNotifications,
 } from './data';
 
-import { BatchItem } from '@/features/institution/types';
+import {
+  BatchItem,
+  ALLOWED_TRANSITIONS,
+  EnrolmentStatus,
+  StudentDetailRecord,
+  TransferRequestItem,
+  ProgramAggregateItem,
+  ReconciliationStatusItem,
+  WebhookConfigItem,
+} from '@/features/institution/types';
+
+let studentsState: StudentDetailRecord[] = JSON.parse(JSON.stringify(mockStudents));
+let transfersState: TransferRequestItem[] = JSON.parse(JSON.stringify(mockTransfers));
+let aggregatesState: ProgramAggregateItem[] = JSON.parse(JSON.stringify(mockAggregates));
+let reconciliationState: ReconciliationStatusItem[] = JSON.parse(JSON.stringify(mockReconciliationStatus));
+let webhooksState: WebhookConfigItem[] = JSON.parse(JSON.stringify(mockWebhooks));
+
+export const resetOperationsMock = () => {
+  studentsState = JSON.parse(JSON.stringify(mockStudents));
+  transfersState = JSON.parse(JSON.stringify(mockTransfers));
+  aggregatesState = JSON.parse(JSON.stringify(mockAggregates));
+  reconciliationState = JSON.parse(JSON.stringify(mockReconciliationStatus));
+  webhooksState = JSON.parse(JSON.stringify(mockWebhooks));
+};
+
 
 let failedLogins = 0;
 let activeSessionUser: typeof mockUser | null = null;
@@ -668,25 +700,304 @@ export const handlers = [
   }),
 
   http.get('*/v1/dashboards/institution/summary', () => {
-    return HttpResponse.json(mockInstitutionSummary);
+    return HttpResponse.json({
+      ...mockInstitutionSummary,
+      dq_trend: mockDqTrend,
+      intake_distribution: mockIntakeDistribution,
+      notifications: mockNotifications,
+      active_transfers_count: transfersState.filter((t) => t.status === 'PENDING').length,
+    });
   }),
 
-  http.get('*/v1/duplicates', () => {
-    return HttpResponse.json(mockBatchReport.duplicate_clusters);
+  // Students & Lifecycle transitions
+  http.get('*/v1/students', ({ request }) => {
+    const url = new URL(request.url);
+    const query = url.searchParams.get('q')?.toLowerCase() || '';
+    const status = url.searchParams.get('status');
+    const program = url.searchParams.get('program');
+
+    let result = [...studentsState];
+    if (query) {
+      result = result.filter(
+        (s) =>
+          s.full_name.toLowerCase().includes(query) ||
+          s.apaar_id.includes(query) ||
+          s.institution_student_id.toLowerCase().includes(query)
+      );
+    }
+    if (status && status !== 'ALL') {
+      result = result.filter((s) => s.enrolment_status === status);
+    }
+    if (program && program !== 'ALL') {
+      result = result.filter((s) => s.program_code === program);
+    }
+
+    return HttpResponse.json(result);
   }),
 
-  http.get('*/v1/transfers', () => {
-    return HttpResponse.json([
-      {
-        id: 'tr-01',
-        apaar_id: '123456789012',
-        from_institution_id: '1-1234567890',
-        to_institution_id: '1-9876543210',
-        status: 'PENDING',
-        reason: 'Relocation of family',
-        created_at: '2026-08-01T10:00:00Z',
-      },
-    ]);
+  http.get('*/v1/students/:apaar_id', ({ params }) => {
+    const student = studentsState.find((s) => s.apaar_id === params.apaar_id);
+    if (!student) {
+      return HttpResponse.json({ message: 'Student record not found' }, { status: 404 });
+    }
+    return HttpResponse.json(student);
+  }),
+
+  http.post('*/v1/students/:apaar_id/transitions', async ({ params, request }) => {
+    const body = (await request.json()) as {
+      to_status: EnrolmentStatus;
+      effective_date: string;
+      reason: string;
+      evidence_ref?: string;
+    };
+
+    const studentIndex = studentsState.findIndex((s) => s.apaar_id === params.apaar_id);
+    if (studentIndex === -1) {
+      return HttpResponse.json({ message: 'Student record not found' }, { status: 404 });
+    }
+
+    const currentStudent = studentsState[studentIndex];
+    const allowed = ALLOWED_TRANSITIONS[currentStudent.enrolment_status] || [];
+
+    if (!allowed.includes(body.to_status)) {
+      return HttpResponse.json(
+        {
+          code: 'V021',
+          message: `Disallowed lifecycle transition from ${currentStudent.enrolment_status} to ${body.to_status}`,
+          details: 'Disallowed transition per agents.md §8.1 lifecycle state machine.',
+        },
+        { status: 422 }
+      );
+    }
+
+    const prevStatus = currentStudent.enrolment_status;
+    const updatedStudent: StudentDetailRecord = {
+      ...currentStudent,
+      enrolment_status: body.to_status,
+      versions: [
+        {
+          version_id: `ver-${Date.now()}`,
+          version_number: currentStudent.versions.length + 1,
+          changed_at: new Date().toISOString(),
+          changed_by: 'inst.admin@demo.local',
+          changes_summary: `Enrolment status updated from ${prevStatus} to ${body.to_status}. Reason: ${body.reason}`,
+          previous_status: prevStatus,
+          new_status: body.to_status,
+        },
+        ...currentStudent.versions,
+      ],
+      timeline: [
+        {
+          id: `tl-${Date.now()}`,
+          event_type: 'STATUS_CHANGE',
+          from_status: prevStatus,
+          to_status: body.to_status,
+          effective_date: body.effective_date || new Date().toISOString().split('T')[0],
+          reason: body.reason,
+          evidence_ref: body.evidence_ref || '',
+          actor: 'Dr. Ramesh Sharma (Admin)',
+          timestamp: new Date().toISOString(),
+        },
+        ...currentStudent.timeline,
+      ],
+    };
+
+    studentsState[studentIndex] = updatedStudent;
+    return HttpResponse.json(updatedStudent);
+  }),
+
+  // Transfers
+  http.get('*/v1/transfers', ({ request }) => {
+    const url = new URL(request.url);
+    const direction = url.searchParams.get('direction');
+    const status = url.searchParams.get('status');
+
+    let result = [...transfersState];
+    if (direction) {
+      result = result.filter((t) => t.direction === direction);
+    }
+    if (status) {
+      result = result.filter((t) => t.status === status);
+    }
+    return HttpResponse.json(result);
+  }),
+
+  http.post('*/v1/transfers', async ({ request }) => {
+    const body = (await request.json()) as {
+      apaar_id: string;
+      from_institution_id: string;
+      from_institution_name?: string;
+      to_program_code: string;
+      reason: string;
+      transfer_certificate_ref?: string;
+    };
+
+    const newTransfer: TransferRequestItem = {
+      id: `TR-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+      apaar_id: body.apaar_id,
+      from_institution_id: body.from_institution_id,
+      from_institution_name: body.from_institution_name || 'Source AICTE Institution',
+      to_institution_id: '1-1234567890',
+      to_institution_name: 'Delhi Institute of Engineering & Technology (Current)',
+      to_program_code: body.to_program_code || 'UG-CSE',
+      reason: body.reason,
+      status: 'PENDING',
+      requested_at: new Date().toISOString(),
+      direction: 'OUTGOING',
+      is_overdue_15_days: false,
+      evidence_ref: body.transfer_certificate_ref || '',
+    };
+
+    transfersState.unshift(newTransfer);
+    return HttpResponse.json(newTransfer, { status: 201 });
+  }),
+
+  http.post('*/v1/transfers/:id/decide', async ({ params, request }) => {
+    const body = (await request.json()) as {
+      decision: 'APPROVED' | 'REJECTED';
+      remarks?: string;
+    };
+
+    const idx = transfersState.findIndex((t) => t.id === params.id);
+    if (idx === -1) {
+      return HttpResponse.json({ message: 'Transfer request not found' }, { status: 404 });
+    }
+
+    const current = transfersState[idx];
+    const updated: TransferRequestItem = {
+      ...current,
+      status: body.decision,
+      decided_at: new Date().toISOString(),
+      decided_by: 'Dr. Ramesh Sharma',
+      decision_note: body.remarks || `Marked ${body.decision} by source institution`,
+    };
+    transfersState[idx] = updated;
+
+    // If approved, transition corresponding student record to TRANSFERRED_OUT per agents.md §8.1
+    if (body.decision === 'APPROVED') {
+      const studentIdx = studentsState.findIndex((s) => s.apaar_id === current.apaar_id);
+      if (studentIdx !== -1) {
+        studentsState[studentIdx] = {
+          ...studentsState[studentIdx],
+          enrolment_status: 'TRANSFERRED_OUT',
+          timeline: [
+            {
+              id: `tl-trans-${Date.now()}`,
+              event_type: 'STATUS_CHANGE',
+              from_status: studentsState[studentIdx].enrolment_status,
+              to_status: 'TRANSFERRED_OUT',
+              effective_date: new Date().toISOString().split('T')[0],
+              reason: `Inter-institution transfer ${current.id} approved`,
+              evidence_ref: current.id,
+              actor: 'Transfer Workflow Engine',
+              timestamp: new Date().toISOString(),
+            },
+            ...studentsState[studentIdx].timeline,
+          ],
+        };
+      }
+    }
+
+    return HttpResponse.json(updated);
+  }),
+
+  http.post('*/v1/transfers/:id/override', ({ params }) => {
+    const idx = transfersState.findIndex((t) => t.id === params.id);
+    if (idx === -1) {
+      return HttpResponse.json({ message: 'Transfer not found' }, { status: 404 });
+    }
+
+    const updated: TransferRequestItem = {
+      ...transfersState[idx],
+      status: 'OVERRIDDEN',
+      decided_at: new Date().toISOString(),
+      decided_by: 'AICTE Central Desk',
+      decision_note: 'Statutory 15-day non-response administrative override applied',
+    };
+    transfersState[idx] = updated;
+    return HttpResponse.json(updated);
+  }),
+
+  // Aggregates & Reconciliation
+  http.get('*/v1/aggregates', () => {
+    return HttpResponse.json(aggregatesState);
+  }),
+
+  http.post('*/v1/aggregates', async ({ request }) => {
+    const body = (await request.json()) as {
+      academic_year?: string;
+      programs: ProgramAggregateItem[];
+    };
+
+    if (body.programs && body.programs.length > 0) {
+      aggregatesState = body.programs;
+      // Recompute reconciliation
+      reconciliationState = body.programs.map((p) => {
+        const delta = p.total_enrolment - p.declared_intake;
+        return {
+          program_code: p.program_code,
+          program_name: p.program_name,
+          declared: p.declared_intake,
+          submitted: p.total_enrolment,
+          delta,
+          status: delta === 0 ? 'MATCH' : delta > 0 ? 'EXCESS' : 'MISMATCH',
+        };
+      });
+    }
+
+    return HttpResponse.json({ success: true, count: aggregatesState.length }, { status: 201 });
+  }),
+
+  http.get('*/v1/reconciliation', () => {
+    return HttpResponse.json(reconciliationState);
+  }),
+
+  // Webhooks
+  http.get('*/v1/webhooks', () => {
+    return HttpResponse.json(webhooksState);
+  }),
+
+  http.post('*/v1/webhooks', async ({ request }) => {
+    const body = (await request.json()) as { url: string; events: string[] };
+    const rawSecret = `whsec_live_${Math.random().toString(36).substring(2, 10)}${Math.random().toString(36).substring(2, 8)}`;
+    const newHook: WebhookConfigItem = {
+      id: `whk-${Date.now()}`,
+      url: body.url,
+      events: body.events || ['batch.committed'],
+      is_active: true,
+      secret_masked: `${rawSecret.substring(0, 10)}****${rawSecret.slice(-4)}`,
+      created_at: new Date().toISOString(),
+      deliveries: [],
+    };
+
+    webhooksState.unshift(newHook);
+    return HttpResponse.json({ ...newHook, raw_secret: rawSecret }, { status: 201 });
+  }),
+
+  http.delete('*/v1/webhooks/:id', ({ params }) => {
+    webhooksState = webhooksState.filter((w) => w.id !== params.id);
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.post('*/v1/webhooks/:id/test', ({ params }) => {
+    const hook = webhooksState.find((w) => w.id === params.id);
+    if (!hook) {
+      return HttpResponse.json({ message: 'Webhook not found' }, { status: 404 });
+    }
+
+    const testDelivery = {
+      id: `del-${Date.now()}`,
+      event: 'ping.test',
+      status_code: 200,
+      response_time_ms: 112,
+      retry_count: 0,
+      delivered_at: new Date().toISOString(),
+      status: 'SUCCESS' as const,
+      payload_summary: 'ping payload with HMAC-SHA256 test signature',
+    };
+
+    hook.deliveries.unshift(testDelivery);
+    return HttpResponse.json({ message: 'Test ping delivered successfully', delivery: testDelivery });
   }),
 
   http.post('*/v1/verify', () => {
@@ -709,3 +1020,4 @@ export const handlers = [
     });
   }),
 ];
+

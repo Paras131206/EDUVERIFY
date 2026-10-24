@@ -69,6 +69,7 @@ export const RowInspectorModal: React.FC<RowInspectorModalProps> = ({
     course_level: 'Course Level',
     department: 'Department',
     academic_year: 'Academic Year',
+    year_of_study: 'Year of Study',
     admission_date: 'Admission Date',
     admission_type: 'Admission Type',
     seat_type: 'Seat Type',

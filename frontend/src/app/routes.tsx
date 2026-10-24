@@ -8,6 +8,8 @@ import { UploadPage } from '@/features/institution/UploadPage';
 import { BatchListPage } from '@/features/institution/BatchListPage';
 import { ReviewPage } from '@/features/institution/ReviewPage';
 import { TransfersPage } from '@/features/institution/TransfersPage';
+import { StudentsPage } from '@/features/institution/StudentsPage';
+import { AggregatesPage } from '@/features/institution/AggregatesPage';
 import { AicteDashboardPage } from '@/features/aicte/AicteDashboardPage';
 import { DabDashboardPage } from '@/features/dab/DabDashboardPage';
 import { StudentWalletPage } from '@/features/student/StudentWalletPage';
@@ -75,6 +77,22 @@ export const router = createBrowserRouter([
             element: (
               <RequireRole roles={['INSTITUTION_ADMIN', 'INSTITUTION_STAFF']}>
                 <TransfersPage />
+              </RequireRole>
+            ),
+          },
+          {
+            path: 'institution/students',
+            element: (
+              <RequireRole roles={['INSTITUTION_ADMIN', 'INSTITUTION_STAFF']}>
+                <StudentsPage />
+              </RequireRole>
+            ),
+          },
+          {
+            path: 'institution/aggregates',
+            element: (
+              <RequireRole roles={['INSTITUTION_ADMIN', 'INSTITUTION_STAFF']}>
+                <AggregatesPage />
               </RequireRole>
             ),
           },
@@ -150,6 +168,14 @@ export const router = createBrowserRouter([
           },
           {
             path: 'settings/users',
+            element: (
+              <RequireRole roles={['INSTITUTION_ADMIN']}>
+                <SettingsPage />
+              </RequireRole>
+            ),
+          },
+          {
+            path: 'settings/webhooks',
             element: (
               <RequireRole roles={['INSTITUTION_ADMIN']}>
                 <SettingsPage />
