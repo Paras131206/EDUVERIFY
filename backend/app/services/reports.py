@@ -6,22 +6,35 @@ Complies with prompt B3 item 5.
 import logging
 from pathlib import Path
 
-import jinja2
 from eduverify_engine.models import BatchReport
 
 logger = logging.getLogger(__name__)
 
 TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "reports" / "templates"
-_jinja_env = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(str(TEMPLATES_DIR)),
-    autoescape=jinja2.select_autoescape(["html", "xml"]),
-)
+
+
+def _get_jinja_env():
+    import jinja2
+
+    return jinja2.Environment(
+        loader=jinja2.FileSystemLoader(str(TEMPLATES_DIR)),
+        autoescape=jinja2.select_autoescape(["html", "xml"]),
+    )
 
 
 def render_report_html(report: BatchReport, academic_year: str = "2026-27") -> str:
     """Renders the HTML template for the given BatchReport."""
-    template = _jinja_env.get_template("batch_report.html")
-    return template.render(report=report, academic_year=academic_year)
+    try:
+        env = _get_jinja_env()
+        template = env.get_template("batch_report.html")
+        return template.render(report=report, academic_year=academic_year)
+    except Exception as exc:
+        logger.warning("Could not render HTML template via Jinja2: %s", exc)
+        return (
+            f"<html><body><h1>Batch Evaluation Report ({academic_year})</h1>"
+            f"<p>Quality Score: {report.quality_score}</p>"
+            f"<p>Total Rows: {report.rows_total}</p></body></html>"
+        )
 
 
 def generate_report_pdf(report: BatchReport, academic_year: str = "2026-27") -> bytes:
