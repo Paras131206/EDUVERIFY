@@ -171,13 +171,3 @@ app.add_api_route(
     summary="Health and readiness check",
     response_model=dict[str, Any],
 )
-
-logger.warning("DIAGNOSTIC app file: %s", __file__)
-logger.warning(
-    "DIAGNOSTIC registered routes: %s",
-    sorted(
-        route.path
-        for route in app.routes
-        if hasattr(route, "path")
-    ),
-)

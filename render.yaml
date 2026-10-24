@@ -5,7 +5,7 @@ services:
     plan: free
     rootDir: .
     buildCommand: "pip install -r backend/requirements.txt && pip install ./engine"
-    startCommand: "cd backend && alembic upgrade head && python -m app.seed --if-empty && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    startCommand: "cd backend && (test ! -f alembic.ini || alembic upgrade head) && (python -c 'import app.seed' 2>/dev/null && python -m app.seed --if-empty || true) && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     healthCheckPath: /healthz
     envVars:
       - key: PYTHON_VERSION
