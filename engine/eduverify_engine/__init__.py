@@ -5,6 +5,7 @@ Pure Python package (no DB, no HTTP in library).
 
 __version__ = "0.0.1"
 
+from .dedup import detect_duplicates
 from .mapping import suggest_mapping
 from .masking import mask_apaar, mask_email, mask_mobile
 from .models import (
@@ -42,6 +43,7 @@ __all__ = [
     "SchemaDrift",
     "SuggestedFix",
     "compare_reports",
+    "detect_duplicates",
     "export_report",
     "mask_apaar",
     "mask_email",
