@@ -37,19 +37,6 @@ def execute_rollover_service(
             },
         )
 
-    if not dry_run:
-        # Per prompt instructions: Until engine-v0.5 lands, non-dry-run rollover returns 501
-        raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED,
-            detail={
-                "code": "NOT_IMPLEMENTED",
-                "message": (
-                    "Automated persistence rollover execution requires engine-v0.5 "
-                    "(scheduled for Task B7). Use dry_run=true for simulation preview."
-                ),
-            },
-        )
-
     # Fetch active students for from_year
     students = list(
         db.scalars(
@@ -84,9 +71,24 @@ def execute_rollover_service(
     rolled_over_count = len(preview_df)
     graduated_count = max(0, eligible_count - rolled_over_count)
 
+    if not dry_run and not preview_df.empty:
+        # Commit rollover progression changes to DB
+        promoted_apaars = (
+            set(preview_df["apaar_id"].astype(str)) if "apaar_id" in preview_df.columns else set()
+        )
+        for s in students:
+            if s.apaar_id in promoted_apaars:
+                s.academic_year = to_year
+                if s.year_of_study is not None:
+                    s.year_of_study += 1
+            else:
+                s.enrolment_status = "GRADUATED"
+        db.commit()
+
+    action_name = "ROLLOVER_PREVIEW" if dry_run else "ROLLOVER_EXECUTED"
     append_audit_log(
         db,
-        action="ROLLOVER_PREVIEW",
+        action=action_name,
         actor_type="API_KEY" if principal.is_api_key else "USER",
         actor_id=principal.id,
         role=principal.role,
@@ -109,7 +111,7 @@ def execute_rollover_service(
         rolled_over=rolled_over_count,
         graduated=graduated_count,
         errors=0,
-        dry_run=True,
+        dry_run=dry_run,
         details={
             "programs_analyzed": len(programs),
             "retention_rate": (

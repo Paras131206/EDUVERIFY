@@ -152,4 +152,35 @@ __all__ = [
     "UserProfile",
     "UserRole",
     "VerificationResultResponse",
+    "CreateWebhookRequest",
+    "WebhookResponse",
+    "WebhookDeliveryResponse",
+    "TestWebhookResponse",
+    "NotificationResponse",
+    "AicteSummaryDashboard",
+    "AicteMapMetricResponse",
+    "AicteLeaderboards",
+    "AnomalyFeedItem",
+    "InstitutionSummaryDashboard",
+    "InstitutionDqTrend",
+    "CreateReportRequest",
+    "ReportItemResponse",
+    "ReportJobResponse",
 ]
+
+from app.schemas.dashboards import (
+    AicteLeaderboards,
+    AicteMapMetricResponse,
+    AicteSummaryDashboard,
+    AnomalyFeedItem,
+    InstitutionDqTrend,
+    InstitutionSummaryDashboard,
+)
+from app.schemas.notifications import NotificationResponse
+from app.schemas.reports import CreateReportRequest, ReportItemResponse, ReportJobResponse
+from app.schemas.webhooks import (
+    CreateWebhookRequest,
+    TestWebhookResponse,
+    WebhookDeliveryResponse,
+    WebhookResponse,
+)

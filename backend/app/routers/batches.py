@@ -27,7 +27,7 @@ from app.services.batches import (
 )
 from app.services.events import broadcaster
 from app.services.reports import generate_report_pdf
-from eduverify_engine.models import BatchReport
+from eduverify_engine.models import BatchReport, DQComparison
 from eduverify_engine.report import export_report
 from fastapi import (
     APIRouter,
@@ -276,22 +276,25 @@ def get_dq_comparison(
     """
     comp_data = get_dq_comparison_service(db, batch_id=id, principal=principal)
     fmt = format.lower()
+
+    dq_comp = DQComparison(
+        rows_scanned=comp_data.get("resolved_count", 0) + comp_data.get("pending_count", 0),
+        errors_found=comp_data.get("pending_count", 0),
+        duplicates_found=0,
+        resolved=comp_data.get("resolved_count", 0),
+        pending=comp_data.get("pending_count", 0),
+        quality_score_before=float(comp_data.get("quality_score_before", 100.0)),
+        quality_score_after=float(comp_data.get("quality_score_after", 100.0)),
+        per_rule_deltas=comp_data.get("per_rule_deltas", {}),
+        per_priority_deltas=comp_data.get("per_priority_deltas", {}),
+        per_column_completeness_before=comp_data.get("per_column_completeness_before", {}),
+        per_column_completeness_after=comp_data.get("per_column_completeness_after", {}),
+    )
+
     if fmt == "xlsx":
-        import io
-
-        import openpyxl
-
-        wb = openpyxl.Workbook()
-        ws = wb.active or wb.create_sheet()
-        ws.title = "DQ Comparison"
-        ws.append(["Metric", "Value"])
-        for k, v in comp_data.items():
-            if not isinstance(v, dict):
-                ws.append([k, str(v)])
-        out = io.BytesIO()
-        wb.save(out)
+        xlsx_bytes = export_report(dq_comp, fmt="xlsx")
         return Response(
-            content=out.getvalue(),
+            content=xlsx_bytes,
             media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             headers={"Content-Disposition": f'attachment; filename="dq_comparison_{id}.xlsx"'},
         )

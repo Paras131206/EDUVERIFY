@@ -750,9 +750,32 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
 
+    # 33. Reports table
+    op.create_table(
+        "reports",
+        sa.Column("id", sa.String(length=36), nullable=False),
+        sa.Column("report_type", sa.String(length=50), nullable=False),
+        sa.Column("format", sa.String(length=10), nullable=False),
+        sa.Column("academic_year", sa.String(length=20), nullable=False),
+        sa.Column("state", sa.String(length=100), nullable=True),
+        sa.Column("program", sa.String(length=100), nullable=True),
+        sa.Column("category", sa.String(length=50), nullable=True),
+        sa.Column("status", sa.String(length=20), nullable=False, server_default="READY"),
+        sa.Column("generated_by", sa.String(length=255), nullable=False),
+        sa.Column("title", sa.String(length=255), nullable=False),
+        sa.Column("title_hi", sa.String(length=255), nullable=True),
+        sa.Column("file_bytes", sa.LargeBinary(), nullable=True),
+        sa.Column("file_size", sa.String(length=50), nullable=False, server_default="0 KB"),
+        sa.Column("summary_json", sa.JSON(), nullable=True),
+        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index(op.f("ix_reports_report_type"), "reports", ["report_type"], unique=False)
+
 
 def downgrade() -> None:
     # Drop tables in reverse dependency order
+    op.drop_table("reports")
     op.drop_table("short_links")
     op.drop_table("verification_nonces")
     op.drop_table("holder_keys")
