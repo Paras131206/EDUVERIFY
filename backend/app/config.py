@@ -53,6 +53,10 @@ class Settings(BaseSettings):
         default=False,
         description="Feature flag: Require TOTP MFA for AICTE_ADMIN",
     )
+    BATCH_FILES_RETENTION_DAYS: int = Field(
+        default=90,
+        description="Number of days to retain raw batch upload files in batch_files before purging",
+    )
 
     # CORS & URLs
     CORS_ORIGINS: list[str] | str = Field(

@@ -1379,14 +1379,35 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ConsentRecord'
+              $ref: '#/components/schemas/ConsentRecordRequest'
       responses:
-        '200':
-          description: Consent saved
+        '201':
+          description: Consent recorded
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConsentRecord'
+                $ref: '#/components/schemas/ConsentItemResponse'
+
+  /v1/consent/me:
+    get:
+      tags: [Consent]
+      summary: Get active consent summary and audit history
+      operationId: getMyConsent
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: apaar_id
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Student consent summary and history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentConsentSummaryResponse'
 
   /v1/consent/{apaar_id}:
     get:
@@ -1733,7 +1754,21 @@ paths:
       security:
         - BearerAuth: []
       parameters:
+        - name: from_date
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to_date
+          in: query
+          schema:
+            type: string
+            format: date-time
         - name: action
+          in: query
+          schema:
+            type: string
+        - name: actor_id
           in: query
           schema:
             type: string
@@ -1741,15 +1776,23 @@ paths:
           in: query
           schema:
             type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
       responses:
         '200':
           description: Audit log records
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AuditEntry'
+                $ref: '#/components/schemas/AuditListResponse'
 
   /v1/audit/verify-chain:
     get:
@@ -1765,6 +1808,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuditChainVerifyResponse'
+
+  /v1/admin/retention/purge:
+    post:
+      tags: [Audit]
+      summary: Trigger data retention purge for expired raw batch upload files
+      operationId: purgeRetentionBatchFiles
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: retention_days
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Purge outcome summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetentionPurgeResponse'
 
   /v1/dashboards/aicte:
     get:
@@ -2623,6 +2686,68 @@ components:
           type: string
           format: date
 
+    ConsentRecordRequest:
+      type: object
+      required: [purpose, action]
+      properties:
+        purpose:
+          type: string
+          enum: [REPOSITORY, VERIFICATION_SHARE, ANALYTICS_AGGREGATE]
+        action:
+          type: string
+          enum: [GRANT, WITHDRAW]
+        apaar_id:
+          type: string
+          pattern: '^\d{12}$'
+        evidence_ref:
+          type: string
+        guardian_consent:
+          type: boolean
+          default: false
+
+    ConsentItemResponse:
+      type: object
+      required: [id, apaar_id, purpose, status, effective_at, guardian_consent]
+      properties:
+        id:
+          type: integer
+        apaar_id:
+          type: string
+        purpose:
+          type: string
+        status:
+          type: string
+          enum: [GRANTED, WITHDRAWN]
+        effective_at:
+          type: string
+          format: date-time
+        guardian_consent:
+          type: boolean
+        signature_ref:
+          type: string
+          nullable: true
+        prev_hash:
+          type: string
+          nullable: true
+        hash:
+          type: string
+          nullable: true
+
+    StudentConsentSummaryResponse:
+      type: object
+      required: [apaar_id, consents, history]
+      properties:
+        apaar_id:
+          type: string
+        consents:
+          type: object
+          additionalProperties:
+            type: string
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentItemResponse'
+
     IssueCredentialRequest:
       type: object
       required: [apaar_id, credential_type, holder_jwk]
@@ -2821,10 +2946,32 @@ components:
         hash:
           type: string
 
+    AuditListResponse:
+      type: object
+      required: [total, items]
+      properties:
+        total:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEntry'
+
     AuditChainVerifyResponse:
       type: object
-      required: [chain_valid, total_records, broken_link_id, verified_at]
+      required: [valid, length, head_hash, reason]
       properties:
+        valid:
+          type: boolean
+        length:
+          type: integer
+        first_broken_id:
+          type: integer
+          nullable: true
+        head_hash:
+          type: string
+        reason:
+          type: string
         chain_valid:
           type: boolean
         total_records:
@@ -2835,6 +2982,18 @@ components:
         verified_at:
           type: string
           format: date-time
+
+    RetentionPurgeResponse:
+      type: object
+      required: [purged_count, cutoff_date, retention_days]
+      properties:
+        purged_count:
+          type: integer
+        cutoff_date:
+          type: string
+          format: date-time
+        retention_days:
+          type: integer
 
     AicteDashboardSummary:
       type: object
