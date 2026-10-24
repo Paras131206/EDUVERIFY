@@ -765,6 +765,51 @@ paths:
         '200':
           description: Batch superseded
 
+  /v1/batches/{id}/revalidate:
+    post:
+      tags: [Batches]
+      summary: Re-runs validation engine on batch with approved corrections applied
+      operationId: revalidateBatch
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Batch revalidation results
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /v1/batches/{id}/dq-comparison:
+    get:
+      tags: [Batches]
+      summary: Get before and after data quality comparison and score delta
+      operationId: getDqComparison
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, xlsx, pdf]
+            default: json
+      responses:
+        '200':
+          description: Quality comparison delta report
+
+
   /v1/batches/{id}/events:
     get:
       tags: [Batches]
@@ -827,7 +872,35 @@ paths:
               schema:
                 type: string
 
+  /v1/issues/{id}/decision:
+    post:
+      tags: [Issues]
+      summary: Submit human review decision on an issue
+      operationId: decideIssueDecision
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueDecisionRequest'
+      responses:
+        '200':
+          description: Decision recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issue'
+
   /v1/issues/{id}/decide:
+
     post:
       tags: [Issues]
       summary: Submit human review decision on an issue
@@ -1058,7 +1131,50 @@ paths:
               schema:
                 $ref: '#/components/schemas/TransferRecord'
 
+  /v1/transfers/{id}/approve:
+    post:
+      tags: [Transfers]
+      summary: Source institution approve transfer request
+      operationId: approveTransfer
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transfer approved and source record set to TRANSFERRED_OUT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferRecord'
+
+  /v1/transfers/{id}/reject:
+    post:
+      tags: [Transfers]
+      summary: Source institution reject transfer request
+      operationId: rejectTransfer
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transfer rejected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferRecord'
+
   /v1/transfers/{id}/decide:
+
     post:
       tags: [Transfers]
       summary: Source institution approve or reject transfer

@@ -1,0 +1,121 @@
+"""
+Academic Year Rollover service using engine.rollover_preview.
+Complies with Task B4 item 6 and prompt guidelines:
+- Dry-run mode previews student progression using engine.rollover_preview and returns counts.
+- Non-dry-run mode returns 501 Not Implemented until engine-v0.5 lands (Task B7).
+"""
+
+import pandas as pd
+from app.models.core import Program, StudentRecord
+from app.schemas.rollover import RolloverSummaryResponse
+from app.security.deps import Principal
+from app.services.audit import append_audit_log
+from eduverify_engine.rollover import rollover_preview
+from fastapi import HTTPException, status
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+
+def execute_rollover_service(
+    db: Session,
+    *,
+    from_year: str,
+    to_year: str,
+    dry_run: bool,
+    principal: Principal,
+) -> RolloverSummaryResponse:
+    """
+    Simulates or executes academic year rollover.
+    Restricted to AICTE_ADMIN.
+    """
+    if principal.role != "AICTE_ADMIN":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "code": "FORBIDDEN",
+                "message": "Only AICTE_ADMIN can execute academic year rollover",
+            },
+        )
+
+    if not dry_run:
+        # Per prompt instructions: Until engine-v0.5 lands, non-dry-run rollover returns 501
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail={
+                "code": "NOT_IMPLEMENTED",
+                "message": (
+                    "Automated persistence rollover execution requires engine-v0.5 "
+                    "(scheduled for Task B7). Use dry_run=true for simulation preview."
+                ),
+            },
+        )
+
+    # Fetch active students for from_year
+    students = list(
+        db.scalars(
+            select(StudentRecord).where(
+                StudentRecord.academic_year == from_year,
+                StudentRecord.enrolment_status == "ACTIVE",
+            )
+        ).all()
+    )
+
+    programs = list(db.scalars(select(Program)).all())
+    programs_df = (
+        pd.DataFrame([p.__dict__ for p in programs]).drop(
+            columns=["_sa_instance_state"], errors="ignore"
+        )
+        if programs
+        else pd.DataFrame()
+    )
+
+    if students:
+        students_df = pd.DataFrame([s.__dict__ for s in students]).drop(
+            columns=["_sa_instance_state"], errors="ignore"
+        )
+    else:
+        students_df = pd.DataFrame()
+
+    preview_df = (
+        rollover_preview(students_df, programs_df) if not students_df.empty else pd.DataFrame()
+    )
+
+    eligible_count = len(students)
+    rolled_over_count = len(preview_df)
+    graduated_count = max(0, eligible_count - rolled_over_count)
+
+    append_audit_log(
+        db,
+        action="ROLLOVER_PREVIEW",
+        actor_type="API_KEY" if principal.is_api_key else "USER",
+        actor_id=principal.id,
+        role=principal.role,
+        resource="ROLLOVER",
+        resource_id=f"{from_year}->{to_year}",
+        payload={
+            "from_year": from_year,
+            "to_year": to_year,
+            "dry_run": dry_run,
+            "eligible": eligible_count,
+            "rolled_over": rolled_over_count,
+            "graduated": graduated_count,
+        },
+    )
+
+    return RolloverSummaryResponse(
+        from_academic_year=from_year,
+        to_academic_year=to_year,
+        eligible_students=eligible_count,
+        rolled_over=rolled_over_count,
+        graduated=graduated_count,
+        errors=0,
+        dry_run=True,
+        details={
+            "programs_analyzed": len(programs),
+            "retention_rate": (
+                round((rolled_over_count / eligible_count) * 100.0, 2)
+                if eligible_count > 0
+                else 100.0
+            ),
+        },
+    )
