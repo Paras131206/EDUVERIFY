@@ -1,0 +1,64 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: eduverify_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: eduverify
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d eduverify"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: eduverify_mailpit
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: eduverify_api
+    restart: unless-stopped
+    environment:
+      ENV: dev
+      PORT: 8000
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/eduverify
+      JWT_SECRET: dev-jwt-secret-at-least-32-characters-for-hs256-signing-eduverify
+      FERNET_KEY: 0123456789abcdef0123456789abcdef0123456789a=
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173,http://localhost:8000
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      PUBLIC_BASE_URL: http://localhost:8000
+      FRONTEND_URL: http://localhost:5173
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+
+  frontend:
+    profiles: ["frontend"]
+    build:
+      context: ./frontend
+    container_name: eduverify_web
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:8000
+
+volumes:
+  db_data:

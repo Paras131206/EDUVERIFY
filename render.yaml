@@ -1,0 +1,65 @@
+services:
+  - type: web
+    name: eduverify-api
+    runtime: python
+    plan: free
+    rootDir: .
+    buildCommand: "pip install -r backend/requirements.txt && pip install ./engine"
+    startCommand: "cd backend && alembic upgrade head && python -m app.seed --if-empty && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: ENV
+        value: prod
+      - key: DATABASE_URL
+        fromDatabase:
+          name: eduverify-db
+          property: connectionString
+      - key: JWT_SECRET
+        sync: false
+      - key: FERNET_KEY
+        sync: false
+      - key: ISSUER_KEYS_JSON
+        sync: false
+      - key: PEPPER
+        sync: false
+      - key: SEED_PASSWORD
+        sync: false
+      - key: CORS_ORIGINS
+        value: "https://eduverify-web.onrender.com"
+      - key: FRONTEND_URL
+        value: "https://eduverify-web.onrender.com"
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+
+  - type: web
+    name: eduverify-web
+    runtime: static
+    plan: free
+    rootDir: frontend
+    buildCommand: "npm ci && npm run build"
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: eduverify-api
+          property: host
+
+databases:
+  - name: eduverify-db
+    plan: free
+    databaseName: eduverify
+    user: eduverify
+    postgresMajorVersion: 16
