@@ -179,7 +179,7 @@ def list_user_notifications_service(
     limit: int = 50,
 ) -> list[NotificationResponse]:
     """Returns alerts for caller's email / user id."""
-    email = principal.email.lower() if principal.email else ""
+    email = principal.email.lower() if principal and principal.email else ""
     items = list(
         db.scalars(
             select(NotificationOutbox)

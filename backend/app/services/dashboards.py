@@ -168,17 +168,20 @@ def get_aicte_map_metric_service(db: Session, metric: str = "coverage") -> Aicte
     states = list(db.scalars(select(State).order_by(State.lgd_state_code)).all())
 
     # Map institution counts by state
-    inst_counts = dict(
-        db.execute(
+    inst_counts = {
+        row[0]: row[1]
+        for row in db.execute(
             select(Institution.state_code, func.count(Institution.institution_aicte_id)).group_by(
                 Institution.state_code
             )
         ).all()
-    )
+        if row[0] is not None
+    }
 
     # Student counts by state
-    student_counts = dict(
-        db.execute(
+    student_counts = {
+        row[0]: row[1]
+        for row in db.execute(
             select(Institution.state_code, func.count(StudentRecord.apaar_id))
             .join(
                 Institution,
@@ -186,11 +189,13 @@ def get_aicte_map_metric_service(db: Session, metric: str = "coverage") -> Aicte
             )
             .group_by(Institution.state_code)
         ).all()
-    )
+        if row[0] is not None
+    }
 
     # DQ scores by state
-    dq_scores = dict(
-        db.execute(
+    dq_scores = {
+        row[0]: row[1]
+        for row in db.execute(
             select(
                 Institution.state_code,
                 func.avg(func.coalesce(Batch.quality_score_after, Batch.quality_score_before)),
@@ -201,7 +206,8 @@ def get_aicte_map_metric_service(db: Session, metric: str = "coverage") -> Aicte
             )
             .group_by(Institution.state_code)
         ).all()
-    )
+        if row[0] is not None
+    }
 
     state_metrics: list[StateMetric] = []
     total_val = 0.0
