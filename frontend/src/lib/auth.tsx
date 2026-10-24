@@ -268,6 +268,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
+export { AuthContext };
+
+export const useOptionalAuth = () => {
+  return useContext(AuthContext);
+};
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -275,6 +281,7 @@ export const useAuth = () => {
   }
   return context;
 };
+
 
 export const RequireRole: React.FC<{ roles: UserRole[]; children?: React.ReactNode }> = ({ roles, children }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
