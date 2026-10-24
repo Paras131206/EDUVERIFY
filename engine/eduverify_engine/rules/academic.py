@@ -7,12 +7,16 @@ V026: Conflicting course/department/level for same student across rows
 V027: year_of_study exceeds program duration or invalid for lateral
 """
 
+import logging
+
 import pandas as pd
 
 from ..models import Issue, SuggestedFix
 from ..normalize import normalize_date
 from .context import RuleContext
 from .registry import make_issue, rule
+
+logger = logging.getLogger(__name__)
 
 PLAUSIBLE_AGE_RANGES = {
     "DIPLOMA": (14, 35),
@@ -83,8 +87,12 @@ def validate_v016_implausible_age(df: pd.DataFrame, ctx: RuleContext) -> list[Is
                         confidence=0.85,
                     )
                 )
-        except Exception:
-            pass
+        except (ValueError, IndexError) as e:
+            logger.debug(
+                "Skipping V016 age calculation for row %d due to unparseable date/year: %s",
+                row_num,
+                e,
+            )
 
     return issues
 

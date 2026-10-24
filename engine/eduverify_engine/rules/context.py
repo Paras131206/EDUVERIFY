@@ -4,6 +4,7 @@ Holds master data, intake quotas, declared totals, mock registry,
 central snapshot, history, transfers, and configuration.
 """
 
+import logging
 from pathlib import Path
 from typing import Any
 
@@ -11,6 +12,8 @@ import pandas as pd
 
 from ..catalog import RuleCatalog, load_rule_catalog
 from ..models import ColumnMapping
+
+logger = logging.getLogger(__name__)
 
 
 def _find_repo_root() -> Path:
@@ -40,8 +43,21 @@ def load_master_tables(repo_root: Path | None = None) -> dict[str, pd.DataFrame]
         table_name = csv_file.stem
         try:
             tables[table_name] = pd.read_csv(csv_file, dtype=str)
-        except Exception:
-            pass
+        except (pd.errors.EmptyDataError, pd.errors.ParserError, OSError) as e:
+            logger.warning(
+                "Could not parse master table '%s' from %s: %s",
+                table_name,
+                csv_file,
+                e,
+            )
+        except Exception as e:
+            logger.error(
+                "Unexpected failure reading master table '%s' from %s: %s",
+                table_name,
+                csv_file,
+                e,
+                exc_info=True,
+            )
     return tables
 
 
@@ -52,8 +68,19 @@ def load_demo_csv(filename: str, repo_root: Path | None = None) -> pd.DataFrame:
     if demo_file.exists():
         try:
             return pd.read_csv(demo_file, dtype=str)
-        except Exception:
-            pass
+        except (pd.errors.EmptyDataError, pd.errors.ParserError, OSError) as e:
+            logger.warning(
+                "Could not load optional demo CSV '%s': %s",
+                filename,
+                e,
+            )
+        except Exception as e:
+            logger.error(
+                "Unexpected failure reading demo CSV '%s': %s",
+                filename,
+                e,
+                exc_info=True,
+            )
     return pd.DataFrame()
 
 

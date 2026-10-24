@@ -5,12 +5,15 @@ V013: Supernumerary per scheme vs allowed
 """
 
 import json
+import logging
 
 import pandas as pd
 
 from ..models import Issue
 from .context import RuleContext
 from .registry import make_issue, rule
+
+logger = logging.getLogger(__name__)
 
 
 @rule("V012")
@@ -152,7 +155,11 @@ def validate_v013_supernumerary_quota_exceeded(df: pd.DataFrame, ctx: RuleContex
                             confidence=1.0,
                         )
                     )
-            except Exception:
-                pass
+            except (json.JSONDecodeError, TypeError, ValueError) as e:
+                logger.warning(
+                    "Failed to parse supernumerary_allowed for program '%s': %s",
+                    prog_code,
+                    e,
+                )
 
     return issues

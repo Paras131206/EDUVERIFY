@@ -6,12 +6,17 @@ V018: Consent missing or minor lacking guardian consent
 V021: Invalid lifecycle transition
 """
 
+import logging
+
 import pandas as pd
 
 from ..models import Issue
 from ..normalize import normalize_date
 from .context import RuleContext
 from .registry import make_issue, rule
+
+logger = logging.getLogger(__name__)
+
 
 
 def _is_truthy(val: any) -> bool:
@@ -242,8 +247,12 @@ def validate_v018_consent(df: pd.DataFrame, ctx: RuleContext) -> list[Issue]:
                             confidence=1.0,
                         )
                     )
-            except Exception:
-                pass
+            except (ValueError, IndexError) as e:
+                logger.debug(
+                    "Skipping minor guardian consent check for row %d due to unparseable date/year: %s",
+                    row_num,
+                    e,
+                )
 
     return issues
 
