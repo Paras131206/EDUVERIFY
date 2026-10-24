@@ -19,7 +19,6 @@ from .models import (
     ColumnMapping,
     IntakeSummary,
     Issue,
-    ReconciliationRow,
 )
 from .parse import parse_file
 from .rules import RuleContext, run_rules
@@ -102,6 +101,7 @@ def validate_batch(
         registry=registry,
         central_snapshot=central_snapshot,
         history=history,
+        previous_batch_profile=previous_batch_profile,
         transfers=transfers,
         academic_year=academic_year,
         institution_aicte_id=inst_id,
@@ -116,31 +116,7 @@ def validate_batch(
     rule_issues = run_rules(working_df, ctx)
     all_issues = parse_issues + rule_issues
 
-    # Sort issues by priority (CRITICAL -> HIGH -> MEDIUM -> LOW) then row
-    priority_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
-    all_issues.sort(key=lambda i: (priority_order.get(i.priority, 4), i.row or 0))
-
-    # 6. Row counts
-    rows_with_error = {i.row for i in all_issues if i.severity == "ERROR" and i.row is not None}
-    rows_with_warning = {
-        i.row for i in all_issues if i.severity == "WARN" and i.row is not None
-    } - rows_with_error
-    err_count = len(rows_with_error)
-    warn_count = len(rows_with_warning)
-    valid_count = max(0, rows_total - (err_count + warn_count))
-
-    # 7. Summary buckets
-    review_summary = {"AUTO_FLAG": 0, "HUMAN_REVIEW": 0, "INFO": 0}
-    priority_summary = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0}
-    for iss in all_issues:
-        review_summary[iss.bucket] = review_summary.get(iss.bucket, 0) + 1
-        priority_summary[iss.priority] = priority_summary.get(iss.priority, 0) + 1
-
-    # 8. Compute Quality Score & Deequ Metrics
-    q_score = calculate_quality_score(all_issues, rows_total)
-    metrics = calculate_deequ_metrics(working_df, all_issues)
-
-    # 9. Intake Summary per program
+    # 6. Intake Summary per program
     intake_summaries: list[IntakeSummary] = []
     if "program_code" in working_df.columns:
         seat_col = (
@@ -184,42 +160,66 @@ def validate_batch(
                 )
             )
 
-    # 10. Reconciliation against declared totals
-    reconciliation_rows: list[ReconciliationRow] = []
-    if not ctx.declared_totals.empty and "program_code" in ctx.declared_totals.columns:
-        inst_declared = ctx.declared_totals[
-            (ctx.declared_totals["institution_aicte_id"].astype(str) == str(inst_id))
-            & (ctx.declared_totals["academic_year"].astype(str) == str(academic_year))
-        ]
-        for _, d_row in inst_declared.iterrows():
-            d_prog = str(d_row["program_code"]).strip()
-            declared_count = int(d_row.get("declared_enrolment", 0))
+    # 7. Reconciliation against declared totals (Task C5.4)
+    reconciliation_rows = getattr(ctx, "_reconciliation", [])
+    if not reconciliation_rows:
+        from .reconcile import reconcile_batch
 
-            uploaded_count = 0
-            if "program_code" in working_df.columns:
-                uploaded_count = int(
-                    (working_df["program_code"].astype(str).str.strip() == d_prog).sum()
-                )
+        rec_issues, reconciliation_rows = reconcile_batch(working_df, ctx)
+        for r_iss in rec_issues:
+            if not any(i.rule_id == r_iss.rule_id and i.field == r_iss.field for i in all_issues):
+                all_issues.append(r_iss)
 
-            delta = uploaded_count - declared_count
-            tolerance = max(2, int(0.02 * declared_count))
-            status = "MATCH" if abs(delta) <= tolerance else "MISMATCH"
-
-            reconciliation_rows.append(
-                ReconciliationRow(
-                    program_code=d_prog,
-                    declared=declared_count,
-                    uploaded=uploaded_count,
-                    delta=delta,
-                    status=status,
-                )
-            )
-
+    # 8. Duplicate Clusters (Task C4)
     duplicate_clusters = getattr(ctx, "_duplicate_clusters", [])
     if not duplicate_clusters and not hasattr(ctx, "_dedup_cache"):
         from .dedup import detect_duplicates
 
         _, duplicate_clusters = detect_duplicates(working_df, ctx)
+
+    # 9. Schema Drift Detection (Task C5.2)
+    schema_drift = getattr(ctx, "_schema_drift", [])
+    if not schema_drift and not hasattr(ctx, "_drift_cache"):
+        from .drift import detect_schema_drift
+
+        drift_issues, schema_drift = detect_schema_drift(working_df, ctx)
+        for d_iss in drift_issues:
+            if not any(i.rule_id == d_iss.rule_id and i.field == d_iss.field for i in all_issues):
+                all_issues.append(d_iss)
+
+    # 10. Statistical Anomaly Detection (Task C5.3)
+    anomalies = getattr(ctx, "_anomalies", [])
+    if not anomalies and not hasattr(ctx, "_anomaly_cache"):
+        from .anomaly import detect_anomalies
+
+        anom_issues, anomalies = detect_anomalies(working_df, ctx)
+        for a_iss in anom_issues:
+            if not any(i.rule_id == a_iss.rule_id and i.field == a_iss.field for i in all_issues):
+                all_issues.append(a_iss)
+
+    # Sort issues by priority (CRITICAL -> HIGH -> MEDIUM -> LOW) then row
+    priority_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
+    all_issues.sort(key=lambda i: (priority_order.get(i.priority, 4), i.row or 0))
+
+    # Row counts
+    rows_with_error = {i.row for i in all_issues if i.severity == "ERROR" and i.row is not None}
+    rows_with_warning = {
+        i.row for i in all_issues if i.severity == "WARN" and i.row is not None
+    } - rows_with_error
+    err_count = len(rows_with_error)
+    warn_count = len(rows_with_warning)
+    valid_count = max(0, rows_total - (err_count + warn_count))
+
+    # Summary buckets
+    review_summary = {"AUTO_FLAG": 0, "HUMAN_REVIEW": 0, "INFO": 0}
+    priority_summary = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0}
+    for iss in all_issues:
+        review_summary[iss.bucket] = review_summary.get(iss.bucket, 0) + 1
+        priority_summary[iss.priority] = priority_summary.get(iss.priority, 0) + 1
+
+    # Compute Quality Score & Deequ Metrics
+    q_score = calculate_quality_score(all_issues, rows_total)
+    metrics = calculate_deequ_metrics(working_df, all_issues)
 
     return BatchReport(
         batch_id=batch_id,
@@ -239,6 +239,6 @@ def validate_batch(
         intake_summary=intake_summaries,
         reconciliation=reconciliation_rows,
         duplicate_clusters=duplicate_clusters,
-        schema_drift=[],
-        anomalies=[],
+        schema_drift=schema_drift,
+        anomalies=anomalies,
     )

@@ -4,7 +4,7 @@ Exports RuleContext, @rule decorator, and execution functions.
 All rules self-register on package import.
 """
 
-from .. import dedup
+from .. import anomaly, dedup, drift, reconcile, rollover
 from . import (
     academic,
     aggregates,
@@ -34,10 +34,14 @@ __all__ = [
     "RULE_REGISTRY",
     "academic",
     "aggregates",
+    "anomaly",
     "completeness",
     "dedup",
+    "drift",
     "format_consistency",
     "identity",
     "institution",
     "quota_status",
+    "reconcile",
+    "rollover",
 ]
