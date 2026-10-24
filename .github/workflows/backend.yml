@@ -1,3 +1,4 @@
+
 name: Team B - Backend CI
 
 on:
@@ -17,6 +18,7 @@ on:
 jobs:
   test-backend:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -41,4 +43,4 @@ jobs:
 
       - name: Verify Contract Schemathesis & OpenAPI Validation
         run: |
-          python -c "import openapi_spec_validator, yaml; spec = yaml.safe_load(open('contracts/openapi.yaml', encoding='utf-8')); openapi_spec_validator.validate(spec, base_uri='file://' + str(Path('contracts/openapi.yaml').resolve())); print('OpenAPI contract validated successfully!')"
+          python -c "from pathlib import Path; import openapi_spec_validator, yaml; spec = yaml.safe_load(open('contracts/openapi.yaml', encoding='utf-8')); openapi_spec_validator.validate(spec, base_uri=Path('contracts/openapi.yaml').resolve().as_uri()); print('OpenAPI contract validated successfully!')"
