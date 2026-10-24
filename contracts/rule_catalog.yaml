@@ -1,4 +1,4 @@
-catalog_version: "0.1.0"
+catalog_version: "1.0.0"
 owner: "team-c"
 description: "Validation rule catalog for EduVerify (V001–V035) per agents.md §6"
 rules:

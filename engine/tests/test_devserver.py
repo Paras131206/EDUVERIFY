@@ -25,7 +25,7 @@ def test_devserver_catalog():
     response = client.get("/catalog")
     assert response.status_code == 200
     data = response.json()
-    assert data["catalog_version"] == "0.1.0"
+    assert data["catalog_version"] == "1.0.0"
     assert len(data["rules"]) == 35
 
 
@@ -64,3 +64,36 @@ def test_devserver_validate():
     report = response.json()
     assert report["rows_total"] == 1
     assert "issues" in report
+
+
+def test_devserver_report_compare():
+    sample_csv = io.BytesIO(b"apaar_id,full_name\n123456789012,John Doe\n")
+    val_resp = client.post(
+        "/validate",
+        files={"file": ("upload.csv", sample_csv, "text/csv")},
+    )
+    report = val_resp.json()
+
+    cmp_payload = {
+        "before": report,
+        "after": report,
+        "decisions": [{"action": "ACCEPT_FIX", "rule_id": "V005"}],
+    }
+    response = client.post("/report/compare", json=cmp_payload)
+    assert response.status_code == 200
+    cmp_data = response.json()
+    assert "quality_score_before" in cmp_data
+    assert "quality_score_after" in cmp_data
+    assert "resolved" in cmp_data
+    assert cmp_data["resolved"] == 1
+
+
+def test_devserver_report_demo_xlsx():
+    response = client.get("/report/demo.xlsx")
+    assert response.status_code == 200
+    assert (
+        response.headers["content-type"]
+        == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    assert "eduverify_demo_report.xlsx" in response.headers.get("content-disposition", "")
+    assert len(response.content) > 1000

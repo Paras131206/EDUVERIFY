@@ -3,7 +3,7 @@ EduVerify Engine - AI & Data Validation Engine for EduVerify.
 Pure Python package (no DB, no HTTP in library).
 """
 
-__version__ = "0.0.1"
+__version__ = "1.0.0"
 
 from .anomaly import detect_anomalies
 from .dedup import detect_duplicates

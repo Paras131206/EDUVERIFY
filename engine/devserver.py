@@ -4,18 +4,21 @@ Local dev harness only (never deployed to production).
 Runs on port 8100.
 """
 
+from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
 # Imports when run from engine directory
 from eduverify_engine import __version__
 from eduverify_engine.catalog import load_rule_catalog
 from eduverify_engine.mapping import suggest_mapping
-from eduverify_engine.models import BatchReport, ColumnMapping
+from eduverify_engine.models import BatchReport, ColumnMapping, DQComparison
 from eduverify_engine.parse import parse_file
+from eduverify_engine.report import compare_reports, export_report
 from eduverify_engine.validate import validate_batch
 
 app = FastAPI(
@@ -100,6 +103,14 @@ async def parse_uploaded_file(file: UploadFile = File(...)) -> ParseResponse:
     )
 
 
+class CompareRequest(BaseModel):
+    before: BatchReport
+    after: BatchReport
+    decisions: list[dict[str, Any]] | None = Field(
+        default=None, description="Optional list of human review decisions"
+    )
+
+
 @app.post("/validate", response_model=BatchReport)
 async def validate_batch_endpoint(file: UploadFile = File(...)) -> BatchReport:
     """
@@ -107,6 +118,36 @@ async def validate_batch_endpoint(file: UploadFile = File(...)) -> BatchReport:
     """
     content = await file.read()
     return validate_batch(content)
+
+
+@app.post("/report/compare", response_model=DQComparison)
+def compare_reports_endpoint(payload: CompareRequest) -> DQComparison:
+    """
+    Compares two BatchReports (before & after) plus optional human review decisions.
+    Returns DQComparison with quality score deltas, rule deltas, and completeness deltas.
+    """
+    return compare_reports(payload.before, payload.after, payload.decisions)
+
+
+@app.get("/report/demo.xlsx")
+def download_demo_report() -> Response:
+    """
+    Validates the demo dataset (batch_2_errors.xlsx) and exports a complete
+    Excel (.xlsx) report containing all 7 sheets with conditional formatting.
+    """
+    repo_root = Path(__file__).resolve().parent.parent
+    demo_file = repo_root / "data" / "demo" / "batch_2_errors.xlsx"
+    if not demo_file.exists():
+        demo_file = Path("data/demo/batch_2_errors.xlsx")
+
+    report = validate_batch(demo_file)
+    content = export_report(report, fmt="xlsx")
+
+    return Response(
+        content=content,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": 'attachment; filename="eduverify_demo_report.xlsx"'},
+    )
 
 
 if __name__ == "__main__":

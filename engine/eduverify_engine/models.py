@@ -126,9 +126,9 @@ class BatchReport(BaseModel):
     model_config = ConfigDict(extra="forbid")
     batch_id: str = Field(..., description="Batch UUID")
     institution_aicte_id: str = Field(..., description="AICTE institution ID")
-    engine_version: str = Field(default="0.0.1", description="Semantic version of engine")
+    engine_version: str = Field(default="1.0.0", description="Semantic version of engine")
     rule_catalog_version: str = Field(
-        default="0.1.0", description="Semantic version of rule catalog"
+        default="1.0.0", description="Semantic version of rule catalog"
     )
     rows_total: int = Field(default=0, ge=0, description="Total rows in batch")
     rows_valid: int = Field(default=0, ge=0, description="Rows with no errors or warnings")

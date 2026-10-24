@@ -219,6 +219,15 @@ class RuleContext:
                 if aid:
                     self._snapshot_by_apaar.setdefault(aid, []).append(r.to_dict())
 
+        # 7. Intake lookup by (program_code, institution_aicte_id, academic_year)
+        self._intake_by_key: dict[tuple[str, str, str], dict[str, Any]] = {}
+        if not self.intake.empty and "program_code" in self.intake.columns:
+            for _, r in self.intake.iterrows():
+                p = str(r["program_code"]).strip()
+                i = str(r.get("institution_aicte_id", "")).strip()
+                y = str(r.get("academic_year", "")).strip()
+                self._intake_by_key[(p, i, y)] = r.to_dict()
+
     def lookup_registry(self, apaar_id: str) -> dict[str, Any] | None:
         """Returns demographic registry record for given APAAR ID or None."""
         return self._registry_by_apaar.get(str(apaar_id).strip())
@@ -253,14 +262,18 @@ class RuleContext:
         if self.intake.empty:
             return None
 
-        mask = (
-            (self.intake["program_code"].astype(str) == str(program_code))
-            & (self.intake["institution_aicte_id"].astype(str) == str(inst))
-            & (self.intake["academic_year"].astype(str) == str(year))
-        )
-        subset = self.intake[mask]
-        if not subset.empty:
-            return subset.iloc[0].to_dict()
+        key = (str(program_code).strip(), str(inst).strip(), str(year).strip())
+        if key in self._intake_by_key:
+            return self._intake_by_key[key]
+
+        # Fallback to key without institution match if universal
+        for (p, i, y), rec in self._intake_by_key.items():
+            if (
+                p == str(program_code).strip()
+                and (not i or i == str(inst).strip())
+                and (not y or y == str(year).strip())
+            ):
+                return rec
         return None
 
     def get_snapshot_records(self, apaar_id: str) -> list[dict[str, Any]]:
