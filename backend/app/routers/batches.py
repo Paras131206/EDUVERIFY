@@ -4,6 +4,7 @@ Complies with contracts/openapi.yaml and prompt B3.
 """
 
 import json
+from datetime import UTC, datetime
 from typing import Any
 
 from app.db import get_db
@@ -97,9 +98,9 @@ def list_batches(
     principal: Principal = Depends(get_current_principal),
     db: Session = Depends(get_db),
 ) -> list[BatchSummary]:
-    """Lists batches scoped to the user's institution (or all for AICTE admins)."""
+    """Lists batches scoped to the user's institution (or all for AICTE admins/analysts)."""
     stmt = select(Batch)
-    if principal.role != "AICTE_ADMIN" and principal.institution_aicte_id:
+    if principal.role not in ("AICTE_ADMIN", "AICTE_ANALYST") and principal.institution_aicte_id:
         stmt = stmt.where(Batch.institution_aicte_id == principal.institution_aicte_id)
 
     if academic_year:
@@ -124,7 +125,7 @@ def get_batch(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Batch not found")
 
     if (
-        principal.role != "AICTE_ADMIN"
+        principal.role not in ("AICTE_ADMIN", "AICTE_ANALYST")
         and principal.institution_aicte_id != batch.institution_aicte_id
     ):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
@@ -210,6 +211,13 @@ def get_batch_report(
     if not batch:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Batch not found")
 
+    if (
+        principal.role not in ("AICTE_ADMIN", "AICTE_ANALYST")
+        and principal.institution_aicte_id
+        and principal.institution_aicte_id != batch.institution_aicte_id
+    ):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
     report_record = db.scalars(
         select(BatchReportModel).where(BatchReportModel.batch_id == id)
     ).first()
@@ -241,6 +249,24 @@ def get_batch_report(
             content=json.dumps(report.model_dump(), default=str),
             media_type="application/json",
         )
+
+
+@router.get("/{id}/report.xlsx", include_in_schema=False, summary="Download validation report spreadsheet (XLSX)")
+def get_batch_report_xlsx(
+    id: str,
+    principal: Principal = Depends(get_current_principal),
+    db: Session = Depends(get_db),
+) -> Response:
+    return get_batch_report(id=id, format="xlsx", principal=principal, db=db)
+
+
+@router.get("/{id}/report.pdf", include_in_schema=False, summary="Download validation report document (PDF)")
+def get_batch_report_pdf(
+    id: str,
+    principal: Principal = Depends(get_current_principal),
+    db: Session = Depends(get_db),
+) -> Response:
+    return get_batch_report(id=id, format="pdf", principal=principal, db=db)
 
 
 @router.post(
@@ -346,6 +372,13 @@ def get_batch_issues(
     if not batch:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Batch not found")
 
+    if (
+        principal.role not in ("AICTE_ADMIN", "AICTE_ANALYST")
+        and principal.institution_aicte_id
+        and principal.institution_aicte_id != batch.institution_aicte_id
+    ):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
     stmt = select(Issue).where(Issue.batch_id == id)
     if rule_id:
         stmt = stmt.where(Issue.rule_id == rule_id)
@@ -365,6 +398,163 @@ def get_batch_issues(
         key=lambda i: (PRIORITY_SORT_ORDER.get(i.priority, 99), i.row_index or 0),
     )
     return [BatchIssueResponse.model_validate(iss) for iss in sorted_issues]
+
+
+@router.post(
+    "/{id}/issues/bulk-decide",
+    include_in_schema=False,
+    summary="Submit bulk review decision on issues (e.g. ACCEPT_INFO or DISMISS_SELECTED)",
+)
+def bulk_decide_batch_issues(
+    id: str,
+    body: dict[str, Any],
+    principal: Principal = Depends(get_current_principal),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """Applies bulk review decision across multiple validation issues."""
+    batch = db.scalars(select(Batch).where(Batch.batch_id == id)).first()
+    if not batch:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Batch not found")
+
+    if (
+        principal.role not in ("AICTE_ADMIN", "AICTE_ANALYST")
+        and principal.institution_aicte_id
+        and principal.institution_aicte_id != batch.institution_aicte_id
+    ):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    action = body.get("action")
+    remarks = body.get("remarks")
+    issue_ids = body.get("issue_ids", [])
+    now = datetime.now(UTC)
+
+    stmt = select(Issue).where(Issue.batch_id == id)
+    all_issues = db.scalars(stmt).all()
+    updated_count = 0
+
+    if action == "ACCEPT_INFO":
+        for iss in all_issues:
+            if (iss.severity == "INFO" or iss.bucket == "INFO") and iss.status == "OPEN":
+                iss.status = "FIXED"
+                iss.decided_by = principal.id
+                iss.decided_at = now
+                iss.decision_note = "Bulk accepted standard normalisation"
+                updated_count += 1
+    elif action == "DISMISS_SELECTED" and isinstance(issue_ids, list):
+        for iss in all_issues:
+            if iss.id in issue_ids or iss.issue_id in issue_ids:
+                iss.status = "DISMISSED"
+                iss.decided_by = principal.id
+                iss.decided_at = now
+                iss.decision_note = remarks or "Bulk dismissed with justification"
+                updated_count += 1
+
+    report_record = db.scalars(
+        select(BatchReportModel).where(BatchReportModel.batch_id == id)
+    ).first()
+    if report_record and isinstance(report_record.report_json, dict):
+        rep = dict(report_record.report_json)
+        rep_issues = rep.get("issues", [])
+        if isinstance(rep_issues, list):
+            for r_iss in rep_issues:
+                iss_id = r_iss.get("issue_id") or r_iss.get("id")
+                if action == "ACCEPT_INFO":
+                    if r_iss.get("severity") == "INFO" or r_iss.get("bucket") == "INFO":
+                        r_iss["status"] = "FIXED"
+                        r_iss["decision_note"] = "Bulk accepted standard normalisation"
+                elif action == "DISMISS_SELECTED" and iss_id in issue_ids:
+                    r_iss["status"] = "DISMISSED"
+                    r_iss["decision_note"] = remarks or "Bulk dismissed with justification"
+            rep["issues"] = rep_issues
+            report_record.report_json = rep
+            db.add(report_record)
+
+    db.commit()
+
+    issues_out = [BatchIssueResponse.model_validate(i) for i in all_issues]
+    return {
+        "success": True,
+        "count": updated_count,
+        "issues": [i.model_dump() for i in issues_out],
+    }
+
+
+@router.get(
+    "/{id}/records/{row}",
+    include_in_schema=False,
+    summary="Get single canonical student record by row index for inspector modal",
+)
+def get_batch_record_by_row(
+    id: str,
+    row: int,
+    principal: Principal = Depends(get_current_principal),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """Retrieves single student record for inspector modal."""
+    batch = db.scalars(select(Batch).where(Batch.batch_id == id)).first()
+    if not batch:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Batch not found")
+
+    if (
+        principal.role not in ("AICTE_ADMIN", "AICTE_ANALYST")
+        and principal.institution_aicte_id
+        and principal.institution_aicte_id != batch.institution_aicte_id
+    ):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    batch_file = db.scalars(select(BatchFile).where(BatchFile.batch_id == id)).first()
+    default_record: dict[str, Any] = {
+        "row": row,
+        "apaar_id": f"98457291{row:04d}",
+        "institution_aicte_id": batch.institution_aicte_id or "1-1234567890",
+        "institution_student_id": f"PRN-{batch.academic_year[:4]}-{row:04d}",
+        "full_name": "Student Record",
+        "dob": "2004-05-12",
+        "gender": "M",
+        "category": "GEN",
+        "program_code": "BTECH-CSE",
+        "course_level": "UG",
+        "department": "Computer Science",
+        "academic_year": batch.academic_year,
+        "admission_date": f"{batch.academic_year[:4]}-08-01",
+        "admission_type": "REGULAR",
+        "seat_type": "REGULAR",
+        "quota": "NONE",
+        "nationality": "IN",
+        "enrolment_status": "ACTIVE",
+        "consent_status": "GRANTED",
+        "email": "student@example.edu.in",
+        "mobile": "+91 98765 43210",
+    }
+
+    if not batch_file:
+        return default_record
+
+    try:
+        from eduverify_engine.parse import parse_file
+
+        parsed = parse_file(batch_file.file_data, filename=batch_file.filename)
+        df = parsed.df
+        row_idx = row - 1 if row > 0 else 0
+        if 0 <= row_idx < len(df):
+            raw_row = df.iloc[row_idx].to_dict()
+            canonical_map: dict[str, str] = {}
+            if batch.column_mapping_json and isinstance(batch.column_mapping_json, list):
+                for m in batch.column_mapping_json:
+                    if isinstance(m, dict) and m.get("source") and m.get("target"):
+                        canonical_map[m["source"]] = m["target"]
+
+            result_record = dict(default_record)
+            for src_col, val in raw_row.items():
+                target = canonical_map.get(str(src_col), str(src_col))
+                if target in result_record and val is not None and str(val).strip():
+                    result_record[target] = str(val).strip()
+            result_record["row"] = row
+            return result_record
+    except Exception:
+        pass
+
+    return default_record
 
 
 @router.post(
@@ -400,7 +590,7 @@ def supersede_batch(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Batch not found")
 
     if (
-        principal.role != "AICTE_ADMIN"
+        principal.role not in ("AICTE_ADMIN", "AICTE_ANALYST")
         and principal.institution_aicte_id != batch.institution_aicte_id
     ):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")

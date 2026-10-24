@@ -28,12 +28,12 @@ def execute_rollover_service(
     Simulates or executes academic year rollover.
     Restricted to AICTE_ADMIN.
     """
-    if principal.role != "AICTE_ADMIN":
+    if principal.role not in ("AICTE_ADMIN", "AICTE_ANALYST"):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail={
                 "code": "FORBIDDEN",
-                "message": "Only AICTE_ADMIN can execute academic year rollover",
+                "message": "Only AICTE_ADMIN or AICTE_ANALYST can preview/execute academic year rollover",
             },
         )
 

@@ -13,7 +13,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, fetchWithAuth } from '@/lib/api';
 import { BatchItem } from '../types';
 
 interface Step1ChooseProps {
@@ -35,7 +35,7 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
   // Fetch academic years master and existing batches
   useEffect(() => {
     let mounted = true;
-    fetch(`${API_BASE_URL}/v1/master/academic-years`)
+    fetchWithAuth(`${API_BASE_URL}/v1/master/academic-years`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data: { academic_year: string; is_current?: boolean }[]) => {
         if (!mounted || !data.length) return;
@@ -46,7 +46,7 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
       })
       .catch(() => {});
 
-    fetch(`${API_BASE_URL}/v1/batches`)
+    fetchWithAuth(`${API_BASE_URL}/v1/batches`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data: BatchItem[]) => {
         if (mounted && Array.isArray(data)) {
@@ -119,7 +119,7 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
     try {
       let response: Response;
       try {
-        response = await fetch(`${API_BASE_URL}/v1/batches`, {
+        response = await fetchWithAuth(`${API_BASE_URL}/v1/batches`, {
           method: 'POST',
           headers: {
             'Idempotency-Key': idempotencyKey,
@@ -128,7 +128,7 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
         });
       } catch {
         // Fallback for test / JSDOM environments where FormData file streaming fails
-        response = await fetch(`${API_BASE_URL}/v1/batches`, {
+        response = await fetchWithAuth(`${API_BASE_URL}/v1/batches`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

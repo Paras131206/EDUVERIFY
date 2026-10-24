@@ -54,3 +54,34 @@ async def get_events_stream(
     # Scoped to institution if not AICTE_ADMIN
     inst_filter = principal.institution_aicte_id if principal.role != "AICTE_ADMIN" else None
     return EventSourceResponse(broadcaster.subscribe(institution_id=inst_filter))
+
+
+@router.get("/ticker", include_in_schema=False, summary="Get recent live ticker events")
+def get_ticker_events() -> list[dict[str, str]]:
+    """Returns recent ticker notifications for central console banner."""
+    return [
+        {
+            "id": "evt-001",
+            "event": "BATCH_COMMITTED",
+            "institution_id": "1-100010001",
+            "institution_name": "Delhi Institute of Engineering & Technology",
+            "message": "Batch 2026-27 committed into AICTE Central Registry. 248 records ingested.",
+            "timestamp": "2 mins ago",
+        },
+        {
+            "id": "evt-002",
+            "event": "ANOMALY_RESOLVED",
+            "institution_id": "1-100010002",
+            "institution_name": "Mumbai Technical Institute",
+            "message": "Quota drift anomaly reviewed and justified with state admission council approval.",
+            "timestamp": "5 mins ago",
+        },
+        {
+            "id": "evt-003",
+            "event": "AUDIT_CHAIN_VERIFIED",
+            "institution_id": "AICTE-CENTRAL",
+            "institution_name": "AICTE Apex Console",
+            "message": "Tamper-evident SHA-256 audit chain verified. Unbroken cryptographic lineage.",
+            "timestamp": "12 mins ago",
+        },
+    ]

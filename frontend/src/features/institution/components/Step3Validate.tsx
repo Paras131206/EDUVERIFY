@@ -10,7 +10,7 @@ import {
   ShieldCheck,
   AlertCircle,
 } from 'lucide-react';
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, fetchWithAuth } from '@/lib/api';
 import { ValidationStage } from '../types';
 
 interface Step3ValidateProps {
@@ -55,7 +55,7 @@ export const Step3Validate: React.FC<Step3ValidateProps> = ({ batchId, onComplet
       if (!isMountedRef.current) return;
 
       try {
-        const res = await fetch(`${API_BASE_URL}/v1/batches/${batchId}`);
+        const res = await fetchWithAuth(`${API_BASE_URL}/v1/batches/${batchId}`);
         if (res.ok) {
           const batch = await res.json();
           if (batch.status === 'IN_REVIEW' || batch.status === 'VALIDATED') {
@@ -93,7 +93,7 @@ export const Step3Validate: React.FC<Step3ValidateProps> = ({ batchId, onComplet
       try {
         let ticket = 'mock-ticket';
         try {
-          const ticketRes = await fetch(`${API_BASE_URL}/v1/events/ticket`, { method: 'POST' });
+          const ticketRes = await fetchWithAuth(`${API_BASE_URL}/v1/events/ticket`, { method: 'POST' });
           if (ticketRes.ok) {
             const data = await ticketRes.json();
             ticket = data.ticket || ticket;

@@ -59,7 +59,15 @@ export const router = createBrowserRouter([
           {
             path: 'institution/batches',
             element: (
-              <RequireRole roles={['INSTITUTION_ADMIN', 'INSTITUTION_STAFF']}>
+              <RequireRole
+                roles={[
+                  'INSTITUTION_ADMIN',
+                  'INSTITUTION_STAFF',
+                  'AICTE_ADMIN',
+                  'AICTE_ANALYST',
+                  'AICTE_VIEWER',
+                ]}
+              >
                 <BatchListPage />
               </RequireRole>
             ),
@@ -67,7 +75,15 @@ export const router = createBrowserRouter([
           {
             path: 'institution/batches/:id/review',
             element: (
-              <RequireRole roles={['INSTITUTION_ADMIN', 'INSTITUTION_STAFF']}>
+              <RequireRole
+                roles={[
+                  'INSTITUTION_ADMIN',
+                  'INSTITUTION_STAFF',
+                  'AICTE_ADMIN',
+                  'AICTE_ANALYST',
+                  'AICTE_VIEWER',
+                ]}
+              >
                 <ReviewPage />
               </RequireRole>
             ),
@@ -100,7 +116,7 @@ export const router = createBrowserRouter([
           {
             path: 'aicte',
             element: (
-              <RequireRole roles={['AICTE_ADMIN', 'AICTE_VIEWER']}>
+              <RequireRole roles={['AICTE_ADMIN', 'AICTE_ANALYST', 'AICTE_VIEWER']}>
                 <AicteDashboardPage />
               </RequireRole>
             ),
@@ -137,8 +153,11 @@ export const router = createBrowserRouter([
                   'INSTITUTION_ADMIN',
                   'INSTITUTION_STAFF',
                   'AICTE_ADMIN',
+                  'AICTE_ANALYST',
                   'AICTE_VIEWER',
+                  'DAB_ADMIN',
                   'DAB_MEMBER',
+                  'VERIFIER',
                 ]}
               >
                 <ReportsPage />

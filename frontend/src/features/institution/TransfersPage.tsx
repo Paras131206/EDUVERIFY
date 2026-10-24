@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from '@/components/ui/table';
 import { MaskedValue } from '@/components/shared/MaskedValue';
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, fetchWithAuth } from '@/lib/api';
 import { TransferRequestItem, TransferStatus } from './types';
 import {
   ArrowLeftRight,
@@ -46,7 +46,7 @@ export const TransfersPage: React.FC = () => {
   const fetchTransfers = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE_URL}/v1/transfers`);
+      const res = await fetchWithAuth(`${API_BASE_URL}/v1/transfers`);
       if (res.ok) {
         const data: TransferRequestItem[] = await res.json();
         setTransfers(data);
@@ -70,7 +70,7 @@ export const TransfersPage: React.FC = () => {
       setIsSubmitting(true);
       setCreateError(null);
 
-      const res = await fetch(`${API_BASE_URL}/v1/transfers`, {
+      const res = await fetchWithAuth(`${API_BASE_URL}/v1/transfers`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -114,7 +114,7 @@ export const TransfersPage: React.FC = () => {
 
     try {
       setDecisionSubmitting(true);
-      const res = await fetch(`${API_BASE_URL}/v1/transfers/${decisionItem.transfer.id}/decide`, {
+      const res = await fetchWithAuth(`${API_BASE_URL}/v1/transfers/${decisionItem.transfer.id}/decide`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

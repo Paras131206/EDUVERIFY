@@ -228,6 +228,8 @@ def parse_file(file_input: str | Path | bytes | io.BytesIO | pd.DataFrame) -> Pa
             encoding = detect_file_encoding(file_bytes)
             df, headers, issues = parse_csv(file_bytes, encoding)
             cell_types = {h: "string" for h in headers}
+            if len(df) > MAX_ROWS:
+                raise ValueError(f"Row count exceeds 100,000 limit ({len(df)} rows)")
     except Exception as e:
         encoding = "unknown"
         headers = []
@@ -247,9 +249,6 @@ def parse_file(file_input: str | Path | bytes | io.BytesIO | pd.DataFrame) -> Pa
                 evidence={"error": str(e)},
             )
         ]
-
-    if len(df) > MAX_ROWS:
-        raise ValueError(f"Row count exceeds 100,000 limit ({len(df)} rows)")
 
     return ParsedFile(
         df=df,
