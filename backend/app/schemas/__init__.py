@@ -10,6 +10,12 @@ from app.schemas.aggregates import (
     ReconciliationItemResponse,
     ReconciliationResponse,
 )
+from app.schemas.audit import (
+    AuditChainVerificationResponse,
+    AuditListResponse,
+    AuditLogEntryResponse,
+    RetentionPurgeResponse,
+)
 from app.schemas.auth import (
     ApiKeyCreatedResponse,
     ApiKeyMetadata,
@@ -33,6 +39,13 @@ from app.schemas.batches import (
     CommitResponse,
     ConfirmMappingRequest,
     EventTicketResponse,
+)
+from app.schemas.consent import (
+    ConsentAction,
+    ConsentItemResponse,
+    ConsentPurpose,
+    ConsentRecordRequest,
+    StudentConsentSummaryResponse,
 )
 from app.schemas.duplicates import (
     DuplicateClusterResponse,
@@ -66,6 +79,9 @@ __all__ = [
     "ApiKeyCreatedResponse",
     "ApiKeyMetadata",
     "ApiKeyScope",
+    "AuditChainVerificationResponse",
+    "AuditListResponse",
+    "AuditLogEntryResponse",
     "BatchIssueResponse",
     "BatchSummary",
     "ChangePasswordRequest",
@@ -73,6 +89,10 @@ __all__ = [
     "CommitRequest",
     "CommitResponse",
     "ConfirmMappingRequest",
+    "ConsentAction",
+    "ConsentItemResponse",
+    "ConsentPurpose",
+    "ConsentRecordRequest",
     "CorrectionCreateRequest",
     "CorrectionResponse",
     "CreateApiKeyRequest",
@@ -92,8 +112,10 @@ __all__ = [
     "ReconciliationItemResponse",
     "ReconciliationResponse",
     "RefreshRequest",
+    "RetentionPurgeResponse",
     "RolloverRequest",
     "RolloverSummaryResponse",
+    "StudentConsentSummaryResponse",
     "StudentRecordResponse",
     "StudentUpdateRequest",
     "TransferDecisionRequest",

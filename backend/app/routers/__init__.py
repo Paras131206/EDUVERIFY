@@ -1,12 +1,14 @@
 """
 Central router registration for EduVerify API.
 Each feature router is imported and registered in sorted alphabetical order.
-Complies with agents.md §2.1 rule 7 and prompts B1, B2, B3, B4.
+Complies with agents.md §2.1 rule 7 and prompts B1, B2, B3, B4, B5.
 """
 
 from app.routers.api_keys import router as api_keys_router
+from app.routers.audit import router as audit_router
 from app.routers.auth import router as auth_router
 from app.routers.batches import router as batches_router
+from app.routers.consent import router as consent_router
 from app.routers.duplicates import router as duplicates_router
 from app.routers.events import router as events_router
 from app.routers.issues import router as issues_router
@@ -23,8 +25,10 @@ from fastapi import APIRouter
 # Registered feature routers in alphabetical order
 ROUTERS: list[APIRouter] = [
     api_keys_router,
+    audit_router,
     auth_router,
     batches_router,
+    consent_router,
     duplicates_router,
     events_router,
     issues_router,
