@@ -99,3 +99,140 @@ export interface BatchItem {
   updated_at?: string;
   supersedes_batch_id?: string | null;
 }
+
+export type IssueSeverity = 'ERROR' | 'WARN' | 'INFO';
+export type IssuePriority = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+export type IssueBucket = 'AUTO_FLAG' | 'HUMAN_REVIEW' | 'INFO';
+export type IssueStatus = 'OPEN' | 'FIXED' | 'DISMISSED' | 'PROPOSED';
+
+export interface IssueItem {
+  issue_id: string;
+  row: number;
+  record_key: string;
+  field: string;
+  rule_id: string;
+  rule_name?: string;
+  severity: IssueSeverity;
+  priority: IssuePriority;
+  confidence: number;
+  bucket: IssueBucket;
+  message: string;
+  reason: string;
+  evidence: Record<string, unknown>;
+  suggested_fix?: {
+    value: string;
+    rationale: string;
+    requires_approval?: boolean;
+  };
+  value_masked: string;
+  status: IssueStatus;
+  decision_note?: string;
+  proposed_value?: string;
+  decided_by?: string;
+}
+
+export interface DuplicateMember {
+  row: number;
+  apaar_masked: string;
+  institution: string;
+  full_name: string;
+  dob?: string;
+  gender?: string;
+  program_code?: string;
+  admission_date?: string;
+}
+
+export interface DuplicateClusterItem {
+  cluster_id: string;
+  score: number;
+  matched_fields: Record<string, number>;
+  scope: 'INTRA' | 'CROSS_INSTITUTION' | string;
+  bucket: 'HUMAN_REVIEW' | 'AUTO_FLAG' | string;
+  status?: 'OPEN' | 'RESOLVED_SAME' | 'RESOLVED_DIFFERENT' | 'RESOLVED_TRANSFER';
+  members: DuplicateMember[];
+}
+
+export interface BatchReportData {
+  batch_id: string;
+  institution_aicte_id: string;
+  engine_version: string;
+  rule_catalog_version: string;
+  rows_total: number;
+  rows_valid: number;
+  rows_warning: number;
+  rows_error: number;
+  quality_score: number;
+  quality_score_before?: number | null;
+  quality_score_after?: number | null;
+  column_mapping: ColumnMappingItem[];
+  issues: IssueItem[];
+  review_summary: {
+    AUTO_FLAG: number;
+    HUMAN_REVIEW: number;
+    INFO: number;
+  };
+  priority_summary: {
+    CRITICAL: number;
+    HIGH: number;
+    MEDIUM: number;
+    LOW: number;
+  };
+  intake_summary: IntakeCardData[];
+  reconciliation: ReconciliationRowData[];
+  duplicate_clusters: DuplicateClusterItem[];
+  schema_drift: SchemaDriftData[];
+  anomalies?: {
+    metric: string;
+    value: number;
+    baseline: number;
+    z: number;
+    method: string;
+    reason: string;
+  }[];
+}
+
+export interface RevalidationResult {
+  batch_id: string;
+  quality_score_before: number;
+  quality_score_after: number;
+  resolved_count: number;
+  pending_count: number;
+  priority_deltas: {
+    priority: IssuePriority;
+    before: number;
+    after: number;
+    delta: number;
+  }[];
+  rule_deltas: {
+    rule_id: string;
+    rule_name: string;
+    before: number;
+    after: number;
+    delta: number;
+  }[];
+}
+
+export interface CanonicalStudentRecord {
+  row: number;
+  apaar_id: string;
+  institution_aicte_id: string;
+  institution_student_id: string;
+  full_name: string;
+  dob: string;
+  gender: string;
+  category: string;
+  program_code: string;
+  course_level: string;
+  department: string;
+  academic_year: string;
+  admission_date: string;
+  admission_type: string;
+  seat_type: string;
+  quota: string;
+  nationality: string;
+  enrolment_status: string;
+  consent_status: string;
+  email?: string;
+  mobile?: string;
+}
+

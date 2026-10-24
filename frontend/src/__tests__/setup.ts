@@ -44,6 +44,23 @@ if (typeof File !== 'undefined') {
   }
 }
 
+// Polyfill ResizeObserver for Recharts in JSDOM
+if (typeof window !== 'undefined' && !window.ResizeObserver) {
+  window.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
+if (typeof global !== 'undefined' && !(global as any).ResizeObserver) {
+  (global as any).ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
+
+
 beforeAll(() => server.listen({ onUnhandledRequest: 'bypass' }));
 afterEach(() => {
   server.resetHandlers();
