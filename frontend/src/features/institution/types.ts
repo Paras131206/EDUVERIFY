@@ -225,14 +225,122 @@ export interface CanonicalStudentRecord {
   course_level: string;
   department: string;
   academic_year: string;
+  year_of_study?: number;
   admission_date: string;
   admission_type: string;
   seat_type: string;
   quota: string;
   nationality: string;
-  enrolment_status: string;
+  enrolment_status: EnrolmentStatus;
   consent_status: string;
   email?: string;
   mobile?: string;
 }
+
+export type EnrolmentStatus =
+  | 'ACTIVE'
+  | 'WITHDRAWN'
+  | 'DEFERRED'
+  | 'TRANSFERRED_OUT'
+  | 'COMPLETED'
+  | 'GRADUATED';
+
+export const ALLOWED_TRANSITIONS: Record<EnrolmentStatus, EnrolmentStatus[]> = {
+  ACTIVE: ['WITHDRAWN', 'DEFERRED', 'TRANSFERRED_OUT', 'COMPLETED'],
+  DEFERRED: ['ACTIVE', 'WITHDRAWN'],
+  COMPLETED: ['GRADUATED'],
+  WITHDRAWN: [],
+  GRADUATED: [],
+  TRANSFERRED_OUT: [],
+};
+
+export interface StudentVersionRecord {
+  version_id: string;
+  version_number: number;
+  changed_at: string;
+  changed_by: string;
+  changes_summary: string;
+  previous_status?: EnrolmentStatus;
+  new_status?: EnrolmentStatus;
+}
+
+export interface StudentTimelineEvent {
+  id: string;
+  event_type: 'ADMISSION' | 'STATUS_CHANGE' | 'TRANSFER_REQUEST' | 'CREDENTIAL_ISSUED' | 'CONSENT_GRANTED';
+  from_status?: EnrolmentStatus;
+  to_status: EnrolmentStatus | string;
+  effective_date: string;
+  reason: string;
+  evidence_ref?: string;
+  actor: string;
+  timestamp: string;
+}
+
+export interface StudentDetailRecord extends CanonicalStudentRecord {
+  versions: StudentVersionRecord[];
+  timeline: StudentTimelineEvent[];
+}
+
+export type TransferStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'OVERRIDDEN';
+
+export interface TransferRequestItem {
+  id: string;
+  apaar_id: string;
+  from_institution_id: string;
+  from_institution_name: string;
+  to_institution_id: string;
+  to_institution_name: string;
+  to_program_code: string;
+  reason: string;
+  status: TransferStatus;
+  requested_at: string;
+  decided_at?: string | null;
+  decided_by?: string | null;
+  decision_note?: string | null;
+  evidence_ref?: string | null;
+  direction: 'INCOMING' | 'OUTGOING';
+  is_overdue_15_days?: boolean;
+}
+
+export interface ProgramAggregateItem {
+  program_code: string;
+  program_name: string;
+  total_enrolment: number;
+  supernumerary_count: number;
+  nri_count: number;
+  oci_count: number;
+  fn_count: number;
+  declared_intake: number;
+}
+
+export interface ReconciliationStatusItem {
+  program_code: string;
+  program_name: string;
+  declared: number;
+  submitted: number;
+  delta: number;
+  status: 'MATCH' | 'MISMATCH' | 'EXCESS';
+}
+
+export interface WebhookDeliveryLog {
+  id: string;
+  event: string;
+  status_code: number;
+  response_time_ms: number;
+  retry_count: number;
+  delivered_at: string;
+  status: 'SUCCESS' | 'FAILED';
+  payload_summary: string;
+}
+
+export interface WebhookConfigItem {
+  id: string;
+  url: string;
+  events: string[];
+  is_active: boolean;
+  secret_masked: string;
+  created_at: string;
+  deliveries: WebhookDeliveryLog[];
+}
+
 
