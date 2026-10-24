@@ -1,0 +1,17 @@
+row,file,rule_id,field
+3,batch_2_errors.xlsx,V002,apaar_id
+6,batch_2_errors.xlsx,V023,apaar_id
+9,batch_2_errors.xlsx,V005,full_name
+13,batch_2_errors.xlsx,V025,expected_graduation_year
+16,batch_2_errors.xlsx,V014,nri_status
+19,batch_2_errors.xlsx,V015,supernumerary_scheme
+23,batch_2_errors.xlsx,V018,consent_status
+27,batch_2_errors.xlsx,V024,admission_date
+31,batch_2_errors.xlsx,V027,year_of_study
+4,batch_3_cross_dupes.csv,V009,full_name
+8,batch_3_cross_dupes.csv,V009,full_name
+11,batch_3_cross_dupes.csv,V010,apaar_id
+19,batch_3_cross_dupes.csv,V032,apaar_id
+1,batch_4_anomaly_drift.csv,V028,guardian_consent
+6,batch_4_anomaly_drift.csv,V029,category
+0,batch_4_anomaly_drift.csv,V020,nri_share

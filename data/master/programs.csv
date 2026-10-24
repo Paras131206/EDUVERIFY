@@ -1,0 +1,28 @@
+program_code,name,course_level,department,duration_years,lateral_allowed
+DIP-CSE,Diploma in Computer Science & Engineering,DIPLOMA,Computer Science,3,False
+DIP-ECE,Diploma in Electronics & Communication,DIPLOMA,Electronics,3,False
+DIP-ME,Diploma in Mechanical Engineering,DIPLOMA,Mechanical,3,False
+DIP-CE,Diploma in Civil Engineering,DIPLOMA,Civil,3,False
+DIP-EE,Diploma in Electrical Engineering,DIPLOMA,Electrical,3,False
+UG-CSE,B.Tech in Computer Science & Engineering,UG,Computer Science,4,True
+UG-IT,B.Tech in Information Technology,UG,Information Technology,4,True
+UG-AI-ML,B.Tech in Artificial Intelligence & Machine Learning,UG,Computer Science,4,True
+UG-DS,B.Tech in Data Science,UG,Computer Science,4,True
+UG-ECE,B.Tech in Electronics & Communication Engineering,UG,Electronics,4,True
+UG-EE,B.Tech in Electrical Engineering,UG,Electrical,4,True
+UG-ME,B.Tech in Mechanical Engineering,UG,Mechanical,4,True
+UG-CE,B.Tech in Civil Engineering,UG,Civil,4,True
+UG-CHE,B.Tech in Chemical Engineering,UG,Chemical,4,True
+UG-BT,B.Tech in Biotechnology,UG,Biotechnology,4,True
+PG-CSE,M.Tech in Computer Science & Engineering,PG,Computer Science,2,False
+PG-AI,M.Tech in Artificial Intelligence,PG,Computer Science,2,False
+PG-VLSI,M.Tech in VLSI Design,PG,Electronics,2,False
+PG-TE,M.Tech in Thermal Engineering,PG,Mechanical,2,False
+PG-SE,M.Tech in Structural Engineering,PG,Civil,2,False
+PG-MCA,Master of Computer Applications,PG,Computer Applications,2,True
+PG-MBA,Master of Business Administration,PG,Management,2,False
+PGDM-GEN,Post Graduate Diploma in Management (General),PGDM,Management,2,False
+PGDM-FIN,Post Graduate Diploma in Management (Finance),PGDM,Management,2,False
+PGDM-MKT,Post Graduate Diploma in Management (Marketing),PGDM,Management,2,False
+PHD-ENG,Doctor of Philosophy in Engineering,PHD,Engineering,3,False
+PHD-MGMT,Doctor of Philosophy in Management,PHD,Management,3,False

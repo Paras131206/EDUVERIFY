@@ -1,0 +1,41 @@
+institution_aicte_id,name,state_code,district_code,type,affiliated_dab_id,onboarding_level,did
+1-100010001,Delhi College of Engineering & Technology,07,101,ENGINEERING,DAB-101,FULL,did:web:dcet.eduverify.ac.in
+1-100010002,Capital Institute of Technology Delhi,07,102,ENGINEERING,DAB-101,FULL,did:web:citd.eduverify.ac.in
+1-100010003,New Delhi School of Advanced Computing,07,103,ENGINEERING,DAB-101,FULL,did:web:ndsac.eduverify.ac.in
+1-100010004,Metropolitan Management Institute,07,101,MANAGEMENT,DAB-101,FULL,did:web:mmi.eduverify.ac.in
+1-100010005,Maharashtra Institute of Technology Pune,27,105,ENGINEERING,DAB-102,FULL,did:web:mitp.eduverify.ac.in
+1-100010006,Mumbai Institute of Engineering & Research,27,104,ENGINEERING,DAB-102,FULL,did:web:mier.eduverify.ac.in
+1-100010007,Nagpur Institute of Technology,27,106,ENGINEERING,DAB-102,FULL,did:web:nitn.eduverify.ac.in
+1-100010008,Thane College of Engineering,27,107,ENGINEERING,DAB-102,FULL,did:web:tce.eduverify.ac.in
+1-100010009,Western India School of Management,27,104,MANAGEMENT,DAB-102,FULL,did:web:wism.eduverify.ac.in
+1-100010010,Bengaluru Institute of Technology & Science,29,108,ENGINEERING,DAB-103,FULL,did:web:bitsb.eduverify.ac.in
+1-100010011,Karnataka College of Engineering Bangalore,29,109,ENGINEERING,DAB-103,FULL,did:web:kceb.eduverify.ac.in
+1-100010012,Mysore Institute of Technology,29,110,ENGINEERING,DAB-103,FULL,did:web:mitm.eduverify.ac.in
+1-100010013,Southern Institute of Management Bengaluru,29,108,MANAGEMENT,DAB-103,FULL,did:web:simb.eduverify.ac.in
+1-100010014,Chennai College of Engineering & Technology,33,111,ENGINEERING,DAB-104,FULL,did:web:ccet.eduverify.ac.in
+1-100010015,Coimbatore Institute of Engineering,33,112,ENGINEERING,DAB-104,FULL,did:web:cie.eduverify.ac.in
+1-100010016,Madurai Engineering College,33,113,ENGINEERING,DAB-104,FULL,did:web:mec.eduverify.ac.in
+1-100010017,Tamil Nadu School of Management Chennai,33,111,MANAGEMENT,DAB-104,FULL,did:web:tnsm.eduverify.ac.in
+1-100010018,Lucknow Institute of Technology,09,114,ENGINEERING,DAB-105,FULL,did:web:litl.eduverify.ac.in
+1-100010019,Kanpur Engineering College,09,115,ENGINEERING,DAB-105,FULL,did:web:kec.eduverify.ac.in
+1-100010020,Noida Institute of Engineering,09,116,ENGINEERING,DAB-105,FULL,did:web:nie.eduverify.ac.in
+1-100010021,Varanasi College of Technology,09,117,ENGINEERING,DAB-105,FULL,did:web:vct.eduverify.ac.in
+1-100010022,Ahmedabad Institute of Technology,24,118,ENGINEERING,DAB-106,FULL,did:web:ait.eduverify.ac.in
+1-100010023,Surat College of Engineering,24,119,ENGINEERING,DAB-106,FULL,did:web:sce.eduverify.ac.in
+1-100010024,Vadodara Institute of Science & Technology,24,120,ENGINEERING,DAB-106,FULL,did:web:vist.eduverify.ac.in
+1-100010025,Hyderabad Institute of Technology & Science,36,121,ENGINEERING,DAB-106,FULL,did:web:hits.eduverify.ac.in
+1-100010026,Telangana College of Engineering,36,122,ENGINEERING,DAB-106,FULL,did:web:tce.eduverify.ac.in
+1-100010027,Jaipur Engineering College,08,123,ENGINEERING,DAB-106,FULL,did:web:jec.eduverify.ac.in
+1-100010028,Jodhpur Institute of Technology,08,124,ENGINEERING,DAB-106,FULL,did:web:jit.eduverify.ac.in
+1-100010029,Kolkata College of Engineering,19,125,ENGINEERING,DAB-106,FULL,did:web:kce.eduverify.ac.in
+1-100010030,Punjab Engineering College Ludhiana,03,127,ENGINEERING,DAB-106,FULL,did:web:pecl.eduverify.ac.in
+1-100010031,Kerala Institute of Technology Trivandrum,32,129,ENGINEERING,DAB-106,FULL,did:web:kit.eduverify.ac.in
+1-100010032,Bhopal Institute of Technology,23,131,ENGINEERING,DAB-106,FULL,did:web:bitb.eduverify.ac.in
+1-100010033,Patna Engineering College,10,133,ENGINEERING,DAB-106,FULL,did:web:pec.eduverify.ac.in
+1-100010034,Gurugram College of Advanced Technology,06,136,ENGINEERING,DAB-106,FULL,did:web:gcat.eduverify.ac.in
+1-100010035,Rural Polytechnic Institute Delhi,07,101,POLYTECHNIC,DAB-101,AGGREGATE_ONLY,did:web:rpid.eduverify.ac.in
+1-100010036,District Polytechnic Institute Pune,27,105,POLYTECHNIC,DAB-102,AGGREGATE_ONLY,did:web:dpip.eduverify.ac.in
+1-100010037,Mysore Rural Technical Institute,29,110,POLYTECHNIC,DAB-103,AGGREGATE_ONLY,did:web:mrti.eduverify.ac.in
+1-100010038,Madurai Regional Polytechnic,33,113,POLYTECHNIC,DAB-104,AGGREGATE_ONLY,did:web:mrp.eduverify.ac.in
+1-100010039,Eastern UP Polytechnic Institute,09,117,POLYTECHNIC,DAB-105,AGGREGATE_ONLY,did:web:eupi.eduverify.ac.in
+1-100010040,Central India Community College,23,131,POLYTECHNIC,DAB-106,AGGREGATE_ONLY,did:web:cicc.eduverify.ac.in

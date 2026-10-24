@@ -1,0 +1,82 @@
+
+name: Security Audit & Scans
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - "backend/**"
+      - "engine/**"
+      - "frontend/**"
+      - ".github/workflows/security.yml"
+
+jobs:
+  static-security-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Security Tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit pip-audit
+          pip install -r backend/requirements.txt
+          pip install -e ./engine
+
+      - name: Static Security Analysis (Bandit)
+        run: bandit -r backend engine -s B101,B104
+
+      - name: Dependency Vulnerability Audit (pip-audit)
+        run: pip-audit -r backend/requirements.txt || true
+
+      - name: Frontend Dependency Audit (npm audit)
+        if: hashFiles('frontend/package.json') != ''
+        run: |
+          cd frontend
+          npm audit --audit-level=high || true
+
+  zap-staging-scan:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wait for Render API
+        shell: bash
+        run: |
+          for attempt in $(seq 1 18); do
+            echo "Checking API health ($attempt/18)..."
+
+            if curl --fail --silent --show-error \
+              --connect-timeout 10 \
+              --max-time 20 \
+              "https://eduverify-api.onrender.com/healthz" || \
+               curl --fail --silent --show-error \
+              --connect-timeout 10 \
+              --max-time 20 \
+              "https://eduverify-api.onrender.com/health"; then
+              echo "API is responding."
+              exit 0
+            fi
+
+            sleep 10
+          done
+
+          echo "::error::Render API did not become healthy."
+          exit 1
+
+      - name: ZAP Baseline Scan (Render Staging)
+        uses: zaproxy/action-baseline@v0.15.0
+        with:
+          target: "https://eduverify-api.onrender.com/health"
+          rules_file_name: "infra/zap-rules.tsv"
+          artifact_name: "zap-scan-report"
+          allow_issue_writing: false
+          fail_action: false

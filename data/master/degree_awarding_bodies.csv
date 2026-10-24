@@ -1,0 +1,7 @@
+dab_id,name,type,state_code,did
+DAB-101,Delhi State Technical University,UNIVERSITY,07,did:web:dstu.eduverify.ac.in
+DAB-102,Maharashtra State Technology University,UNIVERSITY,27,did:web:mstu.eduverify.ac.in
+DAB-103,Karnataka Technological University,UNIVERSITY,29,did:web:ktu.eduverify.ac.in
+DAB-104,Tamil Nadu Technical University,UNIVERSITY,33,did:web:tntu.eduverify.ac.in
+DAB-105,Uttar Pradesh Technical University,DEEMED,09,did:web:uptu.eduverify.ac.in
+DAB-106,National Autonomous Institute of Technology,AUTONOMOUS_INSTITUTION,07,did:web:nait.eduverify.ac.in
