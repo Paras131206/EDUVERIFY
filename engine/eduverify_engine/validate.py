@@ -1,7 +1,7 @@
 """
 Batch validation pipeline for EduVerify Engine.
 Frozen public API for validate_batch().
-Wires parse -> mapping -> normalize -> core rules (V001, V002, V005, V023, V024) -> BatchReport.
+Wires parse -> mapping -> normalize -> rules -> score -> BatchReport.
 """
 
 import io
@@ -13,15 +13,16 @@ import pandas as pd
 
 from . import __version__
 from .catalog import load_rule_catalog
-from .mapping import find_missing_required_fields, suggest_mapping
-from .masking import mask_apaar
+from .mapping import suggest_mapping
 from .models import (
     BatchReport,
     ColumnMapping,
+    IntakeSummary,
     Issue,
 )
-from .normalize import normalize_apaar, normalize_date
 from .parse import parse_file
+from .rules import RuleContext, run_rules
+from .score import calculate_deequ_metrics, calculate_quality_score
 
 
 @runtime_checkable
@@ -35,19 +36,6 @@ class RegistryEntry(Protocol):
 @runtime_checkable
 class RegistryProtocol(Protocol):
     def lookup(self, apaar_id: str) -> RegistryEntry | None: ...
-
-
-PRIORITY_WEIGHTS = {"CRITICAL": 10, "HIGH": 5, "MEDIUM": 2, "LOW": 1}
-MAX_PRIORITY_WEIGHT = 10
-
-
-def calculate_quality_score(issues: list[Issue], rows_total: int) -> float:
-    """Computes quality score [0..100] per agents.md §5.3."""
-    if rows_total <= 0:
-        return 100.0
-    total_penalty = sum(PRIORITY_WEIGHTS.get(i.priority, 1) for i in issues)
-    raw_score = 100.0 * (1.0 - (total_penalty / (rows_total * MAX_PRIORITY_WEIGHT)))
-    return max(0.0, min(100.0, round(raw_score, 1)))
 
 
 def validate_batch(
@@ -69,6 +57,7 @@ def validate_batch(
     """
     Main entry point for batch validation.
     Frozen API signature per C-MASTER and engine-v0.1 tag.
+    Wires: parse -> mapping -> normalize -> rules -> score -> BatchReport.
     """
     batch_id = batch_id or str(uuid.uuid4())
     catalog = load_rule_catalog()
@@ -79,208 +68,158 @@ def validate_batch(
     df = parsed.df
     headers = parsed.original_headers
     rows_total = len(df)
-    issues: list[Issue] = list(parsed.parse_issues)
+    parse_issues: list[Issue] = list(parsed.parse_issues)
 
     # 2. Smart Column Mapping
     if mapping is None:
         mapping = suggest_mapping(headers, sample_df=df)
 
     source_to_target = {m.source: m.target for m in mapping}
-    target_to_source = {m.target: m.source for m in mapping}
 
-    # Check V001: Required columns missing
-    missing_fields = find_missing_required_fields(mapping)
-    for mf in missing_fields:
-        issues.append(
-            Issue(
-                issue_id=str(uuid.uuid4()),
-                field=mf,
-                rule_id="V001",
-                severity="ERROR",
-                priority="CRITICAL",
-                confidence=1.0,
-                bucket="AUTO_FLAG",
-                message=f"Mandatory column '{mf}' is missing and could not be mapped",
-                reason=(
-                    f"Column '{mf}' is required by canonical schema "
-                    "but has no mapped source header."
-                ),
-                evidence={"missing_field": mf, "available_headers": headers},
-            )
-        )
-
-    # Resolve institution ID
-    inst_id = institution_aicte_id or "1-100010001"
-    if "institution_aicte_id" in target_to_source:
-        inst_col = target_to_source["institution_aicte_id"]
-        if not df.empty and df[inst_col].iloc[0].strip():
-            inst_id = df[inst_col].iloc[0].strip()
-
-    # Apply column remapping to a working DataFrame copy
+    # 3. Remap into canonical working DataFrame
     working_df = pd.DataFrame(index=df.index)
     for src_col, tgt_field in source_to_target.items():
         if src_col in df.columns:
             working_df[tgt_field] = df[src_col]
 
-    # Row-level validation loop for V002, V005, V023, V024
-    apaar_col = "apaar_id" if "apaar_id" in working_df.columns else None
-    student_id_col = (
-        "institution_student_id" if "institution_student_id" in working_df.columns else None
+    # Resolve institution ID
+    auth_inst = institution_aicte_id or "1-100010001"
+    inst_id = auth_inst
+    if "institution_aicte_id" in working_df.columns:
+        first_val = working_df["institution_aicte_id"].dropna().astype(str).str.strip()
+        if not first_val.empty and first_val.iloc[0]:
+            inst_id = first_val.iloc[0]
+
+    if "institution_aicte_id" not in working_df.columns:
+        working_df["institution_aicte_id"] = inst_id
+
+    # 4. Construct RuleContext
+    ctx = RuleContext(
+        master=master,
+        intake=intake,
+        declared_totals=declared_totals,
+        registry=registry,
+        central_snapshot=central_snapshot,
+        history=history,
+        previous_batch_profile=previous_batch_profile,
+        transfers=transfers,
+        academic_year=academic_year,
+        institution_aicte_id=inst_id,
+        authenticated_institution_id=auth_inst,
+        batch_id=batch_id,
+        mapping=mapping,
+        raw_df=df,
+        catalog=catalog,
     )
 
-    rows_with_error = set()
-    rows_with_warning = set()
+    # 5. Run Rules Engine
+    rule_issues = run_rules(working_df, ctx)
+    all_issues = parse_issues + rule_issues
 
-    for idx, row in working_df.iterrows():
-        row_num = int(idx) + 2  # 1-indexed, header is row 1
-        fallback_key = f"row-{row_num}"
-        rec_key = str(row.get(student_id_col, fallback_key)) if student_id_col else fallback_key
+    # 6. Intake Summary per program
+    intake_summaries: list[IntakeSummary] = []
+    if "program_code" in working_df.columns:
+        seat_col = (
+            working_df["seat_type"].astype(str).str.strip().str.upper()
+            if "seat_type" in working_df.columns
+            else pd.Series("REGULAR", index=working_df.index)
+        )
+        status_col = (
+            working_df["enrolment_status"].astype(str).str.strip().str.upper()
+            if "enrolment_status" in working_df.columns
+            else pd.Series("ACTIVE", index=working_df.index)
+        )
 
-        # --- Check APAAR ID (V002 & V023) ---
-        if apaar_col:
-            raw_apaar = row.get(apaar_col, "")
-            norm_apaar, defect, fix = normalize_apaar(raw_apaar)
+        programs = working_df["program_code"].dropna().unique()
+        for prog in programs:
+            prog_str = str(prog).strip()
+            if not prog_str or prog_str.lower() in ("nan", "none", "null"):
+                continue
 
-            # V023: Excel-mangled APAAR
-            if defect:
-                issues.append(
-                    Issue(
-                        issue_id=str(uuid.uuid4()),
-                        row=row_num,
-                        record_key=rec_key,
-                        field="apaar_id",
-                        rule_id="V023",
-                        severity="WARN",
-                        priority="HIGH",
-                        confidence=0.98,
-                        bucket="AUTO_FLAG",
-                        message="APAAR identifier appears Excel-mangled",
-                        reason=f"Detected spreadsheet corruption: {defect} in value '{raw_apaar}'",
-                        evidence={"original": raw_apaar, "cleaned": norm_apaar, "defect": defect},
-                        suggested_fix=fix,
-                        value_masked=mask_apaar(norm_apaar),
-                    )
+            prog_mask = (working_df["program_code"].astype(str).str.strip() == prog_str) & (
+                status_col == "ACTIVE"
+            )
+            enrolled = int((prog_mask & (seat_col == "REGULAR")).sum())
+            supernumerary = int((prog_mask & (seat_col == "SUPERNUMERARY")).sum())
+
+            intake_rec = ctx.get_intake_record(prog_str)
+            approved = (
+                int(intake_rec["approved_intake"])
+                if (intake_rec and "approved_intake" in intake_rec)
+                else 60
+            )
+            excess = max(0, enrolled - approved)
+
+            intake_summaries.append(
+                IntakeSummary(
+                    program_code=prog_str,
+                    approved=approved,
+                    enrolled=enrolled,
+                    supernumerary=supernumerary,
+                    excess=excess,
                 )
-                rows_with_warning.add(row_num)
+            )
 
-            # V002: APAAR missing or not 12 digits
-            if not norm_apaar or len(norm_apaar) != 12 or not norm_apaar.isdigit():
-                issues.append(
-                    Issue(
-                        issue_id=str(uuid.uuid4()),
-                        row=row_num,
-                        record_key=rec_key,
-                        field="apaar_id",
-                        rule_id="V002",
-                        severity="ERROR",
-                        priority="CRITICAL",
-                        confidence=1.0,
-                        bucket="AUTO_FLAG",
-                        message="APAAR ID missing or not exactly 12 numeric digits",
-                        reason=(
-                            f"Expected 12 numeric digits, found '{norm_apaar}' "
-                            f"(length {len(norm_apaar)})"
-                        ),
-                        evidence={"value": raw_apaar, "length": len(norm_apaar)},
-                        value_masked=mask_apaar(norm_apaar),
-                    )
-                )
-                rows_with_error.add(row_num)
+    # 7. Reconciliation against declared totals (Task C5.4)
+    reconciliation_rows = getattr(ctx, "_reconciliation", [])
+    if not reconciliation_rows:
+        from .reconcile import reconcile_batch
 
-        # --- Check V005: Required fields null or empty ---
-        required_in_batch = [
-            f
-            for f in [
-                "full_name",
-                "dob",
-                "gender",
-                "category",
-                "program_code",
-                "course_level",
-                "year_of_study",
-                "admission_date",
-                "admission_type",
-                "seat_type",
-            ]
-            if f in working_df.columns
-        ]
+        rec_issues, reconciliation_rows = reconcile_batch(working_df, ctx)
+        for r_iss in rec_issues:
+            if not any(i.rule_id == r_iss.rule_id and i.field == r_iss.field for i in all_issues):
+                all_issues.append(r_iss)
 
-        for rf in required_in_batch:
-            val = str(row.get(rf, "")).strip()
-            if not val or val.lower() in ("nan", "none", "null"):
-                issues.append(
-                    Issue(
-                        issue_id=str(uuid.uuid4()),
-                        row=row_num,
-                        record_key=rec_key,
-                        field=rf,
-                        rule_id="V005",
-                        severity="ERROR",
-                        priority="HIGH" if rf in ("full_name", "dob") else "MEDIUM",
-                        confidence=1.0,
-                        bucket="AUTO_FLAG",
-                        message=f"Required field '{rf}' is empty or null",
-                        reason=f"Field '{rf}' cannot be blank in student enrolment record.",
-                        evidence={"field": rf, "row": row_num},
-                    )
-                )
-                rows_with_error.add(row_num)
+    # 8. Duplicate Clusters (Task C4)
+    duplicate_clusters = getattr(ctx, "_duplicate_clusters", [])
+    if not duplicate_clusters and not hasattr(ctx, "_dedup_cache"):
+        from .dedup import detect_duplicates
 
-        # --- Check V024: Dates (dob, admission_date) ---
-        for date_field in ["dob", "admission_date"]:
-            if date_field in working_df.columns:
-                raw_date = row.get(date_field, "")
-                if raw_date and str(raw_date).strip():
-                    iso_date, candidates, is_valid = normalize_date(raw_date)
-                    if not is_valid:
-                        issues.append(
-                            Issue(
-                                issue_id=str(uuid.uuid4()),
-                                row=row_num,
-                                record_key=rec_key,
-                                field=date_field,
-                                rule_id="V024",
-                                severity="ERROR",
-                                priority="MEDIUM",
-                                confidence=0.90,
-                                bucket="HUMAN_REVIEW",
-                                message=f"Ambiguous or unparseable date in '{date_field}'",
-                                reason=(
-                                    f"Value '{raw_date}' cannot be parsed under Indian date policy."
-                                ),
-                                evidence={
-                                    "original_value": str(raw_date),
-                                    "candidates": candidates,
-                                },
-                            )
-                        )
-                        rows_with_error.add(row_num)
+        _, duplicate_clusters = detect_duplicates(working_df, ctx)
 
-    # Summarize rows
-    err_count = len(rows_with_error)
-    warn_count = len(rows_with_warning - rows_with_error)
-    valid_count = max(0, rows_total - (err_count + warn_count))
+    # 9. Schema Drift Detection (Task C5.2)
+    schema_drift = getattr(ctx, "_schema_drift", [])
+    if not schema_drift and not hasattr(ctx, "_drift_cache"):
+        from .drift import detect_schema_drift
 
-    # Review summaries
-    review_summary = {"AUTO_FLAG": 0, "HUMAN_REVIEW": 0, "INFO": 0}
-    priority_summary = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0}
-    for iss in issues:
-        review_summary[iss.bucket] = review_summary.get(iss.bucket, 0) + 1
-        priority_summary[iss.priority] = priority_summary.get(iss.priority, 0) + 1
+        drift_issues, schema_drift = detect_schema_drift(working_df, ctx)
+        for d_iss in drift_issues:
+            if not any(i.rule_id == d_iss.rule_id and i.field == d_iss.field for i in all_issues):
+                all_issues.append(d_iss)
+
+    # 10. Statistical Anomaly Detection (Task C5.3)
+    anomalies = getattr(ctx, "_anomalies", [])
+    if not anomalies and not hasattr(ctx, "_anomaly_cache"):
+        from .anomaly import detect_anomalies
+
+        anom_issues, anomalies = detect_anomalies(working_df, ctx)
+        for a_iss in anom_issues:
+            if not any(i.rule_id == a_iss.rule_id and i.field == a_iss.field for i in all_issues):
+                all_issues.append(a_iss)
 
     # Sort issues by priority (CRITICAL -> HIGH -> MEDIUM -> LOW) then row
     priority_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
-    issues.sort(key=lambda i: (priority_order.get(i.priority, 4), i.row or 0))
+    all_issues.sort(key=lambda i: (priority_order.get(i.priority, 4), i.row or 0))
 
-    # Compute Quality Score
-    q_score = calculate_quality_score(issues, rows_total)
+    # Row counts
+    rows_with_error = {i.row for i in all_issues if i.severity == "ERROR" and i.row is not None}
+    rows_with_warning = {
+        i.row for i in all_issues if i.severity == "WARN" and i.row is not None
+    } - rows_with_error
+    err_count = len(rows_with_error)
+    warn_count = len(rows_with_warning)
+    valid_count = max(0, rows_total - (err_count + warn_count))
 
-    # Basic completeness metric
-    completeness_metrics = {}
-    if not df.empty:
-        for col in df.columns:
-            non_blank = (df[col].astype(str).str.strip() != "").sum()
-            completeness_metrics[col] = round(float(non_blank / len(df)), 2)
+    # Summary buckets
+    review_summary = {"AUTO_FLAG": 0, "HUMAN_REVIEW": 0, "INFO": 0}
+    priority_summary = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0}
+    for iss in all_issues:
+        review_summary[iss.bucket] = review_summary.get(iss.bucket, 0) + 1
+        priority_summary[iss.priority] = priority_summary.get(iss.priority, 0) + 1
+
+    # Compute Quality Score & Deequ Metrics
+    q_score = calculate_quality_score(all_issues, rows_total)
+    metrics = calculate_deequ_metrics(working_df, all_issues)
 
     return BatchReport(
         batch_id=batch_id,
@@ -293,13 +232,13 @@ def validate_batch(
         rows_error=err_count,
         quality_score=q_score,
         column_mapping=mapping,
-        metrics={"completeness": completeness_metrics},
-        issues=issues,
+        metrics=metrics,
+        issues=all_issues,
         review_summary=review_summary,
         priority_summary=priority_summary,
-        intake_summary=[],
-        reconciliation=[],
-        duplicate_clusters=[],
-        schema_drift=[],
-        anomalies=[],
+        intake_summary=intake_summaries,
+        reconciliation=reconciliation_rows,
+        duplicate_clusters=duplicate_clusters,
+        schema_drift=schema_drift,
+        anomalies=anomalies,
     )

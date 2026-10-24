@@ -1,0 +1,2 @@
+apaar_id,institution_aicte_id,institution_student_id,full_name,dob,gender,category,program_code,course_level,academic_year,year_of_study,admission_date,admission_type,expected_graduation_year,seat_type,supernumerary_scheme,quota,nationality,nri_status,oci_status,fn_status,enrolment_status,consent_status,consent_date,guardian_consent,email,mobile
+104332181960,1-100010001,ST-101,,2006-05-15,M,GEN,UG-CSE,UG,2026-27,1,2026-08-10,REGULAR,2030,REGULAR,,NONE,IN,False,False,False,ACTIVE,GRANTED,2026-08-10,True,student@dcet.ac.in,9876543210

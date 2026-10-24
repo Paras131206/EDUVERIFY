@@ -20,9 +20,7 @@ class Settings(BaseSettings):
     )
 
     ENV: str = Field(default="dev", description="Environment: dev, staging, prod")
-    PORT: int = Field(
-        default=8000, description="Listening port (binds $PORT on Render)"
-    )
+    PORT: int = Field(default=8000, description="Listening port (binds $PORT on Render)")
 
     # Database
     DATABASE_URL: str = Field(
@@ -42,6 +40,18 @@ class Settings(BaseSettings):
     ISSUER_KEYS_JSON: str = Field(
         default="{}",
         description="JSON string containing Ed25519 issuer keys for SD-JWT credentials",
+    )
+    PEPPER: str = Field(
+        default="dev-password-pepper-change-in-production",
+        description="Pepper for password hashing",
+    )
+    SEED_PASSWORD: str = Field(
+        default="AdminPassword@2026",
+        description="Default password for seeded demo accounts",
+    )
+    MFA_REQUIRED_FOR_ADMIN: bool = Field(
+        default=False,
+        description="Feature flag: Require TOTP MFA for AICTE_ADMIN",
     )
 
     # CORS & URLs

@@ -13,11 +13,14 @@ import yaml
 from app.config import get_settings
 from app.db import check_db_health
 from app.logging import setup_logging
-from app.middleware import RequestIdMiddleware
+from app.middleware import RequestIdMiddleware, SecurityHeadersMiddleware
 from app.routers import ROUTERS
-from fastapi import FastAPI, status
+from app.security.limiter import limiter, rate_limit_handler
+from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from slowapi.errors import RateLimitExceeded
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -56,6 +59,31 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Rate limiter configuration
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, rate_limit_handler)
+
+
+@app.exception_handler(StarletteHTTPException)
+async def custom_http_exception_handler(
+    request: Request, exc: StarletteHTTPException
+) -> JSONResponse:
+    """Formats HTTPException into OpenAPI compliant ErrorResponse schema."""
+    if isinstance(exc.detail, dict):
+        content = dict(exc.detail)
+        if "detail" not in content:
+            content["detail"] = str(exc.detail)
+        return JSONResponse(status_code=exc.status_code, content=content, headers=exc.headers)
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+        headers=exc.headers,
+    )
+
+
+# Security headers middleware
+app.add_middleware(SecurityHeadersMiddleware)
 
 # Request ID and latency tracking middleware
 app.add_middleware(RequestIdMiddleware)
@@ -143,9 +171,7 @@ def get_health() -> JSONResponse:
         "db": db_status,
     }
 
-    http_status = (
-        status.HTTP_200_OK if is_healthy else status.HTTP_503_SERVICE_UNAVAILABLE
-    )
+    http_status = status.HTTP_200_OK if is_healthy else status.HTTP_503_SERVICE_UNAVAILABLE
 
     return JSONResponse(
         content=payload,
