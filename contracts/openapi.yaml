@@ -31,6 +31,8 @@ tags:
     description: Mock APAAR identity verification registry checks
   - name: Batches
     description: Ingestion pipeline, mapping confirmation, review, commit, and SSE stream
+  - name: Events
+    description: Real-time Server-Sent Events streams and ticketing
   - name: Issues
     description: Rule engine issue explanation and human review decision workflow
   - name: Corrections
@@ -774,6 +776,47 @@ paths:
         - name: id
           in: path
           required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: SSE event stream
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+  /v1/events/ticket:
+    post:
+      tags: [Events]
+      summary: Obtain short-lived ticket for EventSource authorization
+      operationId: getEventTicket
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Event ticket generated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ticket, expires_in]
+                properties:
+                  ticket:
+                    type: string
+                  expires_in:
+                    type: integer
+                    default: 60
+
+  /v1/events:
+    get:
+      tags: [Events]
+      summary: Global Server-Sent Events stream
+      operationId: streamGlobalEvents
+      parameters:
+        - name: ticket
+          in: query
           schema:
             type: string
       responses:

@@ -35,6 +35,12 @@ async def lifespan(app: FastAPI):
         settings.ENV,
         eduverify_engine.__version__,
     )
+    try:
+        from app.services.batches import resume_stuck_jobs_service
+
+        resume_stuck_jobs_service()
+    except Exception as exc:
+        logger.warning("Could not run resume_stuck_jobs_service on startup: %s", exc)
     yield
     logger.info("Stopping EduVerify API")
 
