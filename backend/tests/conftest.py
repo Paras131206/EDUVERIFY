@@ -26,7 +26,7 @@ from sqlalchemy.pool import StaticPool
 os.environ["ENV"] = "dev"
 settings = get_settings()
 
-TEST_PASSWORD = "TestAdminPassword@2026"
+TEST_PASSWORD = "TestAdminPassword@2026"  # nosec B105
 TEST_PASSWORD_HASH = hash_password(TEST_PASSWORD)
 
 DEMO_ACCOUNTS = [

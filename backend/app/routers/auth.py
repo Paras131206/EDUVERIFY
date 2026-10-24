@@ -223,7 +223,7 @@ def login(
 
     return LoginResponse(
         access_token=access_token,
-        token_type="Bearer",
+        token_type="Bearer",  # nosec B106
         expires_in=900,
         refresh_token=raw_rt,
         user=UserProfile.model_validate(user),
@@ -357,7 +357,7 @@ def refresh_token(
 
     return LoginResponse(
         access_token=access_token,
-        token_type="Bearer",
+        token_type="Bearer",  # nosec B106
         expires_in=900,
         refresh_token=new_raw_rt,
         user=UserProfile.model_validate(user),

@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
-DEFAULT_DEV_PASSWORD = "AdminPassword@2026"
+DEFAULT_DEV_PASSWORD = "AdminPassword@2026"  # nosec B105
 
 DEMO_USERS = [
     {

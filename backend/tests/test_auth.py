@@ -58,7 +58,7 @@ def test_login_wrong_password(client, db_session: Session):
     """POST /v1/auth/login with wrong password fails with uniform 401."""
     response = client.post(
         "/v1/auth/login",
-        json={"email": "aicte.admin@demo.local", "password": "WrongPassword!999"},
+        json={"email": "aicte.admin@demo.local", "password": "WrongPassword!999"},  # nosec B105
     )
     assert response.status_code == 401
     data = response.json()
@@ -75,7 +75,7 @@ def test_login_nonexistent_user(client):
     """POST /v1/auth/login with unknown email returns identical 401 (no enumeration)."""
     response = client.post(
         "/v1/auth/login",
-        json={"email": "nonexistent@demo.local", "password": "SomePassword@2026"},
+        json={"email": "nonexistent@demo.local", "password": "SomePassword@2026"},  # nosec B105
     )
     assert response.status_code == 401
     data = response.json()
@@ -106,7 +106,7 @@ def test_account_lockout_after_5_failures(client, db_session: Session):
     for _ in range(5):
         resp = client.post(
             "/v1/auth/login",
-            json={"email": email, "password": "BadPassword@123"},
+            json={"email": email, "password": "BadPassword@123"},  # nosec B105
         )
         assert resp.status_code == 401
 
@@ -275,7 +275,7 @@ def test_change_password_success(client, db_session: Session):
     db_session.add(rt)
     db_session.flush()
 
-    new_password = "BrandNewSecurePassword@2026"
+    new_password = "BrandNewSecurePassword@2026"  # nosec B105
     resp = client.post(
         "/v1/auth/password",
         headers=headers,
@@ -305,7 +305,7 @@ def test_change_password_weak_or_invalid(client, db_session: Session):
     bad_current = client.post(
         "/v1/auth/password",
         headers=headers,
-        json={"current_password": "WrongPassword@123", "new_password": "ValidNewPassword@2026"},
+        json={"current_password": "WrongPassword@123", "new_password": "ValidNewPassword@2026"},  # nosec B105
     )
     assert bad_current.status_code == 400
     assert bad_current.json()["code"] == "INVALID_PASSWORD"
@@ -314,7 +314,7 @@ def test_change_password_weak_or_invalid(client, db_session: Session):
     weak_pw = client.post(
         "/v1/auth/password",
         headers=headers,
-        json={"current_password": TEST_PASSWORD, "new_password": "password123456"},
+        json={"current_password": TEST_PASSWORD, "new_password": "password123456"},  # nosec B105
     )
     assert weak_pw.status_code == 400
     assert weak_pw.json()["code"] == "WEAK_PASSWORD"
@@ -368,7 +368,7 @@ def test_login_rate_limiting(client):
     for _ in range(12):
         r = client.post(
             "/v1/auth/login",
-            json={"email": "nonexistent@demo.local", "password": "WrongPassword@999"},
+            json={"email": "nonexistent@demo.local", "password": "WrongPassword@999"},  # nosec B105
         )
         responses.append(r)
 

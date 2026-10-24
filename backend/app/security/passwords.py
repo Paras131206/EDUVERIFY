@@ -83,5 +83,5 @@ def verify_dummy() -> None:
     """Performs dummy verification to defeat timing attacks on non-existent users."""
     try:
         _hasher.verify(DUMMY_HASH, "DummySecurePassword123!@#" + settings.PEPPER)
-    except Exception:
+    except Exception:  # nosec B110
         pass
