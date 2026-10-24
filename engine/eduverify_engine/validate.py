@@ -215,6 +215,12 @@ def validate_batch(
                 )
             )
 
+    duplicate_clusters = getattr(ctx, "_duplicate_clusters", [])
+    if not duplicate_clusters and not hasattr(ctx, "_dedup_cache"):
+        from .dedup import detect_duplicates
+
+        _, duplicate_clusters = detect_duplicates(working_df, ctx)
+
     return BatchReport(
         batch_id=batch_id,
         institution_aicte_id=inst_id,
@@ -232,7 +238,7 @@ def validate_batch(
         priority_summary=priority_summary,
         intake_summary=intake_summaries,
         reconciliation=reconciliation_rows,
-        duplicate_clusters=[],
+        duplicate_clusters=duplicate_clusters,
         schema_drift=[],
         anomalies=[],
     )
