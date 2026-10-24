@@ -1,0 +1,50 @@
+enum_name,value,label_en,label_hi
+gender,M,Male,पुरुष
+gender,F,Female,महिला
+gender,T,Transgender,ट्रांसजेंडर
+category,GEN,General,सामान्य
+category,EWS,Economically Weaker Section,आर्थिक रूप से कमजोर वर्ग
+category,OBC-NCL,Other Backward Classes (Non-Creamy Layer),अन्य पिछड़ा वर्ग
+category,SC,Scheduled Caste,अनुसूचित जाति
+category,ST,Scheduled Tribe,अनुसूचित जनजाति
+course_level,DIPLOMA,Diploma,डिप्लोमा
+course_level,UG,Undergraduate,स्नातक
+course_level,PG,Postgraduate,स्नातकोत्तर
+course_level,PGDM,Post Graduate Diploma in Management,प्रबंधन में स्नातकोत्तर डिप्लोमा
+course_level,PHD,Doctor of Philosophy,डॉक्टरेट
+seat_type,REGULAR,Regular,नियमित
+seat_type,SUPERNUMERARY,Supernumerary,अधिसंख्य
+supernumerary_scheme,TFW,Tuition Fee Waiver,ट्यूशन फीस माफी
+supernumerary_scheme,PMSSS,Prime Minister Special Scholarship Scheme,प्रधानमंत्री विशेष छात्रवृत्ति योजना
+supernumerary_scheme,JK,Jammu & Kashmir Quota,जम्मू और कश्मीर कोटा
+supernumerary_scheme,NE,North Eastern Region Quota,पूर्वोत्तर क्षेत्र कोटा
+supernumerary_scheme,FN_OCI_NRI,Foreign National / OCI / NRI Quota,विदेशी नागरिक / ओसीआई / एनआरआई कोटा
+supernumerary_scheme,PWD,Persons with Disabilities Quota,दिव्यांगजन कोटा
+supernumerary_scheme,OTHER,Other AICTE Approved Scheme,अन्य अनुमोदित योजना
+quota,NONE,None,कोई नहीं
+quota,NRI,Non-Resident Indian,अनिवासी भारतीय
+quota,OCI,Overseas Citizen of India,भारत के प्रवासी नागरिक
+quota,FN,Foreign National,विदेशी नागरिक
+quota,PIO,Person of Indian Origin,भारतीय मूल के व्यक्ति
+quota,CIWG,Children of Indian Workers in Gulf,खाड़ी में भारतीय कामगारों के बच्चे
+admission_type,REGULAR,Regular Entry,नियमित प्रवेश
+admission_type,LATERAL,Lateral Entry,पार्श्व प्रवेश
+admission_type,TRANSFER_IN,Transfer In,स्थानांतरण प्रवेश
+enrolment_status,ACTIVE,Active,सक्रिय
+enrolment_status,WITHDRAWN,Withdrawn,वापस लिया गया
+enrolment_status,DEFERRED,Deferred,स्थगित
+enrolment_status,TRANSFERRED_OUT,Transferred Out,स्थानांतरित
+enrolment_status,COMPLETED,Completed Coursework,पाठ्यक्रम पूर्ण
+enrolment_status,GRADUATED,Graduated,उत्तीर्ण / स्नातक
+consent_status,GRANTED,Granted,स्वीकृत
+consent_status,REFUSED,Refused,अस्वीकृत
+consent_status,WITHDRAWN,Withdrawn,वापस ली गई
+onboarding_level,FULL,Full Student-Level Reporting,पूर्ण छात्र-स्तरीय रिपोर्टिंग
+onboarding_level,AGGREGATE_ONLY,Aggregate Totals Only,केवल सकल योग
+user_role,AICTE_ADMIN,AICTE Administrator,एआईसीटीई प्रशासक
+user_role,AICTE_ANALYST,AICTE Data Analyst,एआईसीटीई विश्लेषक
+user_role,DAB_ADMIN,Degree Awarding Body Admin,डिग्री प्रदाता प्रशासक
+user_role,INSTITUTION_ADMIN,Institution Administrator,संस्थान प्रशासक
+user_role,INSTITUTION_STAFF,Institution Staff,संस्थान कर्मचारी
+user_role,VERIFIER,Credential Verifier,सत्यापनकर्ता
+user_role,STUDENT,Student Holder,छात्र

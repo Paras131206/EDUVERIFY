@@ -1,0 +1,5 @@
+# Ignore large synthetic and raw research datasets
+synthetic/
+raw/
+__pycache__/
+*.pyc
