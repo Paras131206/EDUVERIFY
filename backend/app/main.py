@@ -13,7 +13,11 @@ import yaml
 from app.config import get_settings
 from app.db import check_db_health
 from app.logging import setup_logging
-from app.middleware import RequestIdMiddleware, SecurityHeadersMiddleware
+from app.middleware import (
+    RequestIdMiddleware,
+    RequestSizeLimitMiddleware,
+    SecurityHeadersMiddleware,
+)
 from app.routers import ROUTERS
 from app.security.limiter import limiter, rate_limit_handler
 from fastapi import FastAPI, Request, status
@@ -94,6 +98,9 @@ app.add_middleware(SecurityHeadersMiddleware)
 # Request ID and latency tracking middleware
 app.add_middleware(RequestIdMiddleware)
 
+# Request payload size limit middleware (15MB)
+app.add_middleware(RequestSizeLimitMiddleware)
+
 # Register feature routers
 for router in ROUTERS:
     app.include_router(router)
@@ -148,6 +155,12 @@ def custom_openapi() -> dict[str, Any]:
                 for method, op in path_item.items():
                     if method not in schema["paths"][path_key]:
                         schema["paths"][path_key][method] = op
+
+        schema_components = schema.setdefault("components", {})
+        schema_schemas = schema_components.setdefault("schemas", {})
+        for s_name, s_def in generated.get("components", {}).get("schemas", {}).items():
+            if s_name not in schema_schemas:
+                schema_schemas[s_name] = s_def
 
         app.openapi_schema = schema
         return app.openapi_schema

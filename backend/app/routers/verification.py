@@ -194,7 +194,9 @@ def get_status_list_by_id(
     summary="Generate fresh 5-minute challenge nonce for presentation verification",
     tags=["Verification"],
 )
+@limiter.limit("60/minute")
 def get_verification_nonce(
+    request: Request,
     aud: str | None = Query(default=None, description="Audience URI of the verifier"),
     db: Session = Depends(get_db),
 ) -> PresentationNonceResponse:
@@ -209,11 +211,13 @@ def get_verification_nonce(
     summary="Generate fresh presentation nonce (contract alias)",
     tags=["Credentials"],
 )
+@limiter.limit("60/minute")
 def post_presentation_nonce(
+    request: Request,
     db: Session = Depends(get_db),
 ) -> PresentationNonceResponse:
     """Alternative POST endpoint for presentation nonce generation per contract."""
-    nonce, expires_at = create_verification_nonce_service(db)
+    nonce, expires_at = create_verification_nonce_service(db, aud=None)
     return PresentationNonceResponse(nonce=nonce, expires_at=expires_at)
 
 

@@ -1,3 +1,37 @@
+envVarGroups:
+  - name: eduverify-dev-env
+    envVars:
+      - key: ENV
+        value: dev
+      - key: PUBLIC_BASE_URL
+        value: http://localhost:8000
+      - key: FRONTEND_URL
+        value: http://localhost:5173
+      - key: CORS_ORIGINS
+        value: "http://localhost:5173,http://localhost:3000,http://localhost:8000"
+
+  - name: eduverify-staging-env
+    envVars:
+      - key: ENV
+        value: staging
+      - key: PUBLIC_BASE_URL
+        value: https://eduverify-api-staging.onrender.com
+      - key: FRONTEND_URL
+        value: https://eduverify-web-staging.onrender.com
+      - key: CORS_ORIGINS
+        value: "https://eduverify-web-staging.onrender.com"
+
+  - name: eduverify-prod-env
+    envVars:
+      - key: ENV
+        value: prod
+      - key: PUBLIC_BASE_URL
+        value: https://eduverify-api.onrender.com
+      - key: FRONTEND_URL
+        value: https://eduverify-web.onrender.com
+      - key: CORS_ORIGINS
+        value: "https://eduverify-web.onrender.com"
+
 services:
   - type: web
     name: eduverify-api
@@ -8,28 +42,23 @@ services:
     startCommand: "cd backend && (test ! -f alembic.ini || alembic upgrade head) && (python -c 'import app.seed' 2>/dev/null && python -m app.seed --if-empty || true) && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     healthCheckPath: /healthz
     envVars:
+      - fromGroup: eduverify-prod-env # Switch to eduverify-staging-env on staging branch
       - key: PYTHON_VERSION
         value: 3.11.9
-      - key: ENV
-        value: prod
       - key: DATABASE_URL
         fromDatabase:
           name: eduverify-db
           property: connectionString
       - key: JWT_SECRET
-        sync: false
+        generateValue: true
       - key: FERNET_KEY
+        generateValue: true
+      - key: PEPPER
+        generateValue: true
+      - key: SEED_PASSWORD
         sync: false
       - key: ISSUER_KEYS_JSON
         sync: false
-      - key: PEPPER
-        sync: false
-      - key: SEED_PASSWORD
-        sync: false
-      - key: CORS_ORIGINS
-        value: "https://eduverify-web.onrender.com"
-      - key: FRONTEND_URL
-        value: "https://eduverify-web.onrender.com"
       - key: SMTP_HOST
         sync: false
       - key: SMTP_PORT
