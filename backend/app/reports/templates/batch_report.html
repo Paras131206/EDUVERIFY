@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AICTE EduVerify Batch Quality Report</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1.5cm;
+            @bottom-right {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 9pt;
+                font-family: Arial, sans-serif;
+                color: #666;
+            }
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #1a202c;
+            line-height: 1.4;
+            font-size: 10pt;
+        }
+        .header {
+            border-bottom: 2px solid #1f4e79;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 18pt;
+            font-weight: bold;
+            color: #1f4e79;
+            margin: 0;
+        }
+        .subtitle {
+            font-size: 11pt;
+            color: #4a5568;
+            margin-top: 4px;
+        }
+        .meta-grid {
+            display: table;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .meta-row {
+            display: table-row;
+        }
+        .meta-cell {
+            display: table-cell;
+            padding: 4px 8px;
+            font-size: 9pt;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #4a5568;
+        }
+        .score-box {
+            background-color: #ebf8ff;
+            border: 1px solid #bee3f8;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .score-val {
+            font-size: 24pt;
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 9pt;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 6px 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f7fafc;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 8pt;
+            font-weight: bold;
+        }
+        .badge-error { background-color: #fed7d7; color: #9b2c2c; }
+        .badge-warn { background-color: #feebc8; color: #9c4221; }
+        .badge-info { background-color: #e2e8f0; color: #4a5568; }
+        .badge-critical { background-color: #e53e3e; color: #fff; }
+        .badge-high { background-color: #dd6b20; color: #fff; }
+        .badge-medium { background-color: #d69e2e; color: #fff; }
+        .badge-low { background-color: #319795; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">All India Council for Technical Education (AICTE)</h1>
+        <div class="subtitle">EduVerify Student Data Quality Validation Report</div>
+    </div>
+
+    <div class="meta-grid">
+        <div class="meta-row">
+            <div class="meta-cell"><span class="meta-label">Batch ID:</span> {{ report.batch_id }}</div>
+            <div class="meta-cell"><span class="meta-label">Institution:</span> {{ report.institution_aicte_id }}</div>
+        </div>
+        <div class="meta-row">
+            <div class="meta-cell"><span class="meta-label">Academic Year:</span> {{ academic_year or "2026-27" }}</div>
+            <div class="meta-cell"><span class="meta-label">Engine Version:</span> {{ report.engine_version }}</div>
+        </div>
+    </div>
+
+    <div class="score-box">
+        <div>Data Quality Score</div>
+        <div class="score-val">{{ "%.1f"|format(report.quality_score) }} / 100.0</div>
+        <div>Total Rows: {{ report.rows_total }} | Valid: {{ report.rows_valid }} | Warnings: {{ report.rows_warning }} | Fatal Errors: {{ report.rows_error }}</div>
+    </div>
+
+    <h3>Priority Summary</h3>
+    <table>
+        <tr>
+            <th>Priority</th>
+            <th>Count</th>
+            <th>Review Bucket</th>
+            <th>Count</th>
+        </tr>
+        <tr>
+            <td><span class="badge badge-critical">CRITICAL</span></td>
+            <td>{{ report.priority_summary.get("CRITICAL", 0) }}</td>
+            <td>AUTO_FLAG</td>
+            <td>{{ report.review_summary.get("AUTO_FLAG", 0) }}</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-high">HIGH</span></td>
+            <td>{{ report.priority_summary.get("HIGH", 0) }}</td>
+            <td>HUMAN_REVIEW</td>
+            <td>{{ report.review_summary.get("HUMAN_REVIEW", 0) }}</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-medium">MEDIUM</span></td>
+            <td>{{ report.priority_summary.get("MEDIUM", 0) }}</td>
+            <td>INFO</td>
+            <td>{{ report.review_summary.get("INFO", 0) }}</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-low">LOW</span></td>
+            <td>{{ report.priority_summary.get("LOW", 0) }}</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+    </table>
+
+    {% if report.issues %}
+    <h3>Validation Issues (First {{ [report.issues|length, 100]|min }})</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Row</th>
+                <th>Rule</th>
+                <th>Severity</th>
+                <th>Priority</th>
+                <th>Field</th>
+                <th>Message / Explanation</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for iss in report.issues[:100] %}
+            <tr>
+                <td>{{ iss.row or "-" }}</td>
+                <td>{{ iss.rule_id }}</td>
+                <td>
+                    <span class="badge {% if iss.severity == 'ERROR' %}badge-error{% elif iss.severity == 'WARN' %}badge-warn{% else %}badge-info{% endif %}">
+                        {{ iss.severity }}
+                    </span>
+                </td>
+                <td>
+                    <span class="badge badge-{{ iss.priority.lower() }}">{{ iss.priority }}</span>
+                </td>
+                <td>{{ iss.field }}</td>
+                <td>
+                    <strong>{{ iss.message }}</strong>
+                    {% if iss.reason %}<div style="color: #4a5568; font-size: 8pt;">{{ iss.reason }}</div>{% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</body>
+</html>
