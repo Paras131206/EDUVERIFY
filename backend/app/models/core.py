@@ -583,6 +583,10 @@ class Webhook(Base):
         nullable=False,
     )
 
+    deliveries: Mapped[list["WebhookDelivery"]] = relationship(
+        "WebhookDelivery", back_populates="webhook", cascade="all, delete-orphan"
+    )
+
 
 class WebhookDelivery(Base):
     """Webhook dispatch delivery attempt log."""
@@ -604,6 +608,8 @@ class WebhookDelivery(Base):
     delivered_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
     )
+
+    webhook: Mapped["Webhook"] = relationship("Webhook", back_populates="deliveries")
 
 
 class NotificationOutbox(Base):
@@ -760,6 +766,32 @@ class ShortLink(Base):
     credential_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
     presentation_data: Mapped[str] = mapped_column(Text, nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
+
+
+class ReportRecord(Base):
+    """Generated regulatory, policy, accreditation, and monitoring reports."""
+
+    __tablename__ = "reports"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid.uuid4())
+    )
+    report_type: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
+    format: Mapped[str] = mapped_column(String(10), nullable=False)
+    academic_year: Mapped[str] = mapped_column(String(20), nullable=False)
+    state: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    program: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    category: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="READY")
+    generated_by: Mapped[str] = mapped_column(String(255), nullable=False)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    title_hi: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    file_bytes: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
+    file_size: Mapped[str] = mapped_column(String(50), nullable=False, default="0 KB")
+    summary_json: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
     )

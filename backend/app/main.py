@@ -133,6 +133,22 @@ def custom_openapi() -> dict[str, Any]:
         elif healthz_path and not health_path:
             schema["paths"]["/health"] = healthz_path.copy()
 
+        from fastapi.openapi.utils import get_openapi
+
+        generated = get_openapi(
+            title=app.title,
+            version=app.version,
+            description=app.description,
+            routes=app.routes,
+        )
+        for path_key, path_item in generated.get("paths", {}).items():
+            if path_key not in schema["paths"]:
+                schema["paths"][path_key] = path_item
+            else:
+                for method, op in path_item.items():
+                    if method not in schema["paths"][path_key]:
+                        schema["paths"][path_key][method] = op
+
         app.openapi_schema = schema
         return app.openapi_schema
 

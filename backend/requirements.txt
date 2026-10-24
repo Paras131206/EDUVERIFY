@@ -24,3 +24,5 @@ ruff>=0.5.0
 bandit>=1.7.9
 pip-audit>=2.7.0
 pyotp>=2.9.0
+pyarrow>=15.0.0
+eduverify_engine>=1.0.0
