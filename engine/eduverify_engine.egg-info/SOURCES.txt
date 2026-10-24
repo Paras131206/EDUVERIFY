@@ -11,6 +11,7 @@ eduverify_engine.egg-info/requires.txt
 eduverify_engine.egg-info/top_level.txt
 tests/test_catalog.py
 tests/test_devserver.py
+tests/test_generator.py
 tests/test_masking.py
 tests/test_models.py
 tests/test_synonyms.py
