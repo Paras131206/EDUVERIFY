@@ -1,4 +1,3 @@
-
 name: Team B - Backend CI
 
 on:
@@ -44,3 +43,22 @@ jobs:
       - name: Verify Contract Schemathesis & OpenAPI Validation
         run: |
           python -c "from pathlib import Path; import openapi_spec_validator, yaml; spec = yaml.safe_load(open('contracts/openapi.yaml', encoding='utf-8')); openapi_spec_validator.validate(spec, base_uri=Path('contracts/openapi.yaml').resolve().as_uri()); print('OpenAPI contract validated successfully!')"
+
+      - name: Check Render API Health
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          HEALTH_URL: https://eduverify-api.onrender.com/health
+        run: |
+          for i in {1..18}; do
+            echo "Checking API health ($i/18)..."
+            if curl --fail --silent --show-error --max-time 20 "$HEALTH_URL"; then
+              echo
+              echo "Render API is healthy."
+              exit 0
+            fi
+            if [ "$i" -lt 18 ]; then
+              sleep 10
+            fi
+          done
+          echo "Error: Render API did not become healthy."
+          exit 1
