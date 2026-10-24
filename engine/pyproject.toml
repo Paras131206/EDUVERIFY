@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "eduverify_engine"
-version = "0.0.1"
+version = "1.0.0"
 description = "Pure Python rule, data validation and deduplication engine for EduVerify"
 readme = "README.md"
 requires-python = ">=3.11"

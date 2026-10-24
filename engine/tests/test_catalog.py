@@ -3,7 +3,7 @@ from eduverify_engine.catalog import load_rule_catalog
 
 def test_rule_catalog_loads_and_has_35_rules():
     catalog = load_rule_catalog()
-    assert catalog.catalog_version == "0.1.0"
+    assert catalog.catalog_version == "1.0.0"
     assert catalog.owner == "team-c"
     assert len(catalog.rules) == 35
 
