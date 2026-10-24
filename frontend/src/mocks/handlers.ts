@@ -16,6 +16,23 @@ import {
   mockDqTrend,
   mockIntakeDistribution,
   mockNotifications,
+  mockSseTickerEvents,
+  mockStateMetrics,
+  mockDrilldownInstitutions,
+  mockLeaderboards,
+  mockSupernumerarySchemes,
+  mockQuotaShares,
+  mockCrossDuplicates,
+  mockAnomalyFeed,
+  mockAicteReconciliation,
+  mockAuditVerification,
+  mockAuditLog,
+  mockRolloverDryRun,
+  mockTrustList,
+  mockMasterInstitutions,
+  mockMasterDabs,
+  mockMasterPrograms,
+  mockMasterAcademicYears,
 } from './data';
 
 import {
@@ -27,7 +44,18 @@ import {
   ProgramAggregateItem,
   ReconciliationStatusItem,
   WebhookConfigItem,
+  DuplicateClusterItem,
 } from '@/features/institution/types';
+import {
+  SseTickerEvent,
+  StateMetricRecord,
+  InstitutionDrilldownItem,
+  LeaderboardItem,
+  AnomalyFeedItem,
+  AuditVerificationVerdict,
+  AuditLogEntry,
+  ReconciliationRecordItem,
+} from '@/features/aicte/types';
 
 let studentsState: StudentDetailRecord[] = JSON.parse(JSON.stringify(mockStudents));
 let transfersState: TransferRequestItem[] = JSON.parse(JSON.stringify(mockTransfers));
@@ -35,12 +63,30 @@ let aggregatesState: ProgramAggregateItem[] = JSON.parse(JSON.stringify(mockAggr
 let reconciliationState: ReconciliationStatusItem[] = JSON.parse(JSON.stringify(mockReconciliationStatus));
 let webhooksState: WebhookConfigItem[] = JSON.parse(JSON.stringify(mockWebhooks));
 
+// AICTE Console State
+let aicteSummaryState = JSON.parse(JSON.stringify(mockAicteSummary));
+let sseTickerEventsState: SseTickerEvent[] = JSON.parse(JSON.stringify(mockSseTickerEvents));
+let crossDuplicatesState: DuplicateClusterItem[] = JSON.parse(JSON.stringify(mockCrossDuplicates));
+let auditVerificationState: AuditVerificationVerdict = JSON.parse(JSON.stringify(mockAuditVerification));
+let auditLogState: AuditLogEntry[] = JSON.parse(JSON.stringify(mockAuditLog));
+let aicteReconciliationState: ReconciliationRecordItem[] = JSON.parse(JSON.stringify(mockAicteReconciliation));
+
+export const resetAicteMock = () => {
+  aicteSummaryState = JSON.parse(JSON.stringify(mockAicteSummary));
+  sseTickerEventsState = JSON.parse(JSON.stringify(mockSseTickerEvents));
+  crossDuplicatesState = JSON.parse(JSON.stringify(mockCrossDuplicates));
+  auditVerificationState = JSON.parse(JSON.stringify(mockAuditVerification));
+  auditLogState = JSON.parse(JSON.stringify(mockAuditLog));
+  aicteReconciliationState = JSON.parse(JSON.stringify(mockAicteReconciliation));
+};
+
 export const resetOperationsMock = () => {
   studentsState = JSON.parse(JSON.stringify(mockStudents));
   transfersState = JSON.parse(JSON.stringify(mockTransfers));
   aggregatesState = JSON.parse(JSON.stringify(mockAggregates));
   reconciliationState = JSON.parse(JSON.stringify(mockReconciliationStatus));
   webhooksState = JSON.parse(JSON.stringify(mockWebhooks));
+  resetAicteMock();
 };
 
 
@@ -683,6 +729,18 @@ export const handlers = [
         : b
     );
 
+    // Broadcast live SSE ticker event for AICTE console
+    sseTickerEventsState.unshift({
+      id: `sse-${Date.now()}`,
+      event_type: 'batch.committed',
+      title: 'Batch Committed',
+      message: `Batch #${batchId} committed to Central Registry (64 records, quality score 96.5%)`,
+      timestamp: 'Just now',
+      severity: 'INFO',
+      batch_id: batchId,
+      link: `/institution/batches/${batchId}/review`,
+    });
+
     return HttpResponse.json({
       batch_id: batchId,
       status: 'COMMITTED',
@@ -694,9 +752,168 @@ export const handlers = [
     });
   }),
 
-
+  // AICTE Console Endpoints
   http.get('*/v1/dashboards/aicte/summary', () => {
-    return HttpResponse.json(mockAicteSummary);
+    return HttpResponse.json(aicteSummaryState);
+  }),
+
+  http.get('*/v1/dashboards/aicte', () => {
+    return HttpResponse.json(aicteSummaryState);
+  }),
+
+  http.get('*/v1/dashboards/aicte/map', ({ request }) => {
+    const url = new URL(request.url);
+    const stateCode = url.searchParams.get('state_code');
+    if (stateCode) {
+      const institutions = mockDrilldownInstitutions[stateCode] || [];
+      return HttpResponse.json(institutions);
+    }
+    return HttpResponse.json(mockStateMetrics);
+  }),
+
+  http.get('*/v1/dashboards/map', ({ request }) => {
+    const url = new URL(request.url);
+    const stateCode = url.searchParams.get('state_code');
+    if (stateCode) {
+      const institutions = mockDrilldownInstitutions[stateCode] || [];
+      return HttpResponse.json(institutions);
+    }
+    return HttpResponse.json(mockStateMetrics);
+  }),
+
+  http.get('*/v1/dashboards/aicte/leaderboards', () => {
+    return HttpResponse.json(mockLeaderboards);
+  }),
+
+  http.get('*/v1/dashboards/aicte/quotas', () => {
+    return HttpResponse.json({
+      schemes: mockSupernumerarySchemes,
+      shares: mockQuotaShares,
+    });
+  }),
+
+  http.get('*/v1/dashboards/aicte/duplicates', () => {
+    return HttpResponse.json(crossDuplicatesState);
+  }),
+
+  http.post('*/v1/dashboards/aicte/duplicates/:id/resolve', async ({ params, request }) => {
+    const clusterId = params.id as string;
+    const body = (await request.json()) as { decision: 'SAME_PERSON' | 'DIFFERENT_PEOPLE' | 'TRANSFER'; note?: string };
+    const cluster = crossDuplicatesState.find((c) => c.cluster_id === clusterId);
+
+    if (cluster) {
+      cluster.status = `RESOLVED_${body.decision}` as any;
+      if (body.decision === 'TRANSFER') {
+        sseTickerEventsState.unshift({
+          id: `sse-${Date.now()}`,
+          event_type: 'transfer.decided',
+          title: 'Cross-Dupe Transfer Resolved',
+          message: `Cluster ${clusterId} resolved via statutory inter-institution transfer`,
+          timestamp: 'Just now',
+          severity: 'INFO',
+        });
+      }
+    }
+    return HttpResponse.json(cluster || { cluster_id: clusterId, status: `RESOLVED_${body.decision}` });
+  }),
+
+  http.get('*/v1/dashboards/aicte/anomalies', () => {
+    return HttpResponse.json(mockAnomalyFeed);
+  }),
+
+  http.get('*/v1/dashboards/aicte/reconciliation', ({ request }) => {
+    const url = new URL(request.url);
+    const statusFilter = url.searchParams.get('status');
+    const q = url.searchParams.get('q')?.toLowerCase() || '';
+
+    let items = [...aicteReconciliationState];
+    if (statusFilter && statusFilter !== 'ALL') {
+      items = items.filter((item) => item.status === statusFilter);
+    }
+    if (q) {
+      items = items.filter(
+        (item) =>
+          item.institution_name.toLowerCase().includes(q) ||
+          item.institution_aicte_id.toLowerCase().includes(q) ||
+          item.program_code.toLowerCase().includes(q)
+      );
+    }
+    return HttpResponse.json(items);
+  }),
+
+  http.get('*/v1/audit/verify-chain', () => {
+    return HttpResponse.json(auditVerificationState);
+  }),
+
+  http.post('*/v1/audit/verify-chain/recalculate', () => {
+    auditVerificationState.verified_at = new Date().toISOString();
+    return HttpResponse.json(auditVerificationState);
+  }),
+
+  http.get('*/v1/audit/log', () => {
+    return HttpResponse.json(auditLogState);
+  }),
+
+  http.get('*/v1/admin/master/:entity', ({ params }) => {
+    const entity = params.entity as string;
+    if (entity === 'institutions') return HttpResponse.json(mockMasterInstitutions);
+    if (entity === 'dabs') return HttpResponse.json(mockMasterDabs);
+    if (entity === 'programs') return HttpResponse.json(mockMasterPrograms);
+    if (entity === 'academic-years') return HttpResponse.json(mockMasterAcademicYears);
+    return HttpResponse.json({ message: `Entity ${entity} not found` }, { status: 404 });
+  }),
+
+  http.post('*/v1/admin/rollover', async ({ request }) => {
+    const url = new URL(request.url);
+    const isDryRun = url.searchParams.get('dry_run') === 'true';
+
+    if (isDryRun) {
+      return HttpResponse.json(mockRolloverDryRun);
+    }
+
+    sseTickerEventsState.unshift({
+      id: `sse-${Date.now()}`,
+      event_type: 'rollover.completed',
+      title: 'Academic Rollover Executed',
+      message: 'Academic Year 2026-27 cohort rollover executed: 385,200 students promoted to Year N+1',
+      timestamp: 'Just now',
+      severity: 'INFO',
+    });
+
+    return HttpResponse.json({
+      success: true,
+      message: 'Academic Year 2026-27 rollover executed successfully across all institutions',
+      from_year: '2025-26',
+      to_year: '2026-27',
+      executed_at: new Date().toISOString(),
+      transaction_id: 'roll-tx-prod-2026-081',
+      students_advanced: 385200,
+      students_completed: 100090,
+    });
+  }),
+
+  http.get('*/v1/admin/trust-list', () => {
+    return HttpResponse.json(mockTrustList);
+  }),
+
+  http.get('*/v1/events/ticker', () => {
+    return HttpResponse.json(sseTickerEventsState);
+  }),
+
+  http.post('*/v1/events/ticker/simulate', async ({ request }) => {
+    const body = (await request.json()) as Partial<SseTickerEvent>;
+    const newEvent: SseTickerEvent = {
+      id: `sse-${Date.now()}`,
+      event_type: body.event_type || 'batch.committed',
+      title: body.title || 'Simulated Live Broadcast',
+      message: body.message || 'Simulated batch upload event ingested',
+      timestamp: 'Just now',
+      severity: body.severity || 'INFO',
+      institution_name: body.institution_name || 'Simulated Institution',
+      batch_id: body.batch_id || 'batch-sim-1',
+    };
+    sseTickerEventsState.unshift(newEvent);
+    return HttpResponse.json(newEvent);
   }),
 
   http.get('*/v1/dashboards/institution/summary', () => {
