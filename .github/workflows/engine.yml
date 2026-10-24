@@ -46,4 +46,8 @@ jobs:
         run: |
           cd engine
           PYTHONPATH=.. python -c "from data.generator.generate import generate_dataset; generate_dataset()"
+          mkdir -p data
+          if [ -d "../data/demo" ]; then
+            cp -r ../data/demo data/
+          fi
           pytest -v
