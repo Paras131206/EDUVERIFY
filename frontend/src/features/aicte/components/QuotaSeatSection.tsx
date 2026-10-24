@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { SupernumerarySchemeStat, QuotaShareStat } from '../types';
+import { formatIndianNumber } from '@/lib/format';
 import {
   ResponsiveContainer,
   BarChart,
@@ -60,12 +61,12 @@ export const QuotaSeatSection: React.FC<QuotaSeatSectionProps> = ({ schemes, sha
 
               <div className="text-right">
                 <div className="text-xs font-bold text-slate-900">
-                  {scheme.allotted_count.toLocaleString()} seats
+                  {formatIndianNumber(scheme.allotted_count)} seats
                 </div>
                 {scheme.flagged_excess_count > 0 ? (
                   <span className="text-[10px] text-red-700 font-bold bg-red-100 px-1.5 py-0.5 rounded flex items-center gap-1 mt-0.5 justify-end">
                     <AlertTriangle className="w-3 h-3 text-red-600" />
-                    <span>+{scheme.flagged_excess_count} Excess</span>
+                    <span>+{formatIndianNumber(scheme.flagged_excess_count)} Excess</span>
                   </span>
                 ) : (
                   <span className="text-[10px] text-green-700 font-bold flex items-center gap-1 mt-0.5 justify-end">
@@ -120,7 +121,7 @@ export const QuotaSeatSection: React.FC<QuotaSeatSectionProps> = ({ schemes, sha
                 <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#64748B' }} />
                 <YAxis tick={{ fontSize: 11, fill: '#64748B' }} />
                 <Tooltip
-                  formatter={(val: number) => val.toLocaleString()}
+                  formatter={(val: number) => formatIndianNumber(val)}
                   contentStyle={{ backgroundColor: '#0B2545', color: '#fff', borderRadius: '8px', fontSize: '12px' }}
                 />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />

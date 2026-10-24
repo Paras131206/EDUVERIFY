@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { QualityScoreGauge } from '@/components/shared/QualityScoreGauge';
 import { AicteConsoleSummary, SseTickerEvent } from '../types';
 import { API_BASE_URL } from '@/lib/api';
+import { formatIndianNumber } from '@/lib/format';
 import {
   Building2,
   ShieldCheck,
@@ -83,11 +84,11 @@ export const AicteKpiOverview: React.FC<AicteKpiOverviewProps> = ({
               Institutions
             </span>
             <div className="mt-2 text-2xl font-black text-slate-900 flex items-baseline gap-1.5">
-              <span>{summary.total_institutions.toLocaleString()}</span>
+              <span>{formatIndianNumber(summary.total_institutions)}</span>
               <span className="text-xs text-slate-500 font-medium">Total</span>
             </div>
             <p className="text-[11px] text-slate-600 mt-1 font-medium">
-              {summary.onboarded_institutions.toLocaleString()} Onboarded ({summary.coverage_percentage}%)
+              {formatIndianNumber(summary.onboarded_institutions)} Onboarded ({summary.coverage_percentage}%)
             </p>
           </div>
           <div className="mt-3 pt-2 border-t border-slate-100 flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
@@ -126,8 +127,8 @@ export const AicteKpiOverview: React.FC<AicteKpiOverviewProps> = ({
             <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">
               Verified Students
             </span>
-            <div className="mt-2 text-2xl font-black text-slate-900">
-              {summary.total_students.toLocaleString()}
+            <div className="mt-2 text-2xl font-black text-slate-900" data-testid="kpi-students-count">
+              {formatIndianNumber(summary.total_students)}
             </div>
             <p className="text-[11px] text-slate-600 mt-1">
               Active APAAR Identity Keys

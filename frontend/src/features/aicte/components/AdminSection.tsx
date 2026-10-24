@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { RolloverDryRunResult, TrustListItem } from '../types';
 import { API_BASE_URL } from '@/lib/api';
+import { formatIndianNumber } from '@/lib/format';
 import {
   Database,
   Calendar,
@@ -401,25 +402,25 @@ export const AdminSection: React.FC<AdminSectionProps> = ({
                   <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                     <span className="text-[11px] text-slate-500 block">Advancing to Year N+1</span>
                     <span className="text-xl font-bold text-gov-navy">
-                      {rolloverResult.projected_advancements.toLocaleString()}
+                      {formatIndianNumber(rolloverResult.projected_advancements)}
                     </span>
                   </div>
                   <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                     <span className="text-[11px] text-slate-500 block">Graduating to COMPLETED</span>
                     <span className="text-xl font-bold text-green-700">
-                      {rolloverResult.projected_completions.toLocaleString()}
+                      {formatIndianNumber(rolloverResult.projected_completions)}
                     </span>
                   </div>
                   <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                     <span className="text-[11px] text-slate-500 block">Institutions Enrolled</span>
                     <span className="text-xl font-bold text-slate-900">
-                      {rolloverResult.institutions_affected.toLocaleString()}
+                      {formatIndianNumber(rolloverResult.institutions_affected)}
                     </span>
                   </div>
                   <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                     <span className="text-[11px] text-slate-500 block">Potential Missing (V034)</span>
                     <span className="text-xl font-bold text-amber-600">
-                      {rolloverResult.potential_missing_students.toLocaleString()}
+                      {formatIndianNumber(rolloverResult.potential_missing_students)}
                     </span>
                   </div>
                 </div>

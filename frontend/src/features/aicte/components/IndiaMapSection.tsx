@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { StateMetricRecord, InstitutionDrilldownItem } from '../types';
 import { API_BASE_URL } from '@/lib/api';
+import { formatIndianNumber } from '@/lib/format';
 import {
   MapPin,
   Search,
@@ -263,7 +264,7 @@ export const IndiaMapSection: React.FC<IndiaMapSectionProps> = ({ states }) => {
                   </span>
                 </h4>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  {selectedState.total_institutions} Institutions • {selectedState.enrolled_count.toLocaleString()} Students Enrolled • {selectedState.fill_percentage}% Fill Ratio
+                  {formatIndianNumber(selectedState.total_institutions)} Institutions • {formatIndianNumber(selectedState.enrolled_count)} Students Enrolled • {selectedState.fill_percentage}% Fill Ratio
                 </p>
               </div>
 

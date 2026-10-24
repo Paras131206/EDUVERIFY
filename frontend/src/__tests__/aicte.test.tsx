@@ -105,7 +105,9 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
       expect(coverageCard).toHaveTextContent(/aggregate-only/i);
 
       // 3. Total Students Enrolled
-      expect(screen.getByTestId('kpi-students')).toHaveTextContent('4,85,290');
+      const studentsCard = screen.getByTestId('kpi-students');
+      expect(within(studentsCard).getByTestId('kpi-students-count')).toHaveTextContent('4,85,290');
+      expect(studentsCard).toHaveTextContent('4,85,290');
 
       // 4. Avg Fill Percentage
       expect(screen.getByTestId('kpi-avg-fill')).toHaveTextContent('92.4%');
