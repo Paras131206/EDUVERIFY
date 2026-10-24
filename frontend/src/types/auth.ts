@@ -1,8 +1,10 @@
 export type UserRole =
   | 'AICTE_ADMIN'
+  | 'AICTE_ANALYST'
   | 'AICTE_VIEWER'
   | 'INSTITUTION_ADMIN'
   | 'INSTITUTION_STAFF'
+  | 'DAB_ADMIN'
   | 'DAB_MEMBER'
   | 'STUDENT'
   | 'VERIFIER';

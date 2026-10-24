@@ -1,9 +1,10 @@
 import '@testing-library/jest-dom';
+import 'fake-indexeddb/auto';
 import '@/lib/i18n';
 import { beforeAll, afterEach, afterAll } from 'vitest';
 import { server } from '@/mocks/server';
 
-import { resetAuthMock } from '@/mocks/handlers';
+import { resetAuthMock, resetTrustMock } from '@/mocks/handlers';
 
 // Polyfill Blob/File stream and arrayBuffer for jsdom in Node 20
 if (typeof Blob !== 'undefined') {
@@ -56,15 +57,20 @@ if (typeof global !== 'undefined' && !(global as any).ResizeObserver) {
   (global as any).ResizeObserver = class ResizeObserver {
     observe() {}
     unobserve() {}
-    disconnect() {}
   };
 }
 
-
+if (typeof window !== 'undefined' && (!window.crypto || !window.crypto.subtle) && typeof globalThis !== 'undefined' && globalThis.crypto) {
+  Object.defineProperty(window, 'crypto', {
+    value: globalThis.crypto,
+    writable: true,
+  });
+}
 beforeAll(() => server.listen({ onUnhandledRequest: 'bypass' }));
 afterEach(() => {
   server.resetHandlers();
   resetAuthMock();
+  resetTrustMock();
   localStorage.clear();
   sessionStorage.clear();
 });

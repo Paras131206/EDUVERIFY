@@ -105,11 +105,11 @@ export const router = createBrowserRouter([
               </RequireRole>
             ),
           },
-          // DAB Dispute Docket
+          // DAB Portal (DAB_ADMIN / DAB_MEMBER)
           {
             path: 'dab',
             element: (
-              <RequireRole roles={['DAB_MEMBER']}>
+              <RequireRole roles={['DAB_ADMIN', 'DAB_MEMBER']}>
                 <DabDashboardPage />
               </RequireRole>
             ),
@@ -123,14 +123,10 @@ export const router = createBrowserRouter([
               </RequireRole>
             ),
           },
-          // Verifier Desk
+          // Verifier Desk (Public + VERIFIER)
           {
             path: 'verify',
-            element: (
-              <RequireRole roles={['VERIFIER', 'AICTE_ADMIN', 'INSTITUTION_ADMIN']}>
-                <VerifierPage />
-              </RequireRole>
-            ),
+            element: <VerifierPage />,
           },
           // Reports
           {
