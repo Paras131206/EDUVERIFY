@@ -37,8 +37,11 @@ def test_schemathesis_spec_loads(repo_root):
     spec_path = repo_root / "contracts" / "openapi.yaml"
 
     # Support Schemathesis 3.x experimental flag and Schemathesis 4.x native OpenAPI 3.1
-    if hasattr(schemathesis, "experimental") and hasattr(schemathesis.experimental, "OPEN_API_3_1"):
-        schemathesis.experimental.OPEN_API_3_1.enable()
+    exp = getattr(schemathesis, "experimental", None)
+    if exp and hasattr(exp, "OPEN_API_3_1"):
+        exp.OPEN_API_3_1.enable()
+
+
 
     # Schemathesis 4.x moves loaders under schemathesis.openapi;
     # Schemathesis 3.x has them on top-level or schemathesis.openapi.
