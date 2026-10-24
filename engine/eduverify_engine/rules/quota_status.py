@@ -7,6 +7,7 @@ V021: Invalid lifecycle transition
 """
 
 import logging
+from typing import Any
 
 import pandas as pd
 
@@ -18,8 +19,7 @@ from .registry import make_issue, rule
 logger = logging.getLogger(__name__)
 
 
-
-def _is_truthy(val: any) -> bool:
+def _is_truthy(val: Any) -> bool:
     """Helper to check if a boolean or string field is True."""
     if val is True:
         return True
