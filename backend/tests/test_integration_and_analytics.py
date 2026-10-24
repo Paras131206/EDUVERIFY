@@ -374,7 +374,7 @@ def test_webhooks_retries_with_exponential_backoff(db_session: Session):
     wh = Webhook(
         institution_aicte_id="1-10001",
         url="https://flaky.endpoint.edu/webhook",
-        secret_hash="test_secret_hash",
+        secret_hash=hashlib.sha256(b"webhook_test_key").hexdigest(),  # nosec B106
         events=["batch_validated"],
         is_active=True,
     )
