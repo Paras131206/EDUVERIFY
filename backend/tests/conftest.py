@@ -108,12 +108,44 @@ DEMO_ACCOUNTS = [
 @pytest.fixture(scope="session")
 def test_engine():
     """Session-wide SQLite in-memory database engine with shared connection pool."""
+    from app.seed import (
+        find_data_dir,
+        seed_academic_years,
+        seed_dabs,
+        seed_demo_registry,
+        seed_districts,
+        seed_enums,
+        seed_institutions,
+        seed_programs,
+        seed_states,
+    )
+
     engine = create_engine(
         "sqlite:///:memory:",
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
     Base.metadata.create_all(bind=engine)
+
+    # Seed master data once into the in-memory test database
+    session_factory = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    session = session_factory()
+    try:
+        data_dir = find_data_dir()
+        master_dir = data_dir / "master"
+        demo_dir = data_dir / "demo"
+        seed_states(session, master_dir / "states.csv")
+        seed_districts(session, master_dir / "districts.csv")
+        seed_dabs(session, master_dir / "degree_awarding_bodies.csv")
+        seed_institutions(session, master_dir / "institutions.csv")
+        seed_programs(session, master_dir / "programs.csv")
+        seed_academic_years(session, master_dir / "academic_years.csv")
+        seed_enums(session, master_dir / "enums.csv")
+        seed_demo_registry(session, demo_dir / "demo_registry.csv")
+        session.commit()
+    finally:
+        session.close()
+
     yield engine
     Base.metadata.drop_all(bind=engine)
 

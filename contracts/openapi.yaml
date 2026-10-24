@@ -27,6 +27,8 @@ tags:
     description: Reference tables (LGD, institutions, programs, academic years, enums)
   - name: Templates
     description: Student bulk upload template generators
+  - name: Registry
+    description: Mock APAAR identity verification registry checks
   - name: Batches
     description: Ingestion pipeline, mapping confirmation, review, commit, and SSE stream
   - name: Issues
@@ -477,6 +479,44 @@ paths:
               schema:
                 type: string
                 format: binary
+
+  /v1/registry/{apaar}/check:
+    get:
+      tags: [Registry]
+      summary: Check APAAR ID existence and return masked demographic match
+      operationId: checkApaarRegistry
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: apaar
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{12}$'
+      responses:
+        '200':
+          description: Registry check result
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [exists, apaar_id]
+                properties:
+                  exists:
+                    type: boolean
+                  apaar_id:
+                    type: string
+                  match:
+                    type: object
+                    nullable: true
+                    properties:
+                      full_name_masked:
+                        type: string
+                      dob:
+                        type: string
+                      gender:
+                        type: string
 
   /v1/batches:
     post:
