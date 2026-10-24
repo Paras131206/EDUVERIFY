@@ -1,0 +1,258 @@
+version: "0.1.0"
+owner: "team-c"
+description: "Smart column mapping synonym dictionary for EduVerify"
+synonyms:
+  apaar_id:
+    - "apaar"
+    - "apaar_id"
+    - "apaar id"
+    - "apaar no"
+    - "apaar number"
+    - "abc id"
+    - "academic bank of credits id"
+    - "abc_id"
+    - "अपार आईडी"
+    - "अपार संख्या"
+
+  institution_aicte_id:
+    - "institution_aicte_id"
+    - "aicte_id"
+    - "aicte id"
+    - "aicte permanent id"
+    - "institution id"
+    - "college code"
+    - "institute code"
+    - "institution code"
+    - "एआईसीटीई आईडी"
+
+  institution_student_id:
+    - "institution_student_id"
+    - "prn"
+    - "student_id"
+    - "student id"
+    - "enrollment_no"
+    - "enrolment no"
+    - "enrollment number"
+    - "enrolment number"
+    - "roll no"
+    - "roll_no"
+    - "roll number"
+    - "reg no"
+    - "registration number"
+    - "scholar no"
+    - "adm no"
+    - "छात्र आईडी"
+    - "रोल नंबर"
+    - "पंजीकरण संख्या"
+
+  full_name:
+    - "full_name"
+    - "name"
+    - "student name"
+    - "candidate name"
+    - "student_name"
+    - "name of student"
+    - "candidate_name"
+    - "पूरा नाम"
+    - "विद्यार्थी का नाम"
+    - "छात्र का नाम"
+
+  dob:
+    - "dob"
+    - "date_of_birth"
+    - "date of birth"
+    - "birth date"
+    - "birth_date"
+    - "d.o.b."
+    - "जन्म तिथि"
+    - "जन्मतिथि"
+
+  gender:
+    - "gender"
+    - "sex"
+    - "लिंग"
+
+  category:
+    - "category"
+    - "social category"
+    - "caste category"
+    - "social_category"
+    - "reservation category"
+    - "वर्ग"
+    - "श्रेणी"
+
+  pwd:
+    - "pwd"
+    - "physically handicapped"
+    - "ph"
+    - "person with disability"
+    - "is_pwd"
+    - "disability"
+    - "दिव्यांग"
+
+  program_code:
+    - "program_code"
+    - "program code"
+    - "programme code"
+    - "course code"
+    - "course_code"
+    - "पाठ्यक्रम कोड"
+
+  course_level:
+    - "course_level"
+    - "course level"
+    - "degree level"
+    - "level"
+    - "program level"
+    - "पाठ्यक्रम स्तर"
+
+  department:
+    - "department"
+    - "dept"
+    - "dept_name"
+    - "department_name"
+    - "branch"
+    - "branch name"
+    - "specialization"
+    - "stream"
+    - "विभाग"
+    - "शाखा"
+
+  academic_year:
+    - "academic_year"
+    - "academic year"
+    - "acad year"
+    - "session"
+    - "batch"
+    - "batch year"
+    - "शैक्षणिक वर्ष"
+
+  year_of_study:
+    - "year_of_study"
+    - "year of study"
+    - "study year"
+    - "current year"
+    - "year"
+    - "class year"
+    - "वर्ष"
+
+  admission_date:
+    - "admission_date"
+    - "admission date"
+    - "date of admission"
+    - "joining date"
+    - "enrolment date"
+    - "enrollment date"
+    - "प्रवेश तिथि"
+
+  admission_type:
+    - "admission_type"
+    - "admission type"
+    - "entry type"
+    - "entry mode"
+    - "regular/lateral"
+    - "प्रवेश का प्रकार"
+
+  expected_graduation_year:
+    - "expected_graduation_year"
+    - "expected graduation year"
+    - "graduation year"
+    - "passing year"
+    - "year of passing"
+    - "completion year"
+    - "उत्तीर्ण होने का वर्ष"
+
+  seat_type:
+    - "seat_type"
+    - "seat type"
+    - "seat category"
+    - "सीट प्रकार"
+
+  supernumerary_scheme:
+    - "supernumerary_scheme"
+    - "supernumerary scheme"
+    - "scheme"
+    - "supernumerary quota"
+    - "quota scheme"
+    - "योजना"
+
+  quota:
+    - "quota"
+    - "admission quota"
+    - "seat quota"
+    - "कोटा"
+
+  nationality:
+    - "nationality"
+    - "citizenship"
+    - "country"
+    - "nation"
+    - "राष्ट्रीयता"
+
+  nri_status:
+    - "nri_status"
+    - "nri"
+    - "is nri"
+    - "is_nri"
+    - "अनिवासी भारतीय"
+
+  oci_status:
+    - "oci_status"
+    - "oci"
+    - "is oci"
+    - "is_oci"
+    - "ओसीआई"
+
+  fn_status:
+    - "fn_status"
+    - "fn"
+    - "foreign national"
+    - "is foreign national"
+    - "is_fn"
+    - "विदेशी नागरिक"
+
+  enrolment_status:
+    - "enrolment_status"
+    - "enrollment status"
+    - "student status"
+    - "status"
+    - "नामांकन स्थिति"
+
+  consent_status:
+    - "consent_status"
+    - "consent status"
+    - "student consent"
+    - "consent"
+    - "सहमति स्थिति"
+
+  consent_date:
+    - "consent_date"
+    - "consent date"
+    - "date of consent"
+    - "सहमति की तिथि"
+
+  guardian_consent:
+    - "guardian_consent"
+    - "guardian consent"
+    - "parent consent"
+    - "parental consent"
+    - "अभिभावक सहमति"
+
+  email:
+    - "email"
+    - "email_id"
+    - "email id"
+    - "student email"
+    - "mail"
+    - "ईमेल"
+
+  mobile:
+    - "mobile"
+    - "mobile_no"
+    - "mobile no"
+    - "mobile number"
+    - "phone"
+    - "phone number"
+    - "contact number"
+    - "contact no"
+    - "मोबाइल नंबर"
