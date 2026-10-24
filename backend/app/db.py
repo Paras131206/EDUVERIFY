@@ -1,4 +1,3 @@
-
 """
 Database connection and session factory for SQLAlchemy 2.
 Supports SQLite for tests/local dev and PostgreSQL 16 (psycopg 3) for production.

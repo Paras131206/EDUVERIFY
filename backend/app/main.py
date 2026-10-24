@@ -28,7 +28,9 @@ async def lifespan(app: FastAPI):
     """Application startup and shutdown lifecycle management."""
     setup_logging(level="INFO" if settings.ENV != "dev" else "DEBUG")
     logger.info(
-        f"Starting EduVerify API v0.1.0 (ENV={settings.ENV}, engine={eduverify_engine.__version__})"
+        "Starting EduVerify API v0.1.0 (ENV=%s, engine=%s)",
+        settings.ENV,
+        eduverify_engine.__version__,
     )
     yield
     logger.info("Stopping EduVerify API")
@@ -37,13 +39,16 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="EduVerify API",
     version="0.1.0",
-    description="Central repository and verification trust layer for AICTE-approved institutions keyed by APAAR ID.",
+    description=(
+        "Central repository and verification trust layer "
+        "for AICTE-approved institutions keyed by APAAR ID."
+    ),
     lifespan=lifespan,
     docs_url="/docs",
     redoc_url="/redoc",
 )
 
-# CORS Middleware configuration
+# CORS middleware configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -55,35 +60,48 @@ app.add_middleware(
 # Request ID and latency tracking middleware
 app.add_middleware(RequestIdMiddleware)
 
-# Register feature routers in sorted order
+# Register feature routers
 for router in ROUTERS:
     app.include_router(router)
 
 
 def load_canonical_openapi() -> dict[str, Any]:
-    """Loads the canonical contract-first openapi.yaml specification."""
-    # Search for contracts/openapi.yaml relative to workspace or backend
+    """Load the canonical contract-first OpenAPI specification."""
     possible_paths = [
         Path(__file__).resolve().parent.parent.parent / "contracts" / "openapi.yaml",
         Path(__file__).resolve().parent.parent / "contracts" / "openapi.yaml",
         Path("contracts/openapi.yaml"),
     ]
+
     for path in possible_paths:
         if path.exists():
-            with open(path, encoding="utf-8") as f:
-                return yaml.safe_load(f)
+            with path.open(encoding="utf-8") as file:
+                return yaml.safe_load(file) or {}
+
     return {}
 
 
 def custom_openapi() -> dict[str, Any]:
-    """Overrides FastAPI default OpenAPI generator with the contracts/openapi.yaml spec."""
+    """Load the canonical OpenAPI schema and include health endpoints."""
     if app.openapi_schema:
         return app.openapi_schema
+
     schema = load_canonical_openapi()
+
     if schema:
+        schema.setdefault("paths", {})
+
+        health_path = schema["paths"].get("/health")
+        healthz_path = schema["paths"].get("/healthz")
+
+        if health_path and not healthz_path:
+            schema["paths"]["/healthz"] = health_path.copy()
+        elif healthz_path and not health_path:
+            schema["paths"]["/health"] = healthz_path.copy()
+
         app.openapi_schema = schema
         return app.openapi_schema
-    # Fallback to FastAPI generator
+
     from fastapi.openapi.utils import get_openapi
 
     app.openapi_schema = get_openapi(
@@ -98,30 +116,58 @@ def custom_openapi() -> dict[str, Any]:
 app.openapi = custom_openapi
 
 
-@app.get(
-    "/healthz",
-    tags=["Health"],
-    summary="Health and readiness check",
-    response_model=dict[str, Any],
-)
 def get_health() -> JSONResponse:
     """
-    Health check returning status, version, engine_version, and database status.
-    Returns 200 if healthy, 503 if database check fails.
+    Return API health, engine version, and database status.
+
+    Returns HTTP 200 when healthy or HTTP 503 when degraded.
     """
-    db_status = check_db_health()
-    engine_ver = getattr(eduverify_engine, "__version__", "0.0.1")
+    try:
+        db_status = check_db_health()
+    except Exception:
+        logger.exception("Database health check failed")
+        db_status = "unreachable"
+
+    engine_ver = getattr(
+        eduverify_engine,
+        "__version__",
+        "0.0.1",
+    )
+
+    is_healthy = "unreachable" not in db_status.lower()
 
     payload = {
-        "status": "ok" if "unreachable" not in db_status else "degraded",
+        "status": "ok" if is_healthy else "degraded",
         "version": "0.1.0",
         "engine_version": engine_ver,
         "db": db_status,
     }
 
     http_status = (
-        status.HTTP_200_OK
-        if payload["status"] == "ok"
-        else status.HTTP_503_SERVICE_UNAVAILABLE
+        status.HTTP_200_OK if is_healthy else status.HTTP_503_SERVICE_UNAVAILABLE
     )
-    return JSONResponse(content=payload, status_code=http_status)
+
+    return JSONResponse(
+        content=payload,
+        status_code=http_status,
+    )
+
+
+# Register both endpoints explicitly.
+app.add_api_route(
+    "/health",
+    get_health,
+    methods=["GET"],
+    tags=["Health"],
+    summary="Health and readiness check",
+    response_model=dict[str, Any],
+)
+
+app.add_api_route(
+    "/healthz",
+    get_health,
+    methods=["GET"],
+    tags=["Health"],
+    summary="Health and readiness check",
+    response_model=dict[str, Any],
+)

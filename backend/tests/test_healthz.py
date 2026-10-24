@@ -23,6 +23,16 @@ def test_healthz_endpoint(client):
     assert "db" in data
 
 
+def test_health_endpoint(client):
+    response = client.get("/health")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] in ("ok", "degraded")
+    assert data["version"] == "0.1.0"
+    assert "engine_version" in data
+    assert "db" in data
+
+
 def test_request_id_middleware(client):
     custom_id = "test-request-id-12345"
     response = client.get("/healthz", headers={"X-Request-ID": custom_id})
