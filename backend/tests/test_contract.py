@@ -35,9 +35,7 @@ def test_schemathesis_spec_loads(repo_root):
     spec_path = repo_root / "contracts" / "openapi.yaml"
 
     # Support Schemathesis 3.x experimental flag and Schemathesis 4.x native OpenAPI 3.1
-    if hasattr(schemathesis, "experimental") and hasattr(
-        schemathesis.experimental, "OPEN_API_3_1"
-    ):
+    if hasattr(schemathesis, "experimental") and hasattr(schemathesis.experimental, "OPEN_API_3_1"):
         schemathesis.experimental.OPEN_API_3_1.enable()
 
     schema = schemathesis.openapi.from_path(str(spec_path))
