@@ -73,7 +73,7 @@ jobs:
           exit 1
 
       - name: ZAP Baseline Scan (Render Staging)
-        uses: zaproxy/action-baseline@v0.13.0
+        uses: zaproxy/action-baseline@v0.15.0
         with:
           target: "https://eduverify-api.onrender.com/health"
           rules_file_name: "infra/zap-rules.tsv"
