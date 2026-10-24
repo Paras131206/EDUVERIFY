@@ -1,0 +1,17 @@
+.env
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.pyc
+node_modules/
+dist/
+.DS_Store
+data/synthetic/
+data/raw/
+*.sqlite3
+playwright-report/
+test-results/
+.vite/
+*.tsbuildinfo
