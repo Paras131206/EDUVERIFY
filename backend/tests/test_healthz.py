@@ -14,7 +14,7 @@ def client():
 
 
 def test_healthz_endpoint(client):
-    response = client.get("/health")
+    response = client.get("/healthz")
     assert response.status_code == 200
     data = response.json()
     assert data["status"] in ("ok", "degraded")
@@ -24,7 +24,7 @@ def test_healthz_endpoint(client):
 
 
 def test_health_endpoint(client):
-    response = client.get("/healthz")
+    response = client.get("/health")
     assert response.status_code == 200
     data = response.json()
     assert data["status"] in ("ok", "degraded")

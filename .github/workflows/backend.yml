@@ -46,12 +46,10 @@ jobs:
 
       - name: Check Render API Health
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        env:
-          HEALTH_URL: https://eduverify-api.onrender.com/health
         run: |
           for i in {1..18}; do
             echo "Checking API health ($i/18)..."
-            if curl --fail --silent --show-error --max-time 20 "$HEALTH_URL"; then
+            if curl --fail --silent --show-error --max-time 20 "https://eduverify-api.onrender.com/healthz" || curl --fail --silent --show-error --max-time 20 "https://eduverify-api.onrender.com/health"; then
               echo
               echo "Render API is healthy."
               exit 0
