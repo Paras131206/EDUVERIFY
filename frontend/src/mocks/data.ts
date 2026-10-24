@@ -27,6 +27,7 @@ import {
   StudentCredentialItem,
   DabGraduateItem,
 } from '@/features/student/types';
+import { ReportItem } from '@/features/reports/types';
 
 
 export const mockUsers: Record<string, User> = {
@@ -2369,5 +2370,105 @@ export const mockDabGraduates: DabGraduateItem[] = [
     issued_at: '2026-06-15T12:00:00Z',
   },
 ];
+
+export const mockReportItems: ReportItem[] = [
+  {
+    id: 'REP-POL-2026-001',
+    title: 'AICTE National Seat Intake & Policy Audit 2026-27',
+    title_hi: 'अखिल भारतीय तकनीकी शिक्षा परिषद राष्ट्रीय सीट प्रवेश एवं नीति लेखापरीक्षा',
+    report_type: 'POLICY',
+    format: 'PDF',
+    academic_year: '2026-27',
+    state: 'Maharashtra',
+    program: 'ALL',
+    category: 'ALL',
+    status: 'READY',
+    generated_at: '2026-10-24T14:30:00Z',
+    generated_by: 'aicte.analyst@demo.local',
+    file_size: '2.4 MB',
+    download_url: '/v1/reports/REP-POL-2026-001/download',
+    summary: {
+      total_institutions: 48,
+      total_students: 14250,
+      approved_intake: 14000,
+      enrolled_count: 14250,
+      excess_seats: 250,
+      compliance_score: 96.4,
+    },
+  },
+  {
+    id: 'REP-ACC-2026-002',
+    title: 'NBA Accreditation Multi-Program Intake Reconciliation',
+    title_hi: 'एनबीए प्रत्यायन बहु-कार्यक्रम प्रवेश समाधान विवरण',
+    report_type: 'ACCREDITATION',
+    format: 'XLSX',
+    academic_year: '2026-27',
+    state: 'ALL',
+    program: 'B.Tech Computer Science & Engineering',
+    category: 'ALL',
+    status: 'READY',
+    generated_at: '2026-10-24T11:15:00Z',
+    generated_by: 'inst.admin@demo.local',
+    file_size: '1.8 MB',
+    download_url: '/v1/reports/REP-ACC-2026-002/download',
+    summary: {
+      total_institutions: 1,
+      total_students: 480,
+      approved_intake: 480,
+      enrolled_count: 480,
+      excess_seats: 0,
+      compliance_score: 100.0,
+    },
+  },
+  {
+    id: 'REP-MON-2026-003',
+    title: 'Regional Seat Utilization & Supernumerary Quota Monitoring',
+    title_hi: 'क्षेत्रीय सीट उपयोगिता एवं अधिसंख्य कोटा निगरानी रिपोर्ट',
+    report_type: 'MONITORING',
+    format: 'PDF',
+    academic_year: '2026-27',
+    state: 'Delhi',
+    program: 'ALL',
+    category: 'ALL',
+    status: 'READY',
+    generated_at: '2026-10-23T16:45:00Z',
+    generated_by: 'aicte.admin@demo.local',
+    file_size: '3.1 MB',
+    download_url: '/v1/reports/REP-MON-2026-003/download',
+    summary: {
+      total_institutions: 32,
+      total_students: 9800,
+      approved_intake: 10500,
+      enrolled_count: 9800,
+      excess_seats: 0,
+      compliance_score: 98.1,
+    },
+  },
+  {
+    id: 'REP-REG-2026-004',
+    title: 'Statutory Reservation (SC/ST/OBC/EWS) & NRI Quota Compliance',
+    title_hi: 'सांविधिक आरक्षण एवं एनआरआई कोटा अनुपालन प्रतिवेदन',
+    report_type: 'REGULATORY',
+    format: 'PDF',
+    academic_year: '2025-26',
+    state: 'ALL',
+    program: 'ALL',
+    category: 'OBC',
+    status: 'READY',
+    generated_at: '2026-10-22T09:20:00Z',
+    generated_by: 'aicte.analyst@demo.local',
+    file_size: '4.2 MB',
+    download_url: '/v1/reports/REP-REG-2026-004/download',
+    summary: {
+      total_institutions: 112,
+      total_students: 34500,
+      approved_intake: 35000,
+      enrolled_count: 34500,
+      excess_seats: 120,
+      compliance_score: 95.8,
+    },
+  },
+];
+
 
 

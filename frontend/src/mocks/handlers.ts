@@ -39,6 +39,7 @@ import {
   mockConsentHistory,
   mockStudentCredentials,
   mockDabGraduates,
+  mockReportItems,
 } from './data';
 import {
   StudentOwnRecord,
@@ -48,6 +49,7 @@ import {
   StudentCredentialItem,
   DabGraduateItem,
 } from '@/features/student/types';
+import { ReportItem, ReportJob } from '@/features/reports/types';
 import { parsePresentation } from '@/lib/sdjwt';
 
 import {
@@ -121,6 +123,15 @@ export const resetOperationsMock = () => {
   reconciliationState = JSON.parse(JSON.stringify(mockReconciliationStatus));
   webhooksState = JSON.parse(JSON.stringify(mockWebhooks));
   resetAicteMock();
+  resetReportsMock();
+};
+
+export let reportsState: ReportItem[] = JSON.parse(JSON.stringify(mockReportItems));
+export let reportJobsState: Record<string, ReportJob> = {};
+
+export const resetReportsMock = () => {
+  reportsState = JSON.parse(JSON.stringify(mockReportItems));
+  reportJobsState = {};
 };
 
 
@@ -1508,6 +1519,133 @@ export const handlers = [
       issued_at: new Date().toISOString(),
       student_id,
     });
+  }),
+
+  // 11. Reports Builder, Jobs & History (/v1/reports)
+  http.get('*/v1/reports', ({ request }) => {
+    const url = new URL(request.url);
+    const type = url.searchParams.get('type');
+    const format = url.searchParams.get('format');
+    const q = (url.searchParams.get('q') || '').toLowerCase();
+
+    let items = [...reportsState];
+    if (type && type !== 'ALL') {
+      items = items.filter((r) => r.report_type === type);
+    }
+    if (format && format !== 'ALL') {
+      items = items.filter((r) => r.format === format);
+    }
+    if (q) {
+      items = items.filter(
+        (r) =>
+          r.title.toLowerCase().includes(q) ||
+          r.id.toLowerCase().includes(q) ||
+          r.state.toLowerCase().includes(q) ||
+          r.program.toLowerCase().includes(q)
+      );
+    }
+    return HttpResponse.json(items);
+  }),
+
+  http.post('*/v1/reports/jobs', async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as any;
+    const {
+      report_type = 'POLICY',
+      academic_year = '2026-27',
+      state = 'ALL',
+      program = 'ALL',
+      category = 'ALL',
+      format = 'PDF',
+    } = body;
+    const jobId = `job-rep-${Date.now()}`;
+    const reportId = `REP-${report_type.slice(0, 3)}-${Date.now().toString().slice(-4)}`;
+
+    const newReport: ReportItem = {
+      id: reportId,
+      title:
+        report_type === 'POLICY'
+          ? `AICTE Annual Seat Intake & Policy Report (${academic_year})`
+          : report_type === 'ACCREDITATION'
+          ? `Institutional Accreditation & Intake Verification Report (${academic_year})`
+          : report_type === 'MONITORING'
+          ? `Intake Quota & Regional Utilization Monitoring Report (${academic_year})`
+          : `Statutory Reservation & Quota Compliance Report (${academic_year})`,
+      title_hi:
+        report_type === 'POLICY'
+          ? 'अखिल भारतीय तकनीकी शिक्षा परिषद वार्षिक सीट प्रवेश एवं नीति रिपोर्ट'
+          : 'संस्थागत प्रत्यायन एवं प्रवेश सत्यापन रिपोर्ट',
+      report_type,
+      format,
+      academic_year,
+      state,
+      program,
+      category,
+      status: 'READY',
+      generated_at: new Date().toISOString(),
+      generated_by: 'aicte.admin@demo.local',
+      file_size: format === 'PDF' ? '2.8 MB' : '1.5 MB',
+      download_url: `/v1/reports/${reportId}/download`,
+      summary: {
+        total_institutions: state === 'ALL' ? 120 : 36,
+        total_students: state === 'ALL' ? 38400 : 11200,
+        approved_intake: state === 'ALL' ? 38000 : 11000,
+        enrolled_count: state === 'ALL' ? 38400 : 11200,
+        excess_seats: state === 'ALL' ? 400 : 200,
+        compliance_score: 97.2,
+      },
+    };
+
+    reportsState.unshift(newReport);
+
+    const job: ReportJob = {
+      job_id: jobId,
+      status: 'COMPLETED',
+      progress_percent: 100,
+      current_step: 'Report generated successfully',
+      result_report: newReport,
+      download_url: `/v1/reports/${reportId}/download`,
+    };
+    reportJobsState[jobId] = job;
+
+    return HttpResponse.json(job, { status: 201 });
+  }),
+
+  http.get('*/v1/reports/jobs/:id', ({ params }) => {
+    const job = reportJobsState[params.id as string];
+    if (!job) {
+      return HttpResponse.json({ message: 'Report job not found' }, { status: 404 });
+    }
+    return HttpResponse.json(job);
+  }),
+
+  http.get('*/v1/reports/:id/download', ({ params }) => {
+    const report = reportsState.find((r) => r.id === params.id);
+    if (!report) {
+      return HttpResponse.json({ message: 'Report not found' }, { status: 404 });
+    }
+
+    if (report.format === 'PDF') {
+      const pdfContent = `%PDF-1.4\n% EduVerify Report ${report.id}\n${report.title}\nAcademic Year: ${report.academic_year}\nGenerated: ${report.generated_at}\nAICTE Central Repository Verified`;
+      return new HttpResponse(new Blob([pdfContent], { type: 'application/pdf' }), {
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `attachment; filename="${report.id}.pdf"`,
+        },
+      });
+    } else {
+      const csvContent = `Report ID,Title,Type,Academic Year,State,Program,Category,Generated At\n${report.id},"${report.title}",${report.report_type},${report.academic_year},${report.state},"${report.program}",${report.category},${report.generated_at}\n`;
+      return new HttpResponse(
+        new Blob([csvContent], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        }),
+        {
+          headers: {
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition': `attachment; filename="${report.id}.xlsx"`,
+          },
+        }
+      );
+    }
   }),
 ];
 
