@@ -33,7 +33,13 @@ def test_openapi_contract_validates(repo_root):
 
 def test_schemathesis_spec_loads(repo_root):
     spec_path = repo_root / "contracts" / "openapi.yaml"
-    schemathesis.experimental.OPEN_API_3_1.enable()
+
+    # Support Schemathesis 3.x experimental flag and Schemathesis 4.x native OpenAPI 3.1
+    if hasattr(schemathesis, "experimental") and hasattr(
+        schemathesis.experimental, "OPEN_API_3_1"
+    ):
+        schemathesis.experimental.OPEN_API_3_1.enable()
+
     schema = schemathesis.openapi.from_path(str(spec_path))
     operations = list(schema.get_all_operations())
     assert len(operations) > 50, f"Expected >50 operations, got {len(operations)}"
@@ -49,9 +55,11 @@ def test_schemas_directory_contents(repo_root):
         "student_record.json",
         "credential.json",
     ]
+
     for filename in required_files:
         file_path = schemas_dir / filename
         assert file_path.exists(), f"Schema file missing: {filename}"
+
         content = json.loads(file_path.read_text(encoding="utf-8"))
         assert isinstance(content, dict)
 
@@ -84,4 +92,5 @@ def test_student_record_json_schema(repo_root):
         "enrolment_status": "ACTIVE",
         "consent_status": "GRANTED",
     }
+
     jsonschema.validate(instance=sample_student, schema=schema)
