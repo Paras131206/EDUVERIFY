@@ -345,7 +345,7 @@ def test_audit_tampering_detection(client, db_session: Session):
         actor_id=admin_user.id,
         role="AICTE_ADMIN",
         resource="SYSTEM",
-        payload={"secret": "original_value"},
+        payload={"sample_data": "original_value"},
     )
     append_audit_log(
         db_session,
