@@ -94,6 +94,7 @@ def test_revoke_api_key(client, db_session: Session):
 
     # Verify key marked revoked
     key = db_session.query(ApiKey).filter(ApiKey.id == key_id).first()
+    assert key is not None
     assert key.revoked_at is not None
 
     # Revoked key should no longer appear in active list
