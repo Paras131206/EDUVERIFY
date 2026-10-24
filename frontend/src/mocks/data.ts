@@ -1,12 +1,115 @@
-export const mockUser = {
-  id: 'usr-demo-1',
-  email: 'inst.admin@demo.local',
-  full_name: 'Dr. Ramesh Sharma',
-  role: 'INSTITUTION_ADMIN' as const,
-  institution_aicte_id: '1-1234567890',
-  dab_id: null,
-  student_apaar_hash: null,
+import { User, ApiKeyItem, InstitutionUserItem } from '@/types/auth';
+
+export const mockUsers: Record<string, User> = {
+  'inst.admin@demo.local': {
+    id: 'usr-inst-admin-1',
+    email: 'inst.admin@demo.local',
+    full_name: 'Dr. Ramesh Sharma',
+    role: 'INSTITUTION_ADMIN',
+    institution_aicte_id: '1-1234567890',
+    dab_id: null,
+    student_apaar_hash: null,
+  },
+  'inst.staff@demo.local': {
+    id: 'usr-inst-staff-1',
+    email: 'inst.staff@demo.local',
+    full_name: 'Priya Verma',
+    role: 'INSTITUTION_STAFF',
+    institution_aicte_id: '1-1234567890',
+    dab_id: null,
+    student_apaar_hash: null,
+  },
+  'aicte.admin@demo.local': {
+    id: 'usr-aicte-admin-1',
+    email: 'aicte.admin@demo.local',
+    full_name: 'Prof. S. K. Gupta (AICTE Member Secretary)',
+    role: 'AICTE_ADMIN',
+    institution_aicte_id: null,
+    dab_id: null,
+    student_apaar_hash: null,
+  },
+  'aicte.viewer@demo.local': {
+    id: 'usr-aicte-viewer-1',
+    email: 'aicte.viewer@demo.local',
+    full_name: 'Ananya Roy (AICTE Bureau Officer)',
+    role: 'AICTE_VIEWER',
+    institution_aicte_id: null,
+    dab_id: null,
+    student_apaar_hash: null,
+  },
+  'dab.member@demo.local': {
+    id: 'usr-dab-1',
+    email: 'dab.member@demo.local',
+    full_name: 'Hon. K. M. Joseph (DAB Chairman)',
+    role: 'DAB_MEMBER',
+    institution_aicte_id: null,
+    dab_id: 'dab-north-01',
+    student_apaar_hash: null,
+  },
+  'student@demo.local': {
+    id: 'usr-student-1',
+    email: 'student@demo.local',
+    full_name: 'Aarav Patel (APAAR Student)',
+    role: 'STUDENT',
+    institution_aicte_id: '1-1234567890',
+    dab_id: null,
+    student_apaar_hash: '984572912301',
+  },
+  'verifier@demo.local': {
+    id: 'usr-verifier-1',
+    email: 'verifier@demo.local',
+    full_name: 'TCS Background Verification Desk',
+    role: 'VERIFIER',
+    institution_aicte_id: null,
+    dab_id: null,
+    student_apaar_hash: null,
+  },
 };
+
+export const mockUser = mockUsers['inst.admin@demo.local'];
+
+export const mockApiKeys: ApiKeyItem[] = [
+  {
+    id: 'key-001',
+    name: 'Campus ERP Admission Sync',
+    prefix: 'evk_live_9a7b',
+    scopes: ['upload:batches', 'read:reports'],
+    created_at: '2026-08-01T09:00:00Z',
+    last_used_at: '2026-08-11T12:45:00Z',
+    revoked_at: null,
+  },
+  {
+    id: 'key-002',
+    name: 'Legacy SIS Nightly Ingestion',
+    prefix: 'evk_live_4f1c',
+    scopes: ['upload:batches'],
+    created_at: '2026-07-15T11:30:00Z',
+    last_used_at: '2026-08-05T03:00:00Z',
+    revoked_at: null,
+  },
+];
+
+export const mockInstitutionUsers: InstitutionUserItem[] = [
+  {
+    id: 'usr-inst-admin-1',
+    email: 'inst.admin@demo.local',
+    full_name: 'Dr. Ramesh Sharma',
+    role: 'INSTITUTION_ADMIN',
+    is_active: true,
+    created_at: '2026-01-10T08:00:00Z',
+    last_login_at: '2026-08-11T14:20:00Z',
+  },
+  {
+    id: 'usr-inst-staff-1',
+    email: 'inst.staff@demo.local',
+    full_name: 'Priya Verma',
+    role: 'INSTITUTION_STAFF',
+    is_active: true,
+    created_at: '2026-02-14T10:00:00Z',
+    last_login_at: '2026-08-10T16:45:00Z',
+  },
+];
+
 
 export const mockBatches = [
   {

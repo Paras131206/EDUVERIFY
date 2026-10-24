@@ -1,14 +1,22 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Languages, Shield, User as UserIcon } from 'lucide-react';
-import { mockUser } from '@/mocks/data';
+import { Languages, Shield, User as UserIcon, LogOut } from 'lucide-react';
+import { useAuth } from '@/lib/auth';
+import { useNavigate } from 'react-router-dom';
 
 export const TopBar: React.FC = () => {
   const { t, i18n } = useTranslation();
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
   const toggleLanguage = () => {
     const nextLang = i18n.language === 'en' ? 'hi' : 'en';
     i18n.changeLanguage(nextLang);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login', { replace: true });
   };
 
   return (
@@ -45,16 +53,35 @@ export const TopBar: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="text-right hidden sm:block">
-            <p className="text-xs font-semibold text-white">{mockUser.full_name}</p>
-            <p className="text-[11px] text-gov-saffron font-medium">
-              {t(`roles.${mockUser.role}`, { defaultValue: mockUser.role })}
-            </p>
-          </div>
-          <div className="w-9 h-9 rounded-full bg-slate-700 flex items-center justify-center border border-slate-600">
-            <UserIcon className="w-5 h-5 text-slate-200" aria-hidden="true" />
-          </div>
+        <div className="flex items-center gap-4">
+          {isAuthenticated && user ? (
+            <div className="flex items-center gap-3">
+              <div className="text-right hidden sm:block">
+                <p className="text-xs font-semibold text-white">{user.full_name}</p>
+                <p className="text-[11px] text-gov-saffron font-medium">
+                  {t(`roles.${user.role}`, { defaultValue: user.role })}
+                </p>
+              </div>
+              <div className="w-9 h-9 rounded-full bg-slate-700 flex items-center justify-center border border-slate-600">
+                <UserIcon className="w-5 h-5 text-slate-200" aria-hidden="true" />
+              </div>
+              <button
+                onClick={handleLogout}
+                className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded transition"
+                title="Sign Out"
+                aria-label="Sign Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => navigate('/login')}
+              className="px-3 py-1 bg-gov-saffron text-gov-navyDark text-xs font-bold rounded shadow-xs hover:bg-gov-saffronDark transition"
+            >
+              Sign In
+            </button>
+          )}
         </div>
       </div>
     </header>
