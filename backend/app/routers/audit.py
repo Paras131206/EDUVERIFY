@@ -4,6 +4,7 @@ Complies with contracts/openapi.yaml, agents.md §12, and Task B5.
 """
 
 from datetime import datetime
+from typing import Any
 
 from app.db import get_db
 from app.schemas.audit import (
@@ -65,6 +66,12 @@ def list_audit_logs(
     )
 
 
+def _format_timestamp(ts: Any) -> str:
+    if isinstance(ts, datetime):
+        return ts.isoformat()
+    return str(ts or "")
+
+
 @router.get(
     "/v1/audit/log",
     include_in_schema=False,
@@ -85,7 +92,7 @@ def list_audit_log_feed(
         {
             "id": it.get("id"),
             "sequence": it.get("id"),
-            "timestamp": it.get("ts").isoformat() if hasattr(it.get("ts"), "isoformat") else str(it.get("ts") or ""),
+            "timestamp": _format_timestamp(it.get("ts")),
             "actor_id": it.get("actor_id"),
             "action": it.get("action"),
             "resource": it.get("resource"),
