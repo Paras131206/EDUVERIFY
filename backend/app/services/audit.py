@@ -5,6 +5,7 @@ Complies with agents.md §12 and prompt B1.
 
 import hashlib
 import json
+import logging
 import re
 from datetime import UTC, datetime
 from typing import Any
@@ -13,6 +14,8 @@ from app.models.auth import AuditLog
 from eduverify_engine.masking import mask_apaar, mask_email, mask_mobile
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+
+logger = logging.getLogger(__name__)
 
 GENESIS_HASH = "0" * 64
 AUDIT_ADVISORY_LOCK_ID = 742189421
@@ -98,31 +101,125 @@ def append_audit_log(
     return entry
 
 
-def verify_audit_chain(db: Session) -> tuple[bool, str]:
+def verify_audit_chain_detailed(db: Session) -> dict[str, Any]:
     """
-    Validates the entire audit log hash chain.
-    Returns (True, 'Valid') or (False, error_reason).
+    Validates the entire audit log hash chain and returns detailed diagnostics:
+    valid, length, first_broken_id, head_hash, reason.
     """
     rows = db.query(AuditLog).order_by(AuditLog.id.asc()).all()
     if not rows:
-        return True, "Audit log is empty (valid)"
+        return {
+            "valid": True,
+            "length": 0,
+            "first_broken_id": None,
+            "head_hash": GENESIS_HASH,
+            "reason": "Audit log is empty (valid)",
+        }
 
     expected_prev = GENESIS_HASH
     for row in rows:
         if row.prev_hash != expected_prev:
-            return (
-                False,
-                f"Broken link at row {row.id}: "
-                f"expected prev_hash {expected_prev}, got {row.prev_hash}",
-            )
+            return {
+                "valid": False,
+                "length": len(rows),
+                "first_broken_id": row.id,
+                "head_hash": expected_prev,
+                "reason": (
+                    f"Broken link at row {row.id}: "
+                    f"expected prev_hash {expected_prev}, got {row.prev_hash}"
+                ),
+            }
 
         recalculated = compute_audit_hash(row.prev_hash, row.payload_json)
         if row.hash != recalculated:
-            return (
-                False,
-                f"Hash mismatch at row {row.id}: expected {recalculated}, stored {row.hash}",
-            )
+            return {
+                "valid": False,
+                "length": len(rows),
+                "first_broken_id": row.id,
+                "head_hash": row.hash,
+                "reason": (
+                    f"Hash mismatch at row {row.id}: expected {recalculated}, stored {row.hash}"
+                ),
+            }
 
         expected_prev = row.hash
 
-    return True, f"Audit chain verified ({len(rows)} records intact)"
+    return {
+        "valid": True,
+        "length": len(rows),
+        "first_broken_id": None,
+        "head_hash": rows[-1].hash,
+        "reason": f"Audit chain verified ({len(rows)} records intact)",
+    }
+
+
+def verify_audit_chain(db: Session) -> tuple[bool, str]:
+    """
+    Validates the entire audit log hash chain for legacy callers.
+    Returns (True, 'Valid') or (False, error_reason).
+    """
+    res = verify_audit_chain_detailed(db)
+    return res["valid"], res["reason"]
+
+
+def log_daily_audit_head_hash(db: Session) -> str:
+    """Computes and logs the daily audit head hash for external monitoring."""
+    last_row = db.query(AuditLog).order_by(AuditLog.id.desc()).first()
+    head_hash = last_row.hash if last_row else GENESIS_HASH
+    count = db.query(AuditLog).count()
+    logger.info("Daily audit log head hash: %s (chain length: %d)", head_hash, count)
+    return head_hash
+
+
+def list_audit_logs_service(
+    db: Session,
+    *,
+    from_date: datetime | None = None,
+    to_date: datetime | None = None,
+    action: str | None = None,
+    actor_id: str | None = None,
+    resource: str | None = None,
+    limit: int = 50,
+    offset: int = 0,
+) -> tuple[list[dict[str, Any]], int]:
+    """Retrieves paginated audit log entries with flexible filtering."""
+    query = db.query(AuditLog)
+
+    if from_date:
+        query = query.filter(AuditLog.ts >= from_date)
+    if to_date:
+        query = query.filter(AuditLog.ts <= to_date)
+    if action:
+        query = query.filter(AuditLog.action == action)
+    if actor_id:
+        query = query.filter(AuditLog.actor_id == actor_id)
+    if resource:
+        query = query.filter(AuditLog.resource == resource)
+
+    total = query.count()
+    rows = query.order_by(AuditLog.id.desc()).offset(offset).limit(limit).all()
+
+    items = []
+    for r in rows:
+        try:
+            payload = json.loads(r.payload_json)
+        except Exception:
+            payload = {}
+        items.append(
+            {
+                "id": r.id,
+                "ts": r.ts,
+                "actor_type": r.actor_type,
+                "actor_id": r.actor_id,
+                "role": r.role,
+                "action": r.action,
+                "resource": r.resource,
+                "resource_id": r.resource_id,
+                "ip_hash": r.ip_hash,
+                "payload": payload,
+                "prev_hash": r.prev_hash,
+                "hash": r.hash,
+            }
+        )
+
+    return items, total

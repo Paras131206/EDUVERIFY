@@ -75,7 +75,7 @@ def validate_v005_required_field_null(df: pd.DataFrame, ctx: RuleContext) -> lis
 
     target_fields = [f for f in mandatory_fields if f in df.columns]
 
-    for idx, row in df.iterrows():
+    for idx, row in enumerate(ctx.get_records(df)):
         row_num = int(idx) + 2
         rec_key = str(row.get("institution_student_id", f"row-{row_num}"))
 

@@ -31,9 +31,17 @@ def _find_repo_root() -> Path:
     return Path(".")
 
 
+_MASTER_TABLES_CACHE: dict[str, dict[str, pd.DataFrame]] = {}
+_DEMO_CSV_CACHE: dict[str, pd.DataFrame] = {}
+
+
 def load_master_tables(repo_root: Path | None = None) -> dict[str, pd.DataFrame]:
     """Loads all CSV master tables from data/master/ into DataFrames."""
     root = repo_root or _find_repo_root()
+    cache_key = str(root)
+    if cache_key in _MASTER_TABLES_CACHE:
+        return {k: v.copy() for k, v in _MASTER_TABLES_CACHE[cache_key].items()}
+
     master_dir = root / "data" / "master"
     tables: dict[str, pd.DataFrame] = {}
     if not master_dir.exists():
@@ -58,16 +66,23 @@ def load_master_tables(repo_root: Path | None = None) -> dict[str, pd.DataFrame]
                 e,
                 exc_info=True,
             )
-    return tables
+    _MASTER_TABLES_CACHE[cache_key] = tables
+    return {k: v.copy() for k, v in tables.items()}
 
 
 def load_demo_csv(filename: str, repo_root: Path | None = None) -> pd.DataFrame:
     """Loads a CSV from data/demo/ if present, otherwise returns empty DataFrame."""
     root = repo_root or _find_repo_root()
+    cache_key = f"{root}_{filename}"
+    if cache_key in _DEMO_CSV_CACHE:
+        return _DEMO_CSV_CACHE[cache_key].copy()
+
     demo_file = root / "data" / "demo" / filename
     if demo_file.exists():
         try:
-            return pd.read_csv(demo_file, dtype=str)
+            df = pd.read_csv(demo_file, dtype=str)
+            _DEMO_CSV_CACHE[cache_key] = df
+            return df.copy()
         except (pd.errors.EmptyDataError, pd.errors.ParserError, OSError) as e:
             logger.warning(
                 "Could not load optional demo CSV '%s': %s",
@@ -170,63 +185,63 @@ class RuleContext:
         # 1. Registry lookup by apaar_id
         self._registry_by_apaar: dict[str, dict[str, Any]] = {}
         if not self.registry.empty and "apaar_id" in self.registry.columns:
-            for _, r in self.registry.iterrows():
-                aid = str(r["apaar_id"]).strip()
+            for r in self.registry.to_dict(orient="records"):
+                aid = str(r.get("apaar_id", "")).strip()
                 if aid:
-                    self._registry_by_apaar[aid] = r.to_dict()
+                    self._registry_by_apaar[aid] = r
 
         # 2. Programs lookup by program_code
         self._programs_by_code: dict[str, dict[str, Any]] = {}
         programs_df = self.master.get("programs", pd.DataFrame())
         if not programs_df.empty and "program_code" in programs_df.columns:
-            for _, r in programs_df.iterrows():
-                code = str(r["program_code"]).strip()
+            for r in programs_df.to_dict(orient="records"):
+                code = str(r.get("program_code", "")).strip()
                 if code:
-                    self._programs_by_code[code] = r.to_dict()
+                    self._programs_by_code[code] = r
 
         # 3. Academic years lookup
         self._academic_years: dict[str, dict[str, Any]] = {}
         ay_df = self.master.get("academic_years", pd.DataFrame())
         if not ay_df.empty and "academic_year" in ay_df.columns:
-            for _, r in ay_df.iterrows():
-                ay = str(r["academic_year"]).strip()
+            for r in ay_df.to_dict(orient="records"):
+                ay = str(r.get("academic_year", "")).strip()
                 if ay:
-                    self._academic_years[ay] = r.to_dict()
+                    self._academic_years[ay] = r
 
         # 4. Enums lookup by enum_name -> set of valid values
         self._enums: dict[str, set[str]] = {}
         enums_df = self.master.get("enums", pd.DataFrame())
         if not enums_df.empty and "enum_name" in enums_df.columns and "value" in enums_df.columns:
-            for _, r in enums_df.iterrows():
-                ename = str(r["enum_name"]).strip()
-                eval_val = str(r["value"]).strip()
+            for r in enums_df.to_dict(orient="records"):
+                ename = str(r.get("enum_name", "")).strip()
+                eval_val = str(r.get("value", "")).strip()
                 self._enums.setdefault(ename, set()).add(eval_val)
 
         # 5. Institutions lookup by institution_aicte_id
         self._institutions: dict[str, dict[str, Any]] = {}
         inst_df = self.master.get("institutions", pd.DataFrame())
         if not inst_df.empty and "institution_aicte_id" in inst_df.columns:
-            for _, r in inst_df.iterrows():
-                iid = str(r["institution_aicte_id"]).strip()
+            for r in inst_df.to_dict(orient="records"):
+                iid = str(r.get("institution_aicte_id", "")).strip()
                 if iid:
-                    self._institutions[iid] = r.to_dict()
+                    self._institutions[iid] = r
 
         # 6. Central snapshot lookup by apaar_id
         self._snapshot_by_apaar: dict[str, list[dict[str, Any]]] = {}
         if not self.central_snapshot.empty and "apaar_id" in self.central_snapshot.columns:
-            for _, r in self.central_snapshot.iterrows():
-                aid = str(r["apaar_id"]).strip()
+            for r in self.central_snapshot.to_dict(orient="records"):
+                aid = str(r.get("apaar_id", "")).strip()
                 if aid:
-                    self._snapshot_by_apaar.setdefault(aid, []).append(r.to_dict())
+                    self._snapshot_by_apaar.setdefault(aid, []).append(r)
 
         # 7. Intake lookup by (program_code, institution_aicte_id, academic_year)
         self._intake_by_key: dict[tuple[str, str, str], dict[str, Any]] = {}
         if not self.intake.empty and "program_code" in self.intake.columns:
-            for _, r in self.intake.iterrows():
-                p = str(r["program_code"]).strip()
+            for r in self.intake.to_dict(orient="records"):
+                p = str(r.get("program_code", "")).strip()
                 i = str(r.get("institution_aicte_id", "")).strip()
                 y = str(r.get("academic_year", "")).strip()
-                self._intake_by_key[(p, i, y)] = r.to_dict()
+                self._intake_by_key[(p, i, y)] = r
 
     def lookup_registry(self, apaar_id: str) -> dict[str, Any] | None:
         """Returns demographic registry record for given APAAR ID or None."""
@@ -279,3 +294,17 @@ class RuleContext:
     def get_snapshot_records(self, apaar_id: str) -> list[dict[str, Any]]:
         """Returns central snapshot records for given apaar_id."""
         return self._snapshot_by_apaar.get(str(apaar_id).strip(), [])
+
+    def get_records(self, df: pd.DataFrame | None = None) -> list[dict[str, Any]]:
+        """Returns high-performance cached list of row dicts for fast iteration."""
+        target_df = df if df is not None else self.raw_df
+        if target_df is None or target_df.empty:
+            return []
+        df_id = id(target_df)
+        if (
+            not hasattr(self, "_cached_records")
+            or getattr(self, "_cached_records_id", None) != df_id
+        ):
+            self._cached_records = target_df.to_dict(orient="records")
+            self._cached_records_id = df_id
+        return self._cached_records

@@ -19,6 +19,7 @@ from app.models.core import (
     Batch,
     BatchFile,
     ColumnMappingProfile,
+    Correction,
     Credential,
     DeclaredTotal,
     DegreeAwardingBody,
@@ -47,8 +48,9 @@ from app.security.deps import Principal
 from app.services.audit import append_audit_log
 from app.services.events import broadcaster
 from eduverify_engine.mapping import suggest_mapping
-from eduverify_engine.models import ColumnMapping
+from eduverify_engine.models import BatchReport, ColumnMapping
 from eduverify_engine.parse import parse_file
+from eduverify_engine.report import compare_reports
 from eduverify_engine.validate import validate_batch
 from fastapi import HTTPException, status
 from sqlalchemy import select, text
@@ -58,7 +60,31 @@ logger = logging.getLogger(__name__)
 
 # Advisory lock registry for (institution_aicte_id, academic_year)
 _institution_year_locks: dict[tuple[str, str], threading.Lock] = {}
+_batch_locks: dict[str, threading.Lock] = {}
 _locks_mutex = threading.Lock()
+
+
+@contextlib.contextmanager
+def _batch_commit_lock(batch_id: str):
+    """Early non-blocking lock to prevent concurrent workers from touching DB during commit."""
+    with _locks_mutex:
+        if batch_id not in _batch_locks:
+            _batch_locks[batch_id] = threading.Lock()
+        lock = _batch_locks[batch_id]
+        acquired = lock.acquire(blocking=False)
+
+    if not acquired:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={
+                "code": "CONCURRENT_COMMIT",
+                "message": "Commit currently in progress for this batch",
+            },
+        )
+    try:
+        yield
+    finally:
+        lock.release()
 
 
 @contextlib.contextmanager
@@ -538,15 +564,16 @@ def commit_batch_service(
             },
         )
 
-    with _locks_mutex:
-        batch = db.scalars(select(Batch).where(Batch.batch_id == batch_id)).first()
-        if not batch:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Batch not found")
-        inst_id = batch.institution_aicte_id
-        acad_year = batch.academic_year
+    with _batch_commit_lock(batch_id):
+        with _locks_mutex:
+            batch = db.scalars(select(Batch).where(Batch.batch_id == batch_id)).first()
+            if not batch:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Batch not found")
+            inst_id = batch.institution_aicte_id
+            acad_year = batch.academic_year
 
-    with _advisory_lock(db, inst_id, acad_year):
-        return _execute_commit(db, batch=batch, version=version, principal=principal)
+        with _advisory_lock(db, inst_id, acad_year):
+            return _execute_commit(db, batch=batch, version=version, principal=principal)
 
 
 def _execute_commit(
@@ -1145,3 +1172,269 @@ def _broadcast_validation_events(batch: Batch, report: Any) -> None:
             institution_id=batch.institution_aicte_id,
             batch_id=batch.batch_id,
         )
+
+
+def revalidate_batch_service(
+    db: Session,
+    *,
+    batch_id: str,
+    principal: Principal,
+) -> dict[str, Any]:
+    """
+    Re-runs engine validation on the corrected batch dataset.
+    Applies all APPROVED corrections to the raw DataFrame, re-validates,
+    computes before/after comparison with compare_reports, updates quality_score_after,
+    and refreshes issues and duplicates.
+    """
+    batch = db.scalars(select(Batch).where(Batch.batch_id == batch_id)).first()
+    if not batch:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"code": "NOT_FOUND", "message": f"Batch '{batch_id}' not found"},
+        )
+
+    if (
+        principal.role != "AICTE_ADMIN"
+        and principal.institution_aicte_id != batch.institution_aicte_id
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "code": "FORBIDDEN",
+                "message": "Cannot revalidate batch belonging to another institution",
+            },
+        )
+
+    batch_file = db.scalars(select(BatchFile).where(BatchFile.batch_id == batch_id)).first()
+    if not batch_file:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"code": "NOT_FOUND", "message": "Batch raw file data not found"},
+        )
+
+    # 1. Parse raw file
+    parsed = parse_file(batch_file.file_data)
+    df = parsed.df.copy()
+
+    # 2. Extract mappings
+    mappings = []
+    if batch.column_mapping_json and isinstance(batch.column_mapping_json, list):
+        for m in batch.column_mapping_json:
+            mappings.append(
+                ColumnMapping(
+                    source=m["source"],
+                    target=m["target"],
+                    confidence=float(m["confidence"]),
+                    method=m["method"],
+                )
+            )
+
+    target_to_source = {m.target: m.source for m in mappings}
+
+    # 3. Fetch all approved corrections
+    approved_corrections = db.scalars(
+        select(Correction).where(
+            Correction.batch_id == batch_id,
+            Correction.status == "APPROVED",
+        )
+    ).all()
+
+    # 4. Apply corrections onto the raw dataframe
+    for corr in approved_corrections:
+        target_field = corr.field
+        source_col = target_to_source.get(target_field, target_field)
+        if source_col not in df.columns:
+            df[source_col] = ""
+
+        new_val = corr.new_value_enc or ""
+
+        # Match row by apaar_id if present
+        applied = False
+        if corr.apaar_id:
+            apaar_src = target_to_source.get("apaar_id", "apaar_id")
+            if apaar_src in df.columns:
+                mask = df[apaar_src].astype(str).str.strip() == corr.apaar_id.strip()
+                if mask.any():
+                    df.loc[mask, source_col] = new_val
+                    applied = True
+
+        # Match row by issue_id if present
+        if not applied and corr.issue_id:
+            iss = db.scalars(select(Issue).where(Issue.id == corr.issue_id)).first()
+            if iss and iss.row_index and iss.row_index > 1:
+                row_idx = iss.row_index - 2  # 0-indexed in DataFrame
+                if 0 <= row_idx < len(df):
+                    df.loc[df.index[row_idx], source_col] = new_val
+
+    # 5. Build RuleContext from database
+    context_data = _build_context_from_db(db, batch)
+
+    # 6. Re-run pure engine validation
+    new_report = validate_batch(
+        file_or_df=df,
+        mapping=mappings if mappings else None,
+        master=context_data["master"],
+        intake=context_data["intake"],
+        declared_totals=context_data["declared_totals"],
+        registry=context_data["registry"],
+        central_snapshot=context_data["central_snapshot"],
+        history=context_data["history"],
+        transfers=context_data["transfers"],
+        institution_aicte_id=batch.institution_aicte_id,
+        academic_year=batch.academic_year,
+        batch_id=batch.batch_id,
+    )
+
+    # 7. Get previous report
+    old_db_report = db.scalars(
+        select(BatchReportModel).where(BatchReportModel.batch_id == batch_id)
+    ).first()
+    old_engine_report = BatchReport(**old_db_report.report_json) if old_db_report else new_report
+
+    # 8. Compare reports
+    dq_comp = compare_reports(old_engine_report, new_report)
+
+    # 9. Update batch metrics and state
+    batch.quality_score_before = old_engine_report.quality_score
+    batch.quality_score_after = new_report.quality_score
+    batch.status = "VALIDATED" if new_report.rows_error == 0 else "IN_REVIEW"
+    batch.version += 1
+    batch.updated_at = datetime.now(UTC)
+
+    # 10. Update stored report JSON
+    if old_db_report:
+        old_db_report.report_json = new_report.model_dump()
+        old_db_report.created_at = datetime.now(UTC)
+    else:
+        new_db_rep = BatchReportModel(
+            id=str(uuid.uuid4()),
+            batch_id=batch.batch_id,
+            report_json=new_report.model_dump(),
+            created_at=datetime.now(UTC),
+        )
+        db.add(new_db_rep)
+
+    # 11. Refresh issues & duplicate flags
+    db.query(Issue).filter(Issue.batch_id == batch.batch_id).delete()
+    db.query(DuplicateFlag).filter(DuplicateFlag.batch_id == batch.batch_id).delete()
+
+    for iss in new_report.issues:
+        db_iss = Issue(
+            id=iss.issue_id,
+            batch_id=batch.batch_id,
+            rule_id=iss.rule_id,
+            row_index=iss.row,
+            field_name=iss.field,
+            apaar_id=getattr(iss, "apaar_id", None),
+            severity=iss.severity,
+            priority=iss.priority,
+            bucket=iss.bucket,
+            message=iss.message,
+            reason=iss.reason,
+            evidence_json=iss.evidence,
+            suggested_fix_json=iss.suggested_fix.model_dump() if iss.suggested_fix else None,
+            value_masked=iss.value_masked,
+            status="OPEN",
+        )
+        db.add(db_iss)
+
+    for cluster in new_report.duplicate_clusters:
+        for member in cluster.members:
+            flag = DuplicateFlag(
+                id=str(uuid.uuid4()),
+                batch_id=batch.batch_id,
+                cluster_id=cluster.cluster_id,
+                apaar_id=member.apaar_masked,
+                matched_institution_id=member.institution,
+                similarity_score=cluster.score,
+                match_type=cluster.scope,
+                matched_fields_json=cluster.matched_fields,
+                status="OPEN",
+            )
+            db.add(flag)
+
+    append_audit_log(
+        db,
+        action="BATCH_REVALIDATED",
+        actor_type="API_KEY" if principal.is_api_key else "USER",
+        actor_id=principal.id,
+        role=principal.role,
+        resource="BATCH",
+        resource_id=batch.batch_id,
+        payload={
+            "quality_score_before": batch.quality_score_before,
+            "quality_score_after": batch.quality_score_after,
+            "corrections_applied": len(approved_corrections),
+        },
+    )
+
+    db.commit()
+    db.refresh(batch)
+
+    _broadcast_validation_events(batch, new_report)
+
+    return {
+        "batch_id": batch.batch_id,
+        "quality_score_before": float(batch.quality_score_before or 100.0),
+        "quality_score_after": float(batch.quality_score_after or 100.0),
+        "score_delta": round(
+            float(batch.quality_score_after or 100.0) - float(batch.quality_score_before or 100.0),
+            2,
+        ),
+        "resolved_count": dq_comp.resolved,
+        "pending_count": dq_comp.pending,
+        "per_rule_deltas": dq_comp.per_rule_deltas,
+        "per_priority_deltas": dq_comp.per_priority_deltas,
+    }
+
+
+def get_dq_comparison_service(
+    db: Session,
+    *,
+    batch_id: str,
+    principal: Principal,
+) -> dict[str, Any]:
+    """Retrieves before/after data quality comparison and score delta."""
+    batch = db.scalars(select(Batch).where(Batch.batch_id == batch_id)).first()
+    if not batch:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"code": "NOT_FOUND", "message": f"Batch '{batch_id}' not found"},
+        )
+
+    if (
+        principal.role != "AICTE_ADMIN"
+        and principal.institution_aicte_id != batch.institution_aicte_id
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"code": "FORBIDDEN", "message": "Access denied"},
+        )
+
+    q_before = float(
+        batch.quality_score_before if batch.quality_score_before is not None else 100.0
+    )
+    q_after = float(
+        batch.quality_score_after if batch.quality_score_after is not None else q_before
+    )
+    delta = round(q_after - q_before, 2)
+
+    open_count = db.query(Issue).filter(Issue.batch_id == batch_id, Issue.status == "OPEN").count()
+    resolved_count = (
+        db.query(Issue)
+        .filter(Issue.batch_id == batch_id, Issue.status.in_(["ACCEPTED", "FIXED", "DISMISSED"]))
+        .count()
+    )
+
+    return {
+        "batch_id": batch.batch_id,
+        "quality_score_before": q_before,
+        "quality_score_after": q_after,
+        "score_delta": delta,
+        "resolved_count": resolved_count,
+        "pending_count": open_count,
+        "per_rule_deltas": {},
+        "per_priority_deltas": {},
+        "per_column_completeness_before": {},
+        "per_column_completeness_after": {},
+    }
