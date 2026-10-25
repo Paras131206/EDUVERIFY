@@ -480,5 +480,76 @@ describe('Site-Wide Language Translation System', () => {
     expect(translateText('Inspect Full Row')).toBe('पूरी पंक्ति का निरीक्षण करें');
     expect(translateText('निरीक्षण करें Full पंक्ति')).toBe('पूरी पंक्ति का निरीक्षण करें');
   });
+
+  it('translates Transfers Desk and Student Registry elements (Screenshots 1, 3, 4, 5)', () => {
+    // Screenshot 1: Batch List Page errors count
+    expect(translateText('12 error(s)')).toBe('12 त्रुटियां');
+    expect(translateText('error(s)')).toBe('त्रुटियां');
+    expect(translateText('12 त्रुटि(s)')).toBe('12 त्रुटियां');
+
+    // Screenshot 3: Transfers Desk
+    expect(translateText('15-Day AICTE Statutory Override Rule (Agents.md §8.1)'))
+      .toBe('15-दिवसीय एआईसीटीई वैधानिक ओवरराइड नियम (Agents.md §8.1)');
+    expect(translateText('When a destination institution creates a transfer request, the source institution is granted exactly 15 calendar days to decide (Approve or Reject with note). If left unaddressed beyond 15 days, the AICTE Central Desk automatically executes an administrative override. Approved or overridden transfers safely transition source records to TRANSFERRED_OUT, guaranteeing that destination enrolment will not trigger duplicate student flags (Rule V010).'))
+      .toBe('जब कोई गंतव्य संस्थान स्थानांतरण अनुरोध बनाता है, तो स्रोत संस्थान को निर्णय लेने के लिए ठीक 15 कैलेंडर दिन (नोट के साथ स्वीकृत या अस्वीकार) दिए जाते हैं। यदि 15 दिनों से अधिक समय तक कोई कार्रवाई नहीं होती है, तो एआईसीटीई केंद्रीय डेस्क स्वतः प्रशासनिक ओवरराइड निष्पादित करता है। स्वीकृत या ओवरराइड किए गए स्थानांतरण स्रोत रिकॉर्ड को सुरक्षित रूप से स्थानांतरित (बाहर) में बदल देते हैं, जिससे यह सुनिश्चित होता है कि गंतव्य नामांकन से डुप्लिकेट छात्र फ़्लैग (नियम V010) ट्रिगर नहीं होंगे।');
+    expect(translateText('When a गंतव्य संस्थान creates a स्थानांतरण request, the स्रोत संस्थान is granted exactly 15 calendar days to decide (स्वीकृत करें or अस्वीकार करें with note). If left unaddressed beyond 15 days, the AICTE Central Desk automatically executes an administrative override. स्वीकृत or overridden स्थानांतरण safely transition source रिकॉर्ड to TRANSFERRED_OUT , guaranteeing that destination enrolment will not trigger duplicate विद्यार्थी flags (नियम V010).'))
+      .toBe('जब कोई गंतव्य संस्थान स्थानांतरण अनुरोध बनाता है, तो स्रोत संस्थान को निर्णय लेने के लिए ठीक 15 कैलेंडर दिन (नोट के साथ स्वीकृत या अस्वीकार) दिए जाते हैं। यदि 15 दिनों से अधिक समय तक कोई कार्रवाई नहीं होती है, तो एआईसीटीई केंद्रीय डेस्क स्वतः प्रशासनिक ओवरराइड निष्पादित करता है। स्वीकृत या ओवरराइड किए गए स्थानांतरण स्रोत रिकॉर्ड को सुरक्षित रूप से स्थानांतरित (बाहर) में बदल देते हैं, जिससे यह सुनिश्चित होता है कि गंतव्य नामांकन से डुप्लिकेट छात्र फ़्लैग (नियम V010) ट्रिगर नहीं होंगे।');
+    expect(translateText('REASON')).toBe('कारण');
+    expect(translateText('Reason')).toBe('कारण');
+    expect(translateText('Family relocation to NCR')).toBe('एनसीआर (NCR) में पारिवारिक स्थानांतरण');
+    expect(translateText('Parent transfer of central government defense officer')).toBe('केंद्र सरकार के रक्षा अधिकारी अभिभावक का स्थानांतरण');
+    expect(translateText('Parent स्थानांतरण of central government defense officer')).toBe('केंद्र सरकार के रक्षा अधिकारी अभिभावक का स्थानांतरण');
+    expect(translateText('Decided 8/4/2026')).toBe('निर्णय: 8/4/2026');
+    expect(translateText('Awaiting Source')).toBe('स्रोत की प्रतीक्षा');
+
+    // Screenshots 4 & 5: Student Central Registry
+    expect(translateText('Student Central Registry')).toBe('केंद्रीय छात्र रजिस्ट्री');
+    expect(translateText('विद्यार्थी Central Registry')).toBe('केंद्रीय छात्र रजिस्ट्री');
+    expect(translateText('Canonical student records keyed by 12-digit APAAR ID with immutable branch switch history and multiple entry/exit points'))
+      .toBe('अपरिवर्तनीय शाखा परिवर्तन इतिहास और बहु-प्रवेश/निकास बिंदुओं के साथ 12-अंकीय अपार आईडी द्वारा सुरक्षित प्रामाणिक छात्र रिकॉर्ड');
+    expect(translateText('Canonical विद्यार्थी रिकॉर्ड keyed by 12-digit अपार आईडी with immutable branch switch history and multiple entry/exit points'))
+      .toBe('अपरिवर्तनीय शाखा परिवर्तन इतिहास और बहु-प्रवेश/निकास बिंदुओं के साथ 12-अंकीय अपार आईडी द्वारा सुरक्षित प्रामाणिक छात्र रिकॉर्ड');
+    expect(translateText('Admit Student (Entry Point)')).toBe('छात्र प्रवेश (प्रवेश बिंदु)');
+    expect(translateText('Admit विद्यार्थी (Entry Point)')).toBe('छात्र प्रवेश (प्रवेश बिंदु)');
+    expect(translateText('Unmask PII (Authorized)')).toBe('व्यक्तिगत पहचान (PII) अनमास्क करें (अधिकृत)');
+    expect(translateText('Mask PII')).toBe('व्यक्तिगत पहचान (PII) मास्क करें');
+    expect(translateText('ENTRY & EXIT PATHWAYS:')).toBe('प्रवेश एवं निकास मार्ग:');
+    expect(translateText('Entry & Exit Pathways:')).toBe('प्रवेश एवं निकास मार्ग:');
+    expect(translateText('All Students (8)')).toBe('सभी छात्र (8)');
+    expect(translateText('सभी Students (8)')).toBe('सभी छात्र (8)');
+    expect(translateText('DSE Lateral Entry (Year 2)')).toBe('डीएसई पार्श्व प्रवेश (द्वितीय वर्ष)');
+    expect(translateText('DSE पार्श्व प्रवेश (Lateral Entry) (Year 2)')).toBe('डीएसई पार्श्व प्रवेश (द्वितीय वर्ष)');
+    expect(translateText('Regular Entry (Year 1)')).toBe('नियमित प्रवेश (प्रथम वर्ष)');
+    expect(translateText('Transfer-In Entry')).toBe('आवक स्थानांतरण प्रवेश');
+    expect(translateText('स्थानांतरण-In Entry')).toBe('आवक स्थानांतरण प्रवेश');
+    expect(translateText('Exited / Withdrawn / Transferred Out')).toBe('निकास / वापस लिया गया / स्थानांतरित बाहर');
+    expect(translateText('Exited / वापस लिया गया / स्थानांतरित Out')).toBe('निकास / वापस लिया गया / स्थानांतरित बाहर');
+    expect(translateText('Search by student name, APAAR ID, or roll number...')).toBe('छात्र का नाम, अपार आईडी, या रोल नंबर द्वारा खोजें...');
+    expect(translateText('खोजें by छात्र का नाम, अपार आईडी, or roll number...')).toBe('छात्र का नाम, अपार आईडी, या रोल नंबर द्वारा खोजें...');
+    expect(translateText('All Programs')).toBe('सभी कार्यक्रम');
+    expect(translateText('सभी Programs')).toBe('सभी कार्यक्रम');
+    expect(translateText('Student identities verified via Central APAAR registry with DPDP Act student consent status and branch switch tracking'))
+      .toBe('डीपीडीपी (DPDP) अधिनियम छात्र सहमति स्थिति और शाखा परिवर्तन ट्रैकिंग के साथ केंद्रीय अपार रजिस्ट्री द्वारा सत्यापित छात्र पहचान');
+    expect(translateText('विद्यार्थी identities verified via Central APAAR registry with DPDP Act विद्यार्थी सहमति स्थिति and branch switch tracking'))
+      .toBe('डीपीडीपी (DPDP) अधिनियम छात्र सहमति स्थिति और शाखा परिवर्तन ट्रैकिंग के साथ केंद्रीय अपार रजिस्ट्री द्वारा सत्यापित छात्र पहचान');
+    expect(translateText('Student ID (PRN)')).toBe('छात्र आईडी (PRN)');
+    expect(translateText('विद्यार्थी ID (PRN)')).toBe('छात्र आईडी (PRN)');
+    expect(translateText('PROGRAM & BRANCH')).toBe('कार्यक्रम एवं शाखा');
+    expect(translateText('Program & Branch')).toBe('कार्यक्रम एवं शाखा');
+    expect(translateText('ENTRY / YEAR')).toBe('प्रवेश / वर्ष');
+    expect(translateText('Entry / Year')).toBe('प्रवेश / वर्ष');
+    expect(translateText('LIFECYCLE STATUS')).toBe('जीवनचक्र स्थिति');
+    expect(translateText('LIFECYCLE स्थिति')).toBe('जीवनचक्र स्थिति');
+    expect(translateText('Lifecycle Status')).toBe('जीवनचक्र स्थिति');
+    expect(translateText('Year 1 · UG')).toBe('वर्ष 1 · स्नातक (UG)');
+    expect(translateText('Year 2 · PG')).toBe('वर्ष 2 · स्नातकोत्तर (PG)');
+    expect(translateText('Year 4 · UG')).toBe('वर्ष 4 · स्नातक (UG)');
+    expect(translateText('DEFERRED')).toBe('विलंबित');
+    expect(translateText('GRADUATED')).toBe('स्नातक / उत्तीर्ण');
+    expect(translateText('TRANSFERRED_OUT')).toBe('स्थानांतरित (बाहर)');
+    expect(translateText('Branch Switched')).toBe('शाखा परिवर्तित');
+    expect(translateText('Switch Branch')).toBe('शाखा बदलें');
+    expect(translateText('Details')).toBe('विवरण');
+  });
 });
 

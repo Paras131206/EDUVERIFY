@@ -1285,7 +1285,119 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Confirm identical or twin identity": "समान या जुड़वां पहचान की पुष्टि करें",
   "Nationality is IN but quota is marked as OCI": "राष्ट्रीयता IN है लेकिन कोटा OCI के रूप में चिह्नित है",
   "Leading whitespace and non-standard casing in \" computer science\" normalized to canonical catalog form": "\" computer science\" में प्रारंभिक व्हाइटस्पेस और गैर-मानक केसिंग को प्रामाणिक कैटलॉग रूप में सामान्यीकृत किया गया",
-  "admission_date 2026-08-01 + B.Tech duration 4y indicates expected 2030, got 2028": "प्रवेश तिथि 2026-08-01 + बी.टेक अवधि 4 वर्ष से 2030 अपेक्षित है, 2028 मिला"
+  "admission_date 2026-08-01 + B.Tech duration 4y indicates expected 2030, got 2028": "प्रवेश तिथि 2026-08-01 + बी.टेक अवधि 4 वर्ष से 2030 अपेक्षित है, 2028 मिला",
+
+  // Transfers & Student Registry Additions
+  "15-Day AICTE Statutory Override Rule (Agents.md §8.1)": "15-दिवसीय एआईसीटीई वैधानिक ओवरराइड नियम (Agents.md §8.1)",
+  "When a destination institution creates a transfer request, the source institution is granted exactly 15 calendar days to decide (Approve or Reject with note). If left unaddressed beyond 15 days, the AICTE Central Desk automatically executes an administrative override. Approved or overridden transfers safely transition source records to TRANSFERRED_OUT, guaranteeing that destination enrolment will not trigger duplicate student flags (Rule V010).": "जब कोई गंतव्य संस्थान स्थानांतरण अनुरोध बनाता है, तो स्रोत संस्थान को निर्णय लेने के लिए ठीक 15 कैलेंडर दिन (नोट के साथ स्वीकृत या अस्वीकार) दिए जाते हैं। यदि 15 दिनों से अधिक समय तक कोई कार्रवाई नहीं होती है, तो एआईसीटीई केंद्रीय डेस्क स्वतः प्रशासनिक ओवरराइड निष्पादित करता है। स्वीकृत या ओवरराइड किए गए स्थानांतरण स्रोत रिकॉर्ड को सुरक्षित रूप से स्थानांतरित (बाहर) में बदल देते हैं, जिससे यह सुनिश्चित होता है कि गंतव्य नामांकन से डुप्लिकेट छात्र फ़्लैग (नियम V010) ट्रिगर नहीं होंगे।",
+  "When a destination institution creates a transfer request, the source institution is granted exactly": "जब कोई गंतव्य संस्थान स्थानांतरण अनुरोध बनाता है, तो स्रोत संस्थान को निर्णय लेने के लिए ठीक",
+  "15 calendar days": "15 कैलेंडर दिन",
+  "to decide (Approve or Reject with note). If left unaddressed beyond 15 days, the": "दिए जाते हैं (नोट के साथ स्वीकृत या अस्वीकार)। यदि 15 दिनों से अधिक समय तक कोई कार्रवाई नहीं होती है, तो",
+  "AICTE Central Desk": "एआईसीटीई केंद्रीय डेस्क",
+  "automatically executes an administrative override. Approved or overridden transfers safely transition source records to": "स्वतः प्रशासनिक ओवरराइड निष्पादित करता है। स्वीकृत या ओवरराइड किए गए स्थानांतरण स्रोत रिकॉर्ड को सुरक्षित रूप से",
+  ", guaranteeing that destination enrolment will not trigger duplicate student flags (Rule V010).": " में बदल देते हैं, जिससे यह सुनिश्चित होता है कि गंतव्य नामांकन से डुप्लिकेट छात्र फ़्लैग (नियम V010) ट्रिगर नहीं होंगे।",
+  "guaranteeing that destination enrolment will not trigger duplicate student flags (Rule V010).": "में बदल देते हैं, जिससे यह सुनिश्चित होता है कि गंतव्य नामांकन से डुप्लिकेट छात्र फ़्लैग (नियम V010) ट्रिगर नहीं होंगे।",
+  "REASON": "कारण",
+  "Reason": "कारण",
+  "reason": "कारण",
+  "Family relocation to NCR": "एनसीआर (NCR) में पारिवारिक स्थानांतरण",
+  "Parent transfer of central government defense officer": "केंद्र सरकार के रक्षा अधिकारी अभिभावक का स्थानांतरण",
+  "Parent स्थानांतरण of central government defense officer": "केंद्र सरकार के रक्षा अधिकारी अभिभावक का स्थानांतरण",
+  "Medical hardship - transfer to home state": "चिकित्सा कठिनाई - गृह राज्य में स्थानांतरण",
+  "Sanctioned intake capacity exceeded in semester 3": "सत्र 3 में स्वीकृत प्रवेश क्षमता पार हो गई",
+  "Approved with Medical Board clearance and NOC": "मेडिकल बोर्ड अनापत्ति और एनओसी के साथ स्वीकृत",
+  "Awaiting Source": "स्रोत की प्रतीक्षा",
+  "Decided": "निर्णय",
+
+  "Student Central Registry": "केंद्रीय छात्र रजिस्ट्री",
+  "विद्यार्थी Central Registry": "केंद्रीय छात्र रजिस्ट्री",
+  "Central Registry": "केंद्रीय रजिस्ट्री",
+  "Canonical student records keyed by 12-digit APAAR ID with immutable branch switch history and multiple entry/exit points": "अपरिवर्तनीय शाखा परिवर्तन इतिहास और बहु-प्रवेश/निकास बिंदुओं के साथ 12-अंकीय अपार आईडी द्वारा सुरक्षित प्रामाणिक छात्र रिकॉर्ड",
+  "Canonical विद्यार्थी रिकॉर्ड keyed by 12-digit अपार आईडी with immutable branch switch history and multiple entry/exit points": "अपरिवर्तनीय शाखा परिवर्तन इतिहास और बहु-प्रवेश/निकास बिंदुओं के साथ 12-अंकीय अपार आईडी द्वारा सुरक्षित प्रामाणिक छात्र रिकॉर्ड",
+  "Admit Student (Entry Point)": "छात्र प्रवेश (प्रवेश बिंदु)",
+  "Admit विद्यार्थी (Entry Point)": "छात्र प्रवेश (प्रवेश बिंदु)",
+  "Admit Student": "छात्र प्रवेश",
+  "Entry Point": "प्रवेश बिंदु",
+  "Unmask PII (Authorized)": "व्यक्तिगत पहचान (PII) अनमास्क करें (अधिकृत)",
+  "Mask PII": "व्यक्तिगत पहचान (PII) मास्क करें",
+  "Entry & Exit Pathways:": "प्रवेश एवं निकास मार्ग:",
+  "ENTRY & EXIT PATHWAYS:": "प्रवेश एवं निकास मार्ग:",
+  "Entry & Exit Pathways": "प्रवेश एवं निकास मार्ग",
+  "ENTRY & EXIT PATHWAYS": "प्रवेश एवं निकास मार्ग",
+  "All Students": "सभी छात्र",
+  "all students": "सभी छात्र",
+  "Students": "छात्र",
+  "students": "छात्र",
+  "DSE Lateral Entry (Year 2)": "डीएसई पार्श्व प्रवेश (द्वितीय वर्ष)",
+  "DSE पार्श्व प्रवेश (Lateral Entry) (Year 2)": "डीएसई पार्श्व प्रवेश (द्वितीय वर्ष)",
+  "DSE Lateral Entry": "डीएसई पार्श्व प्रवेश",
+  "DSE पार्श्व प्रवेश (Lateral Entry)": "डीएसई पार्श्व प्रवेश",
+  "Lateral Entry (Year 2)": "पार्श्व प्रवेश (द्वितीय वर्ष)",
+  "Regular Entry (Year 1)": "नियमित प्रवेश (प्रथम वर्ष)",
+  "Regular Entry": "नियमित प्रवेश",
+  "Transfer-In Entry": "आवक स्थानांतरण प्रवेश",
+  "स्थानांतरण-In Entry": "आवक स्थानांतरण प्रवेश",
+  "Transfer-In": "आवक स्थानांतरण",
+  "Exited / Withdrawn / Transferred Out": "निकास / वापस लिया गया / स्थानांतरित बाहर",
+  "Exited / वापस लिया गया / स्थानांतरित Out": "निकास / वापस लिया गया / स्थानांतरित बाहर",
+  "Search by student name, APAAR ID, or roll number...": "छात्र का नाम, अपार आईडी, या रोल नंबर द्वारा खोजें...",
+  "खोजें by छात्र का नाम, अपार आईडी, or roll number...": "छात्र का नाम, अपार आईडी, या रोल नंबर द्वारा खोजें...",
+  "All Programs": "सभी कार्यक्रम",
+  "सभी Programs": "सभी कार्यक्रम",
+  "Programs": "कार्यक्रम",
+  "programs": "कार्यक्रम",
+  "Student identities verified via Central APAAR registry with DPDP Act student consent status and branch switch tracking": "डीपीडीपी (DPDP) अधिनियम छात्र सहमति स्थिति और शाखा परिवर्तन ट्रैकिंग के साथ केंद्रीय अपार रजिस्ट्री द्वारा सत्यापित छात्र पहचान",
+  "विद्यार्थी identities verified via Central APAAR registry with DPDP Act विद्यार्थी सहमति स्थिति and branch switch tracking": "डीपीडीपी (DPDP) अधिनियम छात्र सहमति स्थिति और शाखा परिवर्तन ट्रैकिंग के साथ केंद्रीय अपार रजिस्ट्री द्वारा सत्यापित छात्र पहचान",
+  "Student ID (PRN)": "छात्र आईडी (PRN)",
+  "विद्यार्थी ID (PRN)": "छात्र आईडी (PRN)",
+  "Program & Branch": "कार्यक्रम एवं शाखा",
+  "PROGRAM & BRANCH": "कार्यक्रम एवं शाखा",
+  "Entry / Year": "प्रवेश / वर्ष",
+  "ENTRY / YEAR": "प्रवेश / वर्ष",
+  "Lifecycle Status": "जीवनचक्र स्थिति",
+  "LIFECYCLE STATUS": "जीवनचक्र स्थिति",
+  "LIFECYCLE स्थिति": "जीवनचक्र स्थिति",
+  "Branch Switched": "शाखा परिवर्तित",
+  "Switch Branch": "शाखा बदलें",
+  "Switch Branch / Program": "शाखा / कार्यक्रम बदलें",
+  "Switch Student Branch / Program": "छात्र शाखा / कार्यक्रम बदलें",
+  "Details": "विवरण",
+  "details": "विवरण",
+  "DEFERRED": "विलंबित",
+  "Deferred": "विलंबित",
+  "deferred": "विलंबित",
+  "GRADUATED": "स्नातक / उत्तीर्ण",
+  "Graduated": "स्नातक / उत्तीर्ण",
+  "graduated": "स्नातक / उत्तीर्ण",
+  "TRANSFERRED_OUT": "स्थानांतरित (बाहर)",
+  "Transferred Out": "स्थानांतरित (बाहर)",
+  "transferred_out": "स्थानांतरित (बाहर)",
+  "error(s)": "त्रुटियां",
+  "error(s) ": "त्रुटियां ",
+  "त्रुटि(s)": "त्रुटियां",
+  "त्रुटि(s) ": "त्रुटियां ",
+  "UG": "स्नातक (UG)",
+  "PG": "स्नातकोत्तर (PG)",
+  "GRANTED": "स्वीकृत",
+  "Admissions Entry Pathway": "प्रवेश मार्ग",
+  "Direct Second Year (DSE) Lateral Entry — Year 2": "सीधा द्वितीय वर्ष (डीएसई) पार्श्व प्रवेश — वर्ष 2",
+  "First Year Regular Entry — Year 1": "प्रथम वर्ष नियमित प्रवेश — वर्ष 1",
+  "Inter-College / University Transfer-In Entry": "अंतर-कॉलेज / विश्वविद्यालय आवक स्थानांतरण प्रवेश",
+  "Record immutable branch sliding with full historical audit preservation": "पूर्ण ऐतिहासिक ऑडिट संरक्षण के साथ अपरिवर्तनीय शाखा परिवर्तन दर्ज करें",
+  "New Target Program / Branch": "नया लक्षित कार्यक्रम / शाखा",
+  "Student Full Name": "छात्र का पूरा नाम",
+  "Auto-generated if empty": "खाली होने पर स्वतः उत्पन्न",
+  "Current Program": "वर्तमान कार्यक्रम",
+  "Date of Birth": "जन्म तिथि",
+  "Gender & Category": "लिंग एवं श्रेणी",
+  "Seat Type / Quota": "सीट प्रकार / कोटा",
+  "Record Version History (Immutable Audit Log)": "रिकॉर्ड संस्करण इतिहास (अपरिवर्तनीय ऑडिट लॉग)",
+  "Student Lifecycle Timeline": "छात्र जीवनचक्र समयरेखा",
+  "Summary of Modifications": "संशोधनों का सारांश",
+  "Actor / Source": "कर्ता / स्रोत",
+  "Change Status": "स्थिति बदलें",
+  "Branch Switch / Course Transfer Audit Verified": "शाखा परिवर्तन / पाठ्यक्रम स्थानांतरण ऑडिट सत्यापित",
+  "This student has an official branch switch on record. All previous course records and admission credits are retained in the immutable version log below.": "इस छात्र के रिकॉर्ड में आधिकारिक शाखा परिवर्तन दर्ज है। पिछले सभी पाठ्यक्रम रिकॉर्ड और प्रवेश क्रेडिट नीचे अपरिवर्तनीय संस्करण लॉग में बनाए रखे गए हैं।"
 };
 
 // Sorted keys by length descending to match longest phrases first
@@ -1914,6 +2026,69 @@ export function translateText(text: string): string {
   // Pattern: "Rationale: Prepend missing leading zero"
   if (/^Rationale:\s*(.*)$/i.test(result.trim())) {
     result = result.replace(/^Rationale:\s*/i, 'औचित्य: ');
+    hasMatch = true;
+  }
+
+  // Pattern: "12 त्रुटि(s)" or single error(s)
+  if (/(\d+)\s*त्रुटि\(s\)/gi.test(result)) {
+    result = result.replace(/(\d+)\s*त्रुटि\(s\)/gi, '$1 त्रुटियां');
+    hasMatch = true;
+  }
+  if (/^\s*(?:error\(s\)|त्रुटि\(s\))\s*$/i.test(result)) {
+    result = 'त्रुटियां';
+    hasMatch = true;
+  }
+
+  // Pattern: Statutory override notice banner (full or partial Hinglish)
+  if (/(?:When\s+a\s+(?:destination|गंतव्य)\s+(?:institution|संस्थान)\s+creates\s+a\s+(?:transfer|स्थानांतरण)\s+request|15-दिवसीय\s+एआईसीटीई\s+वैधानिक\s+ओवरराइड)/i.test(result)) {
+    result = result.replace(
+      /When\s+a\s+(?:destination|गंतव्य)\s+(?:institution|संस्थान)\s+creates\s+a\s+(?:transfer|स्थानांतरण)\s+request.*?(?:Rule\s+V010|नियम\s+V010)[^.]*\.?/gis,
+      'जब कोई गंतव्य संस्थान स्थानांतरण अनुरोध बनाता है, तो स्रोत संस्थान को निर्णय लेने के लिए ठीक 15 कैलेंडर दिन (नोट के साथ स्वीकृत या अस्वीकार) दिए जाते हैं। यदि 15 दिनों से अधिक समय तक कोई कार्रवाई नहीं होती है, तो एआईसीटीई केंद्रीय डेस्क स्वतः प्रशासनिक ओवरराइड निष्पादित करता है। स्वीकृत या ओवरराइड किए गए स्थानांतरण स्रोत रिकॉर्ड को सुरक्षित रूप से स्थानांतरित (बाहर) में बदल देते हैं, जिससे यह सुनिश्चित होता है कि गंतव्य नामांकन से डुप्लिकेट छात्र फ़्लैग (नियम V010) ट्रिगर नहीं होंगे।'
+    );
+    hasMatch = true;
+  }
+
+  // Pattern: "Decided 8/4/2026", "Decided 2026-08-04"
+  if (/Decided\s+(\d+[\/.-]\d+[\/.-]\d+)/i.test(result)) {
+    result = result.replace(/Decided\s+(\d+[\/.-]\d+[\/.-]\d+)/gi, 'निर्णय: $1');
+    hasMatch = true;
+  }
+
+  // Pattern: "All Students (8)", "सभी Students (8)"
+  if (/(?:All|सभी)\s+Students?\s*\((\d+)\)/i.test(result)) {
+    result = result.replace(/(?:All|सभी)\s+Students?\s*\((\d+)\)/gi, 'सभी छात्र ($1)');
+    hasMatch = true;
+  }
+
+  // Pattern: "Year 1 · UG", "Year 2 · PG", "Year 4 · UG"
+  if (/Year\s*(\d+)\s*(?:·|&middot;)\s*UG/i.test(result)) {
+    result = result.replace(/Year\s*(\d+)\s*(?:·|&middot;)\s*UG/gi, 'वर्ष $1 · स्नातक (UG)');
+    hasMatch = true;
+  }
+  if (/Year\s*(\d+)\s*(?:·|&middot;)\s*PG/i.test(result)) {
+    result = result.replace(/Year\s*(\d+)\s*(?:·|&middot;)\s*PG/gi, 'वर्ष $1 · स्नातकोत्तर (PG)');
+    hasMatch = true;
+  }
+  if (/Year\s*(\d+)\s*(?:·|&middot;)\s*Diploma/i.test(result)) {
+    result = result.replace(/Year\s*(\d+)\s*(?:·|&middot;)\s*Diploma/gi, 'वर्ष $1 · डिप्लोमा');
+    hasMatch = true;
+  }
+
+  // Pattern: Search placeholder
+  if (/(?:Search|खोजें)\s+by\s+(?:student\s+name|छात्र\s+का\s+नाम)/i.test(result)) {
+    result = 'छात्र का नाम, अपार आईडी, या रोल नंबर द्वारा खोजें...';
+    hasMatch = true;
+  }
+
+  // Pattern: Student identities verified banner
+  if (/(?:Student|विद्यार्थी)\s+identities\s+verified\s+via\s+Central\s+APAAR\s+registry/i.test(result)) {
+    result = 'डीपीडीपी (DPDP) अधिनियम छात्र सहमति स्थिति और शाखा परिवर्तन ट्रैकिंग के साथ केंद्रीय अपार रजिस्ट्री द्वारा सत्यापित छात्र पहचान';
+    hasMatch = true;
+  }
+
+  // Pattern: Canonical student records subtitle
+  if (/Canonical\s+(?:student|विद्यार्थी)\s+(?:records|रिकॉर्ड)\s+keyed\s+by\s+12-digit/i.test(result)) {
+    result = 'अपरिवर्तनीय शाखा परिवर्तन इतिहास और बहु-प्रवेश/निकास बिंदुओं के साथ 12-अंकीय अपार आईडी द्वारा सुरक्षित प्रामाणिक छात्र रिकॉर्ड';
     hasMatch = true;
   }
 
