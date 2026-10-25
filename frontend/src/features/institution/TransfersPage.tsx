@@ -16,7 +16,41 @@ import {
   CheckCircle2,
   XCircle,
   ShieldAlert,
+  FileText,
 } from 'lucide-react';
+
+const APPROVAL_REASONS = [
+  'Academic Senate / Governing Board NOC granted; Transfer Certificate issued',
+  'Mutual inter-university transfer agreement per AICTE §8.1',
+  'Approved on medical hardship / compassionate grounds with committee clearance',
+  'Parental relocation of central / state government / armed forces personnel',
+  'Curriculum compatibility verified & seat vacancy available at destination',
+  'Other reason (specify details below)',
+];
+
+const APPROVAL_QUICK_CHIPS = [
+  { label: 'Senate NOC & TC', full: 'Academic Senate / Governing Board NOC granted; Transfer Certificate issued' },
+  { label: 'Medical Clearance', full: 'Approved on medical hardship / compassionate grounds with committee clearance' },
+  { label: 'Parent Relocation', full: 'Parental relocation of central / state government / armed forces personnel' },
+  { label: 'Mutual Agreement', full: 'Mutual inter-university transfer agreement per AICTE §8.1' },
+];
+
+const REJECTION_REASONS = [
+  'Sanctioned intake capacity exceeded in target academic program',
+  'Pending semester tuition fees / institutional library clearance dues',
+  'Disciplinary hold or ongoing academic integrity inquiry',
+  'Minimum credit / course prerequisite eligibility criteria not satisfied',
+  'Invalid, forged, or unverified Transfer Certificate (TC) document',
+  'Student not in active enrolment status at source institution',
+  'Other reason (specify details below)',
+];
+
+const REJECTION_QUICK_CHIPS = [
+  { label: 'Intake Exceeded', full: 'Sanctioned intake capacity exceeded in target academic program' },
+  { label: 'Pending Dues', full: 'Pending semester tuition fees / institutional library clearance dues' },
+  { label: 'Disciplinary Hold', full: 'Disciplinary hold or ongoing academic integrity inquiry' },
+  { label: 'Prerequisite Mismatch', full: 'Minimum credit / course prerequisite eligibility criteria not satisfied' },
+];
 
 export const TransfersPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'incoming' | 'outgoing'>('incoming');
@@ -40,8 +74,13 @@ export const TransfersPage: React.FC = () => {
     transfer: TransferRequestItem;
     action: 'APPROVED' | 'REJECTED';
   } | null>(null);
+  const [reasonPreset, setReasonPreset] = useState('');
   const [decisionNotes, setDecisionNotes] = useState('');
+  const [decisionRef, setDecisionRef] = useState('');
   const [decisionSubmitting, setDecisionSubmitting] = useState(false);
+
+  // View Details Modal State
+  const [viewingTransfer, setViewingTransfer] = useState<TransferRequestItem | null>(null);
 
   const fetchTransfers = async () => {
     try {
@@ -114,12 +153,17 @@ export const TransfersPage: React.FC = () => {
 
     try {
       setDecisionSubmitting(true);
+      let remarksToSend = decisionNotes.trim();
+      if (decisionRef.trim()) {
+        remarksToSend = `${remarksToSend} [Ref: ${decisionRef.trim()}]`;
+      }
+
       const res = await authFetch(`${API_BASE_URL}/v1/transfers/${decisionItem.transfer.id}/decide`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           decision: decisionItem.action,
-          remarks: decisionNotes.trim() || `Decision applied by source institution registrar`,
+          remarks: remarksToSend || `Decision applied by source institution registrar`,
         }),
       });
 
@@ -128,9 +172,19 @@ export const TransfersPage: React.FC = () => {
       }
 
       const updated: TransferRequestItem = await res.json();
-      setTransfers((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+      const finalUpdated: TransferRequestItem = {
+        ...updated,
+        decision_note: remarksToSend || updated.decision_note || `Marked ${decisionItem.action}`,
+        status: decisionItem.action,
+        decided_at: updated.decided_at || new Date().toISOString(),
+        decided_by: updated.decided_by || 'Source Institution Registrar',
+      };
+
+      setTransfers((prev) => prev.map((t) => (t.id === finalUpdated.id ? finalUpdated : t)));
       setDecisionItem(null);
       setDecisionNotes('');
+      setReasonPreset('');
+      setDecisionRef('');
     } catch (err) {
       console.error(err);
     } finally {
@@ -264,7 +318,7 @@ export const TransfersPage: React.FC = () => {
                 <TableHead>APAAR ID</TableHead>
                 <TableHead>{activeTab === 'incoming' ? 'Source Institution' : 'Destination Institution'}</TableHead>
                 <TableHead>Target Program</TableHead>
-                <TableHead>Reason</TableHead>
+                <TableHead className="min-w-[260px]">Reason & Decision Note</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -310,12 +364,60 @@ export const TransfersPage: React.FC = () => {
                     <TableCell className="text-xs font-mono font-medium text-slate-800">
                       {tr.to_program_code}
                     </TableCell>
-                    <TableCell className="text-xs text-slate-600 max-w-xs">
-                      <p>{tr.reason}</p>
+                    <TableCell className="text-xs text-slate-600 max-w-sm">
+                      <div>
+                        <span className="font-semibold text-slate-700">Request:</span>{' '}
+                        <span>{tr.reason}</span>
+                      </div>
                       {tr.evidence_ref && (
                         <span className="text-[11px] text-slate-400 font-mono mt-0.5 block">
                           Ref: {tr.evidence_ref}
                         </span>
+                      )}
+
+                      {/* Prominent, structured Decision Reason badge */}
+                      {tr.decision_note && (
+                        <div
+                          className={`mt-2 p-2.5 rounded-lg border text-xs leading-relaxed ${
+                            tr.status === 'APPROVED'
+                              ? 'bg-emerald-50/90 border-emerald-200 text-emerald-950'
+                              : tr.status === 'REJECTED'
+                              ? 'bg-rose-50/90 border-rose-200 text-rose-950'
+                              : 'bg-purple-50/90 border-purple-200 text-purple-950'
+                          }`}
+                        >
+                          <div className="font-bold flex items-center gap-1.5 mb-1">
+                            {tr.status === 'APPROVED' && (
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                            )}
+                            {tr.status === 'REJECTED' && (
+                              <XCircle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                            )}
+                            {tr.status === 'OVERRIDDEN' && (
+                              <ShieldAlert className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                            )}
+                            <span className="uppercase text-[11px] tracking-wider font-extrabold">
+                              {tr.status === 'APPROVED'
+                                ? 'Approval Reason'
+                                : tr.status === 'REJECTED'
+                                ? 'Rejection Reason'
+                                : 'Override Reason'}
+                            </span>
+                          </div>
+                          <p className="font-medium text-slate-800 bg-white/70 p-1.5 rounded border border-black/5">
+                            {tr.decision_note}
+                          </p>
+                          <div className="text-[10px] text-slate-500 mt-1 flex items-center justify-between">
+                            {tr.decided_by && (
+                              <span>
+                                Decided by: <strong className="text-slate-700">{tr.decided_by}</strong>
+                              </span>
+                            )}
+                            {tr.decided_at && (
+                              <span className="font-mono">{new Date(tr.decided_at).toLocaleDateString()}</span>
+                            )}
+                          </div>
+                        </div>
                       )}
                     </TableCell>
                     <TableCell>{getStatusChip(tr.status)}</TableCell>
@@ -325,10 +427,15 @@ export const TransfersPage: React.FC = () => {
                           <Button
                             variant="saffron"
                             size="sm"
-                            className="text-xs h-7 px-2.5"
+                            className="text-xs h-7 px-2.5 bg-emerald-600 hover:bg-emerald-700 text-white"
                             id={`approve-transfer-${tr.id}`}
                             data-testid={`approve-transfer-${tr.id}`}
-                            onClick={() => setDecisionItem({ transfer: tr, action: 'APPROVED' })}
+                            onClick={() => {
+                              setDecisionItem({ transfer: tr, action: 'APPROVED' });
+                              setReasonPreset('');
+                              setDecisionNotes('');
+                              setDecisionRef('');
+                            }}
                           >
                             <Check className="w-3.5 h-3.5 mr-1" />
                             Approve
@@ -339,16 +446,33 @@ export const TransfersPage: React.FC = () => {
                             className="text-xs h-7 px-2.5 text-red-700 hover:bg-red-50 hover:text-red-800 border-red-200"
                             id={`reject-transfer-${tr.id}`}
                             data-testid={`reject-transfer-${tr.id}`}
-                            onClick={() => setDecisionItem({ transfer: tr, action: 'REJECTED' })}
+                            onClick={() => {
+                              setDecisionItem({ transfer: tr, action: 'REJECTED' });
+                              setReasonPreset('');
+                              setDecisionNotes('');
+                              setDecisionRef('');
+                            }}
                           >
                             <X className="w-3.5 h-3.5 mr-1" />
                             Reject
                           </Button>
                         </div>
                       ) : (
-                        <span className="text-xs text-slate-400">
-                          {tr.decided_at ? `Decided ${new Date(tr.decided_at).toLocaleDateString()}` : 'Awaiting Source'}
-                        </span>
+                        <div className="flex flex-col items-end gap-1">
+                          <span className="text-xs text-slate-500">
+                            {tr.decided_at
+                              ? `Decided ${new Date(tr.decided_at).toLocaleDateString()}`
+                              : 'Awaiting Decision'}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setViewingTransfer(tr)}
+                            className="text-[11px] font-semibold text-gov-navy hover:underline flex items-center gap-1 cursor-pointer"
+                          >
+                            <FileText className="w-3 h-3 text-gov-navy" />
+                            <span>View Reason</span>
+                          </button>
+                        </div>
                       )}
                     </TableCell>
                   </TableRow>
@@ -504,20 +628,30 @@ export const TransfersPage: React.FC = () => {
         </div>
       )}
 
-      {/* DECISION DIALOG (APPROVE / REJECT WITH NOTE) */}
+      {/* DECISION DIALOG (APPROVE / REJECT WITH STRUCTURED REASON) */}
       {decisionItem && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full border border-slate-200 overflow-hidden">
-            <div className={`p-4 text-white flex items-center justify-between ${
-              decisionItem.action === 'APPROVED' ? 'bg-green-700' : 'bg-red-700'
-            }`}>
+          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div
+              className={`p-4 text-white flex items-center justify-between ${
+                decisionItem.action === 'APPROVED' ? 'bg-emerald-700' : 'bg-rose-700'
+              }`}
+            >
               <h3 className="text-base font-bold flex items-center gap-2">
-                {decisionItem.action === 'APPROVED' ? <CheckCircle2 className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
-                <span>{decisionItem.action === 'APPROVED' ? 'Approve Transfer Request' : 'Reject Transfer Request'}</span>
+                {decisionItem.action === 'APPROVED' ? (
+                  <CheckCircle2 className="w-5 h-5" />
+                ) : (
+                  <XCircle className="w-5 h-5" />
+                )}
+                <span>
+                  {decisionItem.action === 'APPROVED'
+                    ? 'Approve Transfer Request'
+                    : 'Reject Transfer Request'}
+                </span>
               </h3>
               <button
                 onClick={() => setDecisionItem(null)}
-                className="text-white/80 hover:text-white p-1"
+                className="text-white/80 hover:text-white p-1 rounded-lg"
                 aria-label="Close"
               >
                 <X className="w-4 h-4" />
@@ -525,31 +659,112 @@ export const TransfersPage: React.FC = () => {
             </div>
 
             <form onSubmit={handleExecuteDecision} className="p-5 space-y-4">
-              <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1">
-                <p className="font-semibold text-slate-800">
-                  Transfer Ref: <span className="font-mono">{decisionItem.transfer.id}</span>
-                </p>
-                <p className="text-slate-600">
-                  Student APAAR: <MaskedValue value={decisionItem.transfer.apaar_id} kind="apaar" className="font-mono" />
-                </p>
-                <p className="text-slate-600">
-                  Target Institution: {decisionItem.transfer.to_institution_name}
-                </p>
+              <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1.5">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500 font-medium">Transfer Reference:</span>
+                  <span className="font-mono font-bold text-slate-900">{decisionItem.transfer.id}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500 font-medium">Student APAAR ID:</span>
+                  <MaskedValue
+                    value={decisionItem.transfer.apaar_id}
+                    kind="apaar"
+                    className="font-mono font-semibold"
+                  />
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500 font-medium">Target Institution:</span>
+                  <span className="font-semibold text-slate-800 text-right">
+                    {decisionItem.transfer.to_institution_name}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500 font-medium">Target Program:</span>
+                  <span className="font-mono font-semibold text-slate-800">
+                    {decisionItem.transfer.to_program_code}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500 font-medium">Student's Request Reason:</span>
+                  <span className="text-slate-700 italic text-right truncate max-w-[240px]">
+                    {decisionItem.transfer.reason}
+                  </span>
+                </div>
+
                 {decisionItem.action === 'APPROVED' && (
                   <p className="text-green-800 font-semibold pt-1">
                     Notice: Approving will transition your source student record to TRANSFERRED_OUT.
                   </p>
                 )}
+                {decisionItem.action === 'REJECTED' && (
+                  <p className="text-rose-800 font-semibold pt-1">
+                    Notice: Rejecting will deny this transfer request. A valid documented reason is required.
+                  </p>
+                )}
               </div>
 
+              {/* Reason Category Selector */}
+              <div className="space-y-1.5">
+                <label htmlFor="reason-preset-select" className="text-xs font-bold text-slate-700 block">
+                  {decisionItem.action === 'APPROVED' ? 'Approval Reason Category' : 'Rejection Reason Category'}{' '}
+                  <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="reason-preset-select"
+                  value={reasonPreset}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setReasonPreset(val);
+                    if (val && val !== 'Other reason (specify details below)') {
+                      setDecisionNotes(val);
+                    }
+                  }}
+                  className="w-full text-xs bg-white border border-slate-300 rounded-md px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-gov-saffron font-medium"
+                >
+                  <option value="">-- Select Standard Regulatory Reason --</option>
+                  {(decisionItem.action === 'APPROVED' ? APPROVAL_REASONS : REJECTION_REASONS).map((r) => (
+                    <option key={r} value={r}>
+                      {r}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Quick Chips */}
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {(decisionItem.action === 'APPROVED' ? APPROVAL_QUICK_CHIPS : REJECTION_QUICK_CHIPS).map((chip) => (
+                    <button
+                      type="button"
+                      key={chip.label}
+                      onClick={() => {
+                        setReasonPreset(chip.full);
+                        setDecisionNotes(chip.full);
+                      }}
+                      className={`text-[10px] px-2 py-0.5 rounded-full border transition font-medium cursor-pointer ${
+                        reasonPreset === chip.full
+                          ? decisionItem.action === 'APPROVED'
+                            ? 'bg-emerald-100 border-emerald-400 text-emerald-900 font-bold'
+                            : 'bg-rose-100 border-rose-400 text-rose-900 font-bold'
+                          : 'bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      {chip.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Detailed Decision Note / Remarks Textarea */}
               <div className="space-y-1.5">
                 <label htmlFor="transfer-decision-notes" className="text-xs font-bold text-slate-700 block">
-                  Registrar Decision Note / Remarks <span className="text-red-500">*</span>
+                  {decisionItem.action === 'APPROVED'
+                    ? 'Registrar Approval Remarks & Terms'
+                    : 'Registrar Rejection Reason & Justification'}{' '}
+                  <span className="text-red-500">*</span>
                 </label>
-                <Input
+                <textarea
                   id="transfer-decision-notes"
-                  type="text"
                   required
+                  rows={3}
                   placeholder={
                     decisionItem.action === 'APPROVED'
                       ? 'e.g. NOC granted by Academic Senate; TC dispatched'
@@ -557,7 +772,29 @@ export const TransfersPage: React.FC = () => {
                   }
                   value={decisionNotes}
                   onChange={(e) => setDecisionNotes(e.target.value)}
-                  className="text-xs"
+                  className="w-full text-xs border border-slate-300 rounded-md p-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-gov-saffron resize-none font-normal"
+                />
+                <p className="text-[10px] text-slate-400">
+                  This justification will be permanently stamped in the tamper-evident audit log and shared with the destination institution.
+                </p>
+              </div>
+
+              {/* Official Order / Reference Number */}
+              <div className="space-y-1.5">
+                <label htmlFor="decision-order-ref" className="text-xs font-bold text-slate-700 block">
+                  Official Order / Resolution / Letter Reference <span className="text-slate-400 font-normal">(Optional)</span>
+                </label>
+                <Input
+                  id="decision-order-ref"
+                  type="text"
+                  placeholder={
+                    decisionItem.action === 'APPROVED'
+                      ? 'e.g. NOC-2026-AUG-14 or SENATE-RES-402'
+                      : 'e.g. REJECT-MEMO-88 or DUES-NOTICE-2026'
+                  }
+                  value={decisionRef}
+                  onChange={(e) => setDecisionRef(e.target.value)}
+                  className="text-xs font-mono"
                 />
               </div>
 
@@ -575,12 +812,121 @@ export const TransfersPage: React.FC = () => {
                   size="sm"
                   disabled={decisionSubmitting || !decisionNotes.trim()}
                   id="confirm-decision-btn"
-                  className={decisionItem.action === 'APPROVED' ? 'bg-green-700 hover:bg-green-800 text-white' : 'bg-red-700 hover:bg-red-800 text-white'}
+                  className={
+                    decisionItem.action === 'APPROVED'
+                      ? 'bg-emerald-700 hover:bg-emerald-800 text-white'
+                      : 'bg-rose-700 hover:bg-rose-800 text-white'
+                  }
                 >
                   {decisionSubmitting ? 'Recording Decision...' : `Confirm ${decisionItem.action}`}
                 </Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* AUDIT / REASON DETAILS MODAL */}
+      {viewingTransfer && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="bg-gov-navy text-white p-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ArrowLeftRight className="w-4 h-4 text-gov-saffron" />
+                <h3 className="text-base font-bold">Transfer Decision & Reason Details</h3>
+              </div>
+              <button
+                onClick={() => setViewingTransfer(null)}
+                className="text-white/80 hover:text-white p-1 rounded-lg"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4">
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500 font-medium">Transfer ID:</span>
+                  <span className="font-mono font-bold text-slate-900">{viewingTransfer.id}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500 font-medium">Student APAAR ID:</span>
+                  <MaskedValue value={viewingTransfer.apaar_id} kind="apaar" className="font-mono font-semibold" />
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500 font-medium">Decision Status:</span>
+                  <div>{getStatusChip(viewingTransfer.status)}</div>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500 font-medium">Source Institution:</span>
+                  <span className="text-right font-medium text-slate-800">{viewingTransfer.from_institution_name}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500 font-medium">Destination Institution:</span>
+                  <span className="text-right font-medium text-slate-800">{viewingTransfer.to_institution_name}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500 font-medium">Target Program:</span>
+                  <span className="font-mono font-medium text-slate-800">{viewingTransfer.to_program_code}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500 font-medium">Request Reason:</span>
+                  <span className="text-right text-slate-700">{viewingTransfer.reason}</span>
+                </div>
+                {viewingTransfer.evidence_ref && (
+                  <div className="flex justify-between py-1 border-b border-slate-100">
+                    <span className="text-slate-500 font-medium">Transfer Certificate / Ref:</span>
+                    <span className="font-mono text-slate-700">{viewingTransfer.evidence_ref}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Decision reason callout */}
+              <div
+                className={`p-3.5 rounded-xl border text-xs space-y-1.5 ${
+                  viewingTransfer.status === 'APPROVED'
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-950'
+                    : viewingTransfer.status === 'REJECTED'
+                    ? 'bg-rose-50 border-rose-200 text-rose-950'
+                    : 'bg-purple-50 border-purple-200 text-purple-950'
+                }`}
+              >
+                <div className="font-bold flex items-center gap-1.5">
+                  {viewingTransfer.status === 'APPROVED' && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
+                  {viewingTransfer.status === 'REJECTED' && <XCircle className="w-4 h-4 text-rose-600" />}
+                  {viewingTransfer.status === 'OVERRIDDEN' && <ShieldAlert className="w-4 h-4 text-purple-600" />}
+                  <span className="text-sm">
+                    {viewingTransfer.status === 'APPROVED'
+                      ? 'Official Approval Justification'
+                      : viewingTransfer.status === 'REJECTED'
+                      ? 'Official Rejection Justification'
+                      : 'AICTE Statutory Override Justification'}
+                  </span>
+                </div>
+                <p className="font-medium text-slate-800 leading-relaxed pt-1">
+                  {viewingTransfer.decision_note || 'No additional decision note recorded.'}
+                </p>
+                <div className="pt-2 border-t border-slate-200/60 text-[11px] text-slate-500 flex justify-between">
+                  <span>
+                    Decided By:{' '}
+                    <strong className="text-slate-700">{viewingTransfer.decided_by || 'Source Registrar'}</strong>
+                  </span>
+                  <span>{viewingTransfer.decided_at ? new Date(viewingTransfer.decided_at).toLocaleString() : ''}</span>
+                </div>
+              </div>
+
+              <div className="pt-2 flex justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setViewingTransfer(null)}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       )}

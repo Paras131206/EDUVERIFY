@@ -277,6 +277,35 @@ describe('Task A4: Institution Operations & Lifecycle Management', () => {
       });
     });
 
+    it('source institution can reject incoming transfer with structured reason and preset', async () => {
+      renderComponent(<TransfersPage />, '/institution/transfers');
+
+      await waitFor(() => {
+        expect(screen.getByText('TR-2026-0881')).toBeInTheDocument();
+      });
+
+      const rejectBtn = screen.getByTestId('reject-transfer-TR-2026-0881');
+      fireEvent.click(rejectBtn);
+
+      await waitFor(() => {
+        expect(screen.getByText(/reject transfer request/i)).toBeInTheDocument();
+        expect(screen.getByText(/notice: rejecting will deny this transfer request/i)).toBeInTheDocument();
+      });
+
+      // Select preset chip
+      fireEvent.click(screen.getByRole('button', { name: /intake exceeded/i }));
+
+      // Confirm REJECTED
+      fireEvent.click(screen.getByRole('button', { name: /confirm REJECTED/i }));
+
+      await waitFor(() => {
+        expect(screen.getAllByText('REJECTED').length).toBeGreaterThanOrEqual(2);
+        expect(
+          screen.getByText('Sanctioned intake capacity exceeded in target academic program')
+        ).toBeInTheDocument();
+      });
+    });
+
     it('creates outgoing transfer request with APAAR ID and source institution search', async () => {
       renderComponent(<TransfersPage />, '/institution/transfers');
 
