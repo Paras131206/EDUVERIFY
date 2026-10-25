@@ -1225,6 +1225,136 @@ export const handlers = [
     });
   }),
 
+  http.post('*/v1/admin/institutions/register', async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as Record<string, any>;
+    const nowIso = new Date().toISOString();
+    const docHash = `sha256:${Math.random().toString(16).slice(2, 10)}${Math.random().toString(16).slice(2, 10)}seatmatrix`;
+
+    const aicteId = body.institution_aicte_id || `1-${100010060 + masterInstitutionsState.length}`;
+    const intake = Number(body.approved_intake) || 360;
+
+    const defaultQuotas = {
+      gen: Math.round(intake * 0.5),
+      obc: Math.round(intake * 0.27),
+      sc: Math.round(intake * 0.15),
+      st: Math.round(intake * 0.075),
+      ews: Math.round(intake * 0.1),
+      pwd: Math.round(intake * 0.05),
+    };
+
+    const record = {
+      institution_aicte_id: aicteId,
+      name: body.name || `Registered Institution ${aicteId}`,
+      state_code: body.state_code || '07',
+      state_name: body.state_name || 'Delhi',
+      district_code: body.district_code || '101',
+      district_name: body.district_name || 'Central Delhi',
+      type: (body.type || 'ENGINEERING').toUpperCase(),
+      affiliated_dab_id: body.affiliated_dab_id || 'DAB-101',
+      onboarding_level: (body.onboarding_level || 'FULL') as 'FULL' | 'AGGREGATE_ONLY',
+      did: body.did || `did:web:${aicteId.toLowerCase().replace(/[^a-z0-9]/g, '')}.eduverify.ac.in`,
+      aishe_code: body.aishe_code || `C-${Math.floor(10000 + Math.random() * 89999)}`,
+      approval_order_ref: body.approval_order_ref || `F.No. AICTE/AB/2026/APH-${aicteId.slice(-4)}`,
+      source_authority: body.source_authority || 'AICTE Approval Process Handbook (APH) 2026-27',
+      source_file_name: body.document_name || 'statutory_seat_matrix_approval.pdf',
+      source_file_hash: docHash,
+      verified_by: body.authorizing_director || 'Dr. T.G. Sitharam, Chairman AICTE',
+      verified_at: nowIso,
+      approved_intake: intake,
+      academic_year: body.academic_year || '2026-27',
+      quotas: body.quotas || defaultQuotas,
+      supernumerary: body.supernumerary || {
+        tfw: Math.round(intake * 0.05),
+        pmsss: 10,
+        nri_oci_fn: Math.round(intake * 0.15),
+        ciwg: 15,
+      },
+      document_name: body.document_name || 'official_intake_approval.pdf',
+      document_type: body.document_type || 'AICTE_APPROVAL_LETTER',
+      document_hash: docHash,
+      document_uploaded_at: nowIso,
+      authorizing_director: body.authorizing_director || 'Dr. T.G. Sitharam, Chairman AICTE',
+    };
+
+    const existingIdx = masterInstitutionsState.findIndex((m: any) => m.institution_aicte_id === aicteId);
+    if (existingIdx >= 0) {
+      masterInstitutionsState[existingIdx] = { ...masterInstitutionsState[existingIdx], ...record };
+    } else {
+      masterInstitutionsState.unshift(record);
+    }
+
+    auditLogState.unshift({
+      id: `aud-reg-${Date.now()}`,
+      timestamp: nowIso,
+      actor_email: 'aicte.admin@aicte-india.org',
+      actor_role: 'AICTE_ADMIN',
+      action: 'INSTITUTION_REGISTERED',
+      resource: `${record.institution_aicte_id} - ${record.name} (${record.approved_intake} seats)`,
+      record_hash: docHash,
+      prev_record_hash: auditLogState[0]?.record_hash || '0000000000000000',
+      metadata: {
+        institution_aicte_id: record.institution_aicte_id,
+        approved_intake: record.approved_intake,
+        approval_order_ref: record.approval_order_ref,
+        document_name: record.document_name,
+      },
+    });
+
+    return HttpResponse.json({ success: true, institution: record }, { status: 201 });
+  }),
+
+  http.post('*/v1/admin/institutions/:id/seat-matrix', async ({ params, request }) => {
+    const id = params.id as string;
+    const body = (await request.json().catch(() => ({}))) as Record<string, any>;
+    const nowIso = new Date().toISOString();
+    const docHash = `sha256:${Math.random().toString(16).slice(2, 10)}${Math.random().toString(16).slice(2, 10)}reviseddoc`;
+
+    const instIdx = masterInstitutionsState.findIndex((m: any) => m.institution_aicte_id === id);
+    if (instIdx < 0) {
+      return HttpResponse.json({ message: `Institution ${id} not found` }, { status: 404 });
+    }
+
+    const current = masterInstitutionsState[instIdx];
+    const newIntake = Number(body.approved_intake) || current.approved_intake || 360;
+
+    const updated = {
+      ...current,
+      approved_intake: newIntake,
+      academic_year: body.academic_year || current.academic_year || '2026-27',
+      quotas: body.quotas || current.quotas,
+      supernumerary: body.supernumerary || current.supernumerary,
+      approval_order_ref: body.approval_order_ref || current.approval_order_ref,
+      document_name: body.document_name || current.document_name || 'revised_seat_matrix.pdf',
+      document_type: body.document_type || current.document_type || 'SEAT_MATRIX_GAZETTE',
+      document_hash: docHash,
+      document_uploaded_at: nowIso,
+      authorizing_director: body.authorizing_director || current.authorizing_director || 'Dr. T.G. Sitharam, Chairman AICTE',
+      source_file_hash: docHash,
+      verified_at: nowIso,
+    };
+
+    masterInstitutionsState[instIdx] = updated;
+
+    auditLogState.unshift({
+      id: `aud-seat-${Date.now()}`,
+      timestamp: nowIso,
+      actor_email: 'aicte.admin@aicte-india.org',
+      actor_role: 'AICTE_ADMIN',
+      action: 'SEAT_MATRIX_DOCUMENT_UPLOADED',
+      resource: `${id} - ${updated.name} (Sanctioned Intake: ${newIntake})`,
+      record_hash: docHash,
+      prev_record_hash: auditLogState[0]?.record_hash || '0000000000000000',
+      metadata: {
+        institution_aicte_id: id,
+        new_approved_intake: newIntake,
+        document_name: updated.document_name,
+        approval_order_ref: updated.approval_order_ref,
+      },
+    });
+
+    return HttpResponse.json({ success: true, institution: updated });
+  }),
+
   http.post('*/v1/admin/rollover', async ({ request }) => {
     const url = new URL(request.url);
     const isDryRun = url.searchParams.get('dry_run') === 'true';
