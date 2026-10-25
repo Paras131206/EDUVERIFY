@@ -12,6 +12,7 @@ import {
   RefreshCw,
   ExternalLink,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { API_BASE_URL, authFetch, getAuthToken } from '@/lib/api';
 import { BatchItem } from '../types';
 import { getDemoBatchFile } from '../demoBatchFile';
