@@ -322,7 +322,10 @@ def revert_issue_service(
         ):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail={"code": "FORBIDDEN", "message": "Cannot revert issues for another institution"},
+                detail={
+                    "code": "FORBIDDEN",
+                    "message": "Cannot revert issues for another institution",
+                },
             )
 
     old_status = issue.status
@@ -337,7 +340,8 @@ def revert_issue_service(
     corrections = db.scalars(select(Correction).where(Correction.issue_id == issue.id)).all()
     for corr in corrections:
         corr.status = "REVERTED"
-        revert_note = f"[Reverted by {principal.id}: {reason or 'Rollback to original document state'}]"
+        fallback_reason = reason or "Rollback to original document state"
+        revert_note = f"[Reverted by {principal.id}: {fallback_reason}]"
         corr.note = f"{corr.note} {revert_note}" if corr.note else revert_note
 
     # Record tamper-evident audit log entry

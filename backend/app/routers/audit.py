@@ -174,7 +174,10 @@ def purge_retention_batch_files_endpoint(
 @router.get(
     "/v1/institution/audit-trail",
     include_in_schema=False,
-    summary="Get complete document upload audit trail and discrepancy change history for institution admin",
+    summary=(
+        "Get complete document upload audit trail and discrepancy change history "
+        "for institution admin"
+    ),
 )
 def get_institution_audit_trail(
     batch_id: str | None = Query(None, description="Filter by specific batch ID"),
@@ -205,13 +208,17 @@ def get_institution_audit_trail(
     } if batch_ids else {}
 
     # 2. Fetch issues for these batches
-    issues_stmt = select(Issue).order_by(Issue.created_at.desc() if hasattr(Issue, "created_at") else Issue.id.desc())
     if batch_ids:
-        issues_stmt = issues_stmt.where(Issue.batch_id.in_(batch_ids))
+        issues_stmt = (
+            select(Issue)
+            .where(Issue.batch_id.in_(batch_ids))
+            .order_by(Issue.created_at.desc() if hasattr(Issue, "created_at") else Issue.id.desc())
+            .limit(limit)
+        )
+        issues = list(db.scalars(issues_stmt).all())
     else:
-        issues_stmt = issues_stmt.where(False)
+        issues = []
 
-    issues = list(db.scalars(issues_stmt.limit(limit)).all())
     issue_ids = [i.id for i in issues]
 
     # Fetch corrections associated with these issues
@@ -270,7 +277,10 @@ def get_institution_audit_trail(
         latest_corr = corrs[-1] if corrs else None
 
         decided_user = users_map.get(i.decided_by) if i.decided_by else None
-        decided_by_name = decided_user.full_name or decided_user.email if decided_user else (i.decided_by or None)
+        if decided_user:
+            decided_by_name = decided_user.full_name or decided_user.email
+        else:
+            decided_by_name = i.decided_by or None
         decided_by_role = decided_user.role if decided_user else None
 
         is_reverted = False
@@ -287,8 +297,16 @@ def get_institution_audit_trail(
         if is_reverted:
             total_reverted += 1
 
-        original_val = latest_corr.old_value_enc if latest_corr and latest_corr.old_value_enc else i.value_masked
-        modified_val = latest_corr.new_value_enc if latest_corr and latest_corr.new_value_enc else None
+        original_val = (
+            latest_corr.old_value_enc
+            if latest_corr and latest_corr.old_value_enc
+            else i.value_masked
+        )
+        modified_val = (
+            latest_corr.new_value_enc
+            if latest_corr and latest_corr.new_value_enc
+            else None
+        )
         if not modified_val and i.status == "DISMISSED":
             modified_val = "DISMISSED"
         elif not modified_val and i.suggested_fix_json and i.status in ("ACCEPTED", "FIXED"):
@@ -296,6 +314,13 @@ def get_institution_audit_trail(
 
         bf = batch_files.get(i.batch_id)
         batch_filename = bf.filename if bf else f"{i.batch_id}.csv"
+
+        if i.decided_at:
+            decided_at_str = i.decided_at.isoformat()
+        elif latest_corr and latest_corr.decided_at:
+            decided_at_str = latest_corr.decided_at.isoformat()
+        else:
+            decided_at_str = None
 
         discrepancies.append(
             {
@@ -316,7 +341,7 @@ def get_institution_audit_trail(
                 "decided_by_id": i.decided_by,
                 "decided_by_name": decided_by_name,
                 "decided_by_role": decided_by_role,
-                "decided_at": i.decided_at.isoformat() if i.decided_at else (latest_corr.decided_at.isoformat() if latest_corr and latest_corr.decided_at else None),
+                "decided_at": decided_at_str,
                 "decision_note": latest_corr.note if latest_corr else None,
                 "is_reverted": is_reverted,
                 "revert_reason": revert_reason,
@@ -329,16 +354,16 @@ def get_institution_audit_trail(
     audit_rows = list(db.scalars(recent_logs_stmt).all())
     formatted_logs = [
         {
-            "id": l.id,
-            "timestamp": l.ts.isoformat() if l.ts else None,
-            "action": l.action,
-            "actor_id": l.actor_id,
-            "role": l.role,
-            "resource": l.resource,
-            "resource_id": l.resource_id,
-            "sha256_hash": l.hash,
+            "id": audit_row.id,
+            "timestamp": audit_row.ts.isoformat() if audit_row.ts else None,
+            "action": audit_row.action,
+            "actor_id": audit_row.actor_id,
+            "role": audit_row.role,
+            "resource": audit_row.resource,
+            "resource_id": audit_row.resource_id,
+            "sha256_hash": audit_row.hash,
         }
-        for l in audit_rows
+        for audit_row in audit_rows
     ]
 
     return {

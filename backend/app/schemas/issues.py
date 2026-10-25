@@ -73,5 +73,7 @@ class DQComparisonResponse(BaseModel):
 
 class IssueRevertRequest(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    reason: str | None = Field(default=None, description="Audit justification for reverting decision")
+    reason: str | None = Field(
+        default=None, description="Audit justification for reverting decision"
+    )
 
