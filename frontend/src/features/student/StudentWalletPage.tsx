@@ -6,6 +6,7 @@ import {
   ConsentPurposeSetting,
   ConsentHistoryRecord,
   StudentCredentialItem,
+  UserTypeConsentSetting,
 } from './types';
 import { getOrInitHolderKey } from '@/lib/holderKey';
 import { HolderKeyBanner } from './components/HolderKeyBanner';
@@ -23,6 +24,7 @@ export const StudentWalletPage: React.FC = () => {
   const [record, setRecord] = useState<StudentOwnRecord | null>(null);
   const [versions, setVersions] = useState<StudentVersionHistoryItem[]>([]);
   const [purposes, setPurposes] = useState<ConsentPurposeSetting[]>([]);
+  const [userConsents, setUserConsents] = useState<UserTypeConsentSetting[]>([]);
   const [history, setHistory] = useState<ConsentHistoryRecord[]>([]);
   const [credentials, setCredentials] = useState<StudentCredentialItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -81,12 +83,13 @@ export const StudentWalletPage: React.FC = () => {
 
       const recData = await recRes.json();
       const verData = verRes.ok ? await verRes.json() : [];
-      const cstData = cstRes.ok ? await cstRes.json() : { purposes: [], history: [] };
+      const cstData = cstRes.ok ? await cstRes.json() : { purposes: [], history: [], user_consents: [] };
       const credData = credRes.ok ? await credRes.json() : [];
 
       setRecord(recData);
       setVersions(verData);
       setPurposes(cstData.purposes || []);
+      setUserConsents(cstData.user_consents || []);
       setHistory(cstData.history || []);
       setCredentials(credData);
     } catch (err: any) {
@@ -196,6 +199,7 @@ export const StudentWalletPage: React.FC = () => {
       {/* 3. Consent Management with Plain-Language Consequences (Req 1) */}
       <ConsentManagementCard
         purposes={purposes}
+        userConsents={userConsents}
         history={history}
         onConsentUpdated={(msg) => {
           fetchData();
@@ -216,6 +220,7 @@ export const StudentWalletPage: React.FC = () => {
       {/* Selective Disclosure Presentation Builder Modal */}
       <SharePresentationModal
         credential={selectedCredForShare}
+        userConsents={userConsents}
         isOpen={!!selectedCredForShare}
         onClose={() => setSelectedCredForShare(null)}
         holderPrivateKey={holderPrivateKey}

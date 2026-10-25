@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { VerificationResult } from '@/features/student/types';
+import { VerificationResult, VerifierUserType } from '@/features/student/types';
 import { API_BASE_URL } from '@/lib/api';
 import {
   ShieldCheck,
@@ -11,11 +11,13 @@ import {
   AlertTriangle,
   Clock,
   Ban,
+  Users,
 } from 'lucide-react';
 
 export const VerifierPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [presentationInput, setPresentationInput] = useState<string>('');
+  const [verifierType, setVerifierType] = useState<VerifierUserType>('PUBLIC');
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const [result, setResult] = useState<VerificationResult | null>(null);
 
@@ -35,9 +37,10 @@ export const VerifierPage: React.FC = () => {
     return trimmed;
   };
 
-  const handleVerify = useCallback(async (tokenToVerify?: string) => {
+  const handleVerify = useCallback(async (tokenToVerify?: string, typeOverride?: VerifierUserType) => {
     const token = cleanPresentationString(tokenToVerify || presentationInput);
     if (!token) return;
+    const activeType = typeOverride || verifierType;
 
     setIsVerifying(true);
     setResult(null);
@@ -50,6 +53,7 @@ export const VerifierPage: React.FC = () => {
           sd_jwt_presentation: token,
           aud: 'Public/Authorized Verifier Desk',
           nonce: `nonce-${Date.now()}`,
+          verifier_type: activeType,
         }),
       });
 
@@ -72,14 +76,18 @@ export const VerifierPage: React.FC = () => {
     } finally {
       setIsVerifying(false);
     }
-  }, [presentationInput]);
+  }, [presentationInput, verifierType]);
 
   // Auto-verify if `?presentation=...` is present in query parameters
   useEffect(() => {
     const queryPresentation = searchParams.get('presentation');
+    const queryVerifierType = searchParams.get('verifier_type') as VerifierUserType;
+    if (queryVerifierType) {
+      setVerifierType(queryVerifierType);
+    }
     if (queryPresentation) {
       setPresentationInput(queryPresentation);
-      handleVerify(queryPresentation);
+      handleVerify(queryPresentation, queryVerifierType || 'PUBLIC');
     }
   }, [searchParams, handleVerify]);
 
@@ -127,6 +135,38 @@ export const VerifierPage: React.FC = () => {
         </CardHeader>
 
         <CardContent className="pt-4 space-y-4">
+          {/* Verifier Role / Category Selector */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-1 border-b border-slate-100">
+            <div>
+              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                Verifier Role / Organization Type
+              </label>
+              <select
+                value={verifierType}
+                onChange={(e) => setVerifierType(e.target.value as VerifierUserType)}
+                className="w-full p-2 rounded-lg border border-slate-300 text-xs bg-white font-medium"
+                data-testid="verifier-role-select"
+              >
+                <option value="PUBLIC">🌐 Public / Third-Party Verifier (PUBLIC)</option>
+                <option value="EMPLOYER">🏢 Corporate Employer & Recruiter (EMPLOYER)</option>
+                <option value="HIGHER_ED">🎓 University & Academic Institution (HIGHER_ED)</option>
+                <option value="GOVERNMENT">🏛️ Government & Scholarship Authority (GOVERNMENT)</option>
+                <option value="FINANCIAL">🏦 Bank & Education Loan Lender (FINANCIAL)</option>
+                <option value="REGULATORY">🛡️ AICTE & Apex Regulatory Board (REGULATORY)</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                DPDP Statutory Enforcement
+              </label>
+              <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
+                <span>Section 8.4 User Consent Policy</span>
+                <span className="font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded text-[10px]">
+                  Live Enforced
+                </span>
+              </div>
+            </div>
+          </div>
 
           {/* Paste Presentation or Share URL */}
           <div className="space-y-1.5">
@@ -276,8 +316,8 @@ export const VerifierPage: React.FC = () => {
                         CONSENT WITHDRAWN
                       </span>
                     </div>
-                    <p className="text-xs text-slate-700 font-medium">
-                      Holder has withdrawn VERIFICATION_SHARE consent under Section 8.4. No student data is revealed.
+                    <p className="text-xs text-slate-700 font-medium" data-testid="suspended-reason-text">
+                      {result.error_message || 'Holder has withdrawn VERIFICATION_SHARE consent under Section 8.4. No student data is revealed.'}
                     </p>
                   </div>
                 </div>
