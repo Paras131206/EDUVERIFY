@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="760" viewBox="0 0 760 760" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a8f98"/>
+    </marker>
+    <marker id="arrO" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#e39a32"/>
+    </marker>
+  </defs>
+
+  <rect x="1.5" y="1.5" width="757" height="757" fill="#ffffff" stroke="#7b3fe4" stroke-width="3"/>
+
+  <text x="26" y="38" font-size="22" font-weight="bold" fill="#3c7a7f">END-TO-END WORKFLOW</text>
+  <text x="734" y="32" font-size="15" font-weight="bold" fill="#222" text-anchor="end" font-family="Georgia, 'Times New Roman', serif">FIGURE NO: 01</text>
+
+  <!-- main spine -->
+  <line x1="301" y1="114" x2="301" y2="625" stroke="#8a8f98" stroke-width="1.2"/>
+
+  <!-- stage labels on the left edge -->
+  <g font-size="10" font-weight="bold" fill="#9aa1ab" letter-spacing="1">
+    <text transform="translate(14,190) rotate(-90)" text-anchor="middle">INGESTION</text>
+    <text transform="translate(14,330) rotate(-90)" text-anchor="middle">VERIFICATION</text>
+    <text transform="translate(14,555) rotate(-90)" text-anchor="middle">STORAGE &amp; UPDATE</text>
+    <text transform="translate(14,652) rotate(-90)" text-anchor="middle">USE</text>
+  </g>
+
+  <!-- Row helper: pill x=24 w=106, box x=138 w=327, h=54 -->
+
+  <!-- 1 AICTE -->
+  <rect x="24" y="60" width="106" height="54" rx="5" fill="#1f2d4f"/>
+  <text x="77" y="92" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">AICTE</text>
+  <rect x="138" y="60" width="327" height="54" rx="5" fill="#fff" stroke="#1f2d4f" stroke-width="1.8"/>
+  <text x="150" y="92" font-size="14" fill="#1f2d4f"><tspan font-weight="bold">1</tspan>  Set approved intake and validation rules</text>
+
+  <!-- 2 INSTITUTION -->
+  <rect x="24" y="129" width="106" height="54" rx="5" fill="#3a7d7e"/>
+  <text x="77" y="161" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">INSTITUTION</text>
+  <rect x="138" y="129" width="327" height="54" rx="5" fill="#fff" stroke="#3a7d7e" stroke-width="1.8"/>
+  <text font-size="14" fill="#1f2d4f"><tspan x="150" y="152"><tspan font-weight="bold" fill="#3a7d7e">2</tspan>  Submit student records</tspan><tspan x="150" y="170">(file upload or system integration)</tspan></text>
+
+  <!-- 3 INSTITUTION -->
+  <rect x="24" y="198" width="106" height="54" rx="5" fill="#3a7d7e"/>
+  <text x="77" y="230" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">INSTITUTION</text>
+  <rect x="138" y="198" width="327" height="54" rx="5" fill="#fff" stroke="#3a7d7e" stroke-width="1.8"/>
+  <text font-size="14" fill="#1f2d4f"><tspan x="150" y="221"><tspan font-weight="bold" fill="#3a7d7e">3</tspan>  Map submitted fields to the standard</tspan><tspan x="150" y="239">format; submitter confirms</tspan></text>
+
+  <!-- 4 SYSTEM -->
+  <rect x="24" y="267" width="106" height="54" rx="5" fill="#4a5568"/>
+  <text x="77" y="299" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">SYSTEM</text>
+  <rect x="138" y="267" width="327" height="54" rx="5" fill="#fff" stroke="#4a5568" stroke-width="1.8"/>
+  <text font-size="14" fill="#1f2d4f"><tspan x="150" y="290"><tspan font-weight="bold" fill="#4a5568">4</tspan>  Check completeness, format, consistency</tspan><tspan x="150" y="308">and intake limits</tspan></text>
+
+  <!-- 5 SYSTEM -->
+  <rect x="24" y="336" width="106" height="54" rx="5" fill="#4a5568"/>
+  <text x="77" y="368" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">SYSTEM</text>
+  <rect x="138" y="336" width="327" height="54" rx="5" fill="#fff" stroke="#4a5568" stroke-width="1.8"/>
+  <text font-size="14" fill="#1f2d4f"><tspan x="150" y="359"><tspan font-weight="bold" fill="#4a5568">5</tspan>  Detect possible duplicates within and</tspan><tspan x="150" y="377">across institutions</tspan></text>
+
+  <!-- decision -->
+  <polygon points="301,397 396,425 301,453 206,425" fill="#fbe3c4" stroke="#e39a32" stroke-width="1.8"/>
+  <text x="301" y="430" font-size="14" font-weight="bold" fill="#8a5a17" text-anchor="middle">Issues found?</text>
+  <text x="440" y="416" font-size="13" font-weight="bold" fill="#b3741d" font-style="italic">YES</text>
+  <text x="312" y="472" font-size="12" font-weight="bold" fill="#8a8f98" font-style="italic">NO</text>
+  <line x1="396" y1="425" x2="493" y2="425" stroke="#e39a32" stroke-width="1.5" marker-end="url(#arrO)"/>
+
+  <!-- 6, 7 review loop -->
+  <rect x="495" y="398" width="212" height="54" rx="5" fill="#fff" stroke="#e39a32" stroke-width="1.8"/>
+  <text font-size="14" fill="#1f2d4f"><tspan x="507" y="421"><tspan font-weight="bold" fill="#e39a32">6</tspan>  Authorised review:</tspan><tspan x="507" y="439">approve / correct / reject</tspan></text>
+  <line x1="601" y1="452" x2="601" y2="471" stroke="#e39a32" stroke-width="1.5" marker-end="url(#arrO)"/>
+  <rect x="495" y="473" width="212" height="54" rx="5" fill="#fff" stroke="#e39a32" stroke-width="1.8"/>
+  <text font-size="14" fill="#1f2d4f"><tspan x="507" y="496"><tspan font-weight="bold" fill="#e39a32">7</tspan>  Record decision and</tspan><tspan x="507" y="514">evidence in the audit trail</tspan></text>
+
+  <!-- return loop to step 4 (from 7 and from 9) -->
+  <polyline points="707,500 736,500 736,294 467,294" fill="none" stroke="#e39a32" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrO)"/>
+  <polyline points="465,583 736,583 736,500" fill="none" stroke="#e39a32" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text transform="translate(749,400) rotate(-90)" font-size="11" font-weight="bold" fill="#b3741d" text-anchor="middle">RE-CHECKED</text>
+
+  <!-- 8 AICTE store -->
+  <rect x="24" y="487" width="106" height="54" rx="5" fill="#1f2d4f"/>
+  <text x="77" y="519" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">AICTE</text>
+  <rect x="138" y="487" width="327" height="54" rx="5" fill="#e8eef5" stroke="#1f2d4f" stroke-width="1.8"/>
+  <text font-size="14" fill="#1f2d4f"><tspan x="150" y="510"><tspan font-weight="bold">8</tspan>  Store verified record in the central</tspan><tspan x="150" y="528">repository with its status</tspan></text>
+
+  <!-- 9 INSTITUTION update -->
+  <rect x="24" y="556" width="106" height="54" rx="5" fill="#3a7d7e"/>
+  <text x="77" y="588" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">INSTITUTION</text>
+  <rect x="138" y="556" width="327" height="54" rx="5" fill="#fff" stroke="#3a7d7e" stroke-width="1.8"/>
+  <text font-size="14" fill="#1f2d4f"><tspan x="150" y="579"><tspan font-weight="bold" fill="#3a7d7e">9</tspan>  Update records (corrections, status</tspan><tspan x="150" y="597">changes); updates are checked again</tspan></text>
+
+  <!-- 10 AUTHORISED USERS -->
+  <rect x="24" y="625" width="106" height="54" rx="5" fill="#1f2d4f"/>
+  <text font-size="12" font-weight="bold" fill="#fff" text-anchor="middle"><tspan x="77" y="649">AUTHORISED</tspan><tspan x="77" y="664">USERS</tspan></text>
+  <rect x="138" y="625" width="327" height="54" rx="5" fill="#fff" stroke="#1f2d4f" stroke-width="1.8"/>
+  <text font-size="14" fill="#1f2d4f"><tspan x="150" y="648"><tspan font-weight="bold">10</tspan>  Dashboards, reports and consent-based</tspan><tspan x="150" y="666">verification of records</tspan></text>
+
+  <!-- legend -->
+  <rect x="26" y="712" width="40" height="18" rx="3" fill="#fff" stroke="#3a7d7e" stroke-width="1.8"/>
+  <text x="76" y="726" font-size="13" fill="#555">main flow</text>
+  <rect x="190" y="712" width="40" height="18" rx="3" fill="#fff" stroke="#e39a32" stroke-width="1.8" stroke-dasharray="5 4"/>
+  <text x="240" y="726" font-size="13" fill="#555">review and update loop</text>
+  <rect x="420" y="712" width="40" height="18" rx="3" fill="#e8eef5" stroke="#1f2d4f" stroke-width="1.8"/>
+  <text x="470" y="726" font-size="13" fill="#555">trusted central record</text>
+</svg>

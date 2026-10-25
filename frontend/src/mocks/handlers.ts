@@ -491,6 +491,11 @@ export const handlers = [
     };
 
     batches = [newBatch, ...batches];
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem('eduverify_data_uploaded', 'true');
+      }
+    } catch {}
     return HttpResponse.json(newBatch, { status: 201 });
   }),
 
@@ -1005,6 +1010,33 @@ export const handlers = [
   }),
 
   http.get('*/v1/dashboards/institution/summary', () => {
+    let hasUploaded = false;
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        hasUploaded = window.localStorage.getItem('eduverify_data_uploaded') === 'true';
+      }
+    } catch {}
+
+    if (!hasUploaded) {
+      return HttpResponse.json({
+        institution_name: 'Delhi Institute of Engineering & Technology (AICTE ID: 1-1234567890)',
+        total_enrolled: 0,
+        approved_intake: 520,
+        batches_count: 0,
+        latest_quality_score: 0.0,
+        pending_review_count: 0,
+        active_transfers_count: 0,
+        dq_trend: [],
+        intake_distribution: [
+          { program: 'UG-CSE', approved: 60, enrolled: 0 },
+          { program: 'UG-ECE', approved: 60, enrolled: 0 },
+          { program: 'UG-ME', approved: 60, enrolled: 0 },
+          { program: 'PG-MBA', approved: 40, enrolled: 0 },
+        ],
+        notifications: [],
+      });
+    }
+
     return HttpResponse.json({
       ...mockInstitutionSummary,
       dq_trend: mockDqTrend,

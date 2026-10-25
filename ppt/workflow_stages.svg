@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="650" viewBox="0 0 1100 650" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8a8f98"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e39a32"/></marker>
+    <marker id="d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f2d4f"/></marker>
+  </defs>
+
+  <rect x="1.5" y="1.5" width="1097" height="647" fill="#fff" stroke="#7b3fe4" stroke-width="3"/>
+  <text x="30" y="44" font-size="22" font-weight="bold" fill="#3c7a7f">END-TO-END WORKFLOW</text>
+  <text x="1070" y="38" font-size="15" font-weight="bold" fill="#222" text-anchor="end" font-family="Georgia, 'Times New Roman', serif">FIGURE NO: 01</text>
+
+  <!-- stage header chips + main flow arrows -->
+  <g font-size="14" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">
+    <rect x="30" y="70" width="230" height="34" rx="17" fill="#3a7d7e"/><text x="145" y="92">1 · INGEST</text>
+    <rect x="300" y="70" width="230" height="34" rx="17" fill="#4a5568"/><text x="415" y="92">2 · VERIFY</text>
+    <rect x="570" y="70" width="230" height="34" rx="17" fill="#1f2d4f"/><text x="685" y="92">3 · STORE</text>
+    <rect x="840" y="70" width="230" height="34" rx="17" fill="#7b3fe4"/><text x="955" y="92">4 · USE</text>
+  </g>
+  <g stroke="#1f2d4f" stroke-width="2" marker-end="url(#d)">
+    <line x1="262" y1="87" x2="297" y2="87"/>
+    <line x1="532" y1="87" x2="567" y2="87"/>
+    <line x1="802" y1="87" x2="837" y2="87"/>
+  </g>
+
+  <!-- in-column connectors -->
+  <g stroke="#8a8f98" stroke-width="1.3" marker-end="url(#g)">
+    <line x1="145" y1="176" x2="145" y2="188"/><line x1="145" y1="246" x2="145" y2="258"/>
+    <line x1="415" y1="176" x2="415" y2="188"/><line x1="415" y1="246" x2="415" y2="258"/>
+    <line x1="415" y1="316" x2="415" y2="350"/>
+    <line x1="685" y1="176" x2="685" y2="188"/>
+    <line x1="955" y1="176" x2="955" y2="188"/><line x1="955" y1="246" x2="955" y2="258"/>
+  </g>
+
+  <g font-size="14" fill="#1f2d4f">
+    <!-- INGEST -->
+    <rect x="30" y="120" width="230" height="56" rx="6" fill="#fff" stroke="#3a7d7e" stroke-width="1.8"/>
+    <text><tspan x="44" y="144">AICTE sets approved</tspan><tspan x="44" y="162">intake and rules</tspan></text>
+    <rect x="30" y="190" width="230" height="56" rx="6" fill="#fff" stroke="#3a7d7e" stroke-width="1.8"/>
+    <text><tspan x="44" y="214">Institution submits</tspan><tspan x="44" y="232">student records</tspan></text>
+    <rect x="30" y="260" width="230" height="56" rx="6" fill="#fff" stroke="#3a7d7e" stroke-width="1.8"/>
+    <text><tspan x="44" y="284">Fields mapped to the</tspan><tspan x="44" y="302">standard format</tspan></text>
+
+    <!-- VERIFY -->
+    <rect x="300" y="120" width="230" height="56" rx="6" fill="#fff" stroke="#4a5568" stroke-width="1.8"/>
+    <text><tspan x="314" y="144">Completeness and</tspan><tspan x="314" y="162">format checks</tspan></text>
+    <rect x="300" y="190" width="230" height="56" rx="6" fill="#fff" stroke="#4a5568" stroke-width="1.8"/>
+    <text><tspan x="314" y="214">Consistency and</tspan><tspan x="314" y="232">intake-limit checks</tspan></text>
+    <rect x="300" y="260" width="230" height="56" rx="6" fill="#fff" stroke="#4a5568" stroke-width="1.8"/>
+    <text><tspan x="314" y="284">Duplicate detection</tspan><tspan x="314" y="302">across institutions</tspan></text>
+
+    <!-- STORE -->
+    <rect x="570" y="120" width="230" height="56" rx="6" fill="#e8eef5" stroke="#1f2d4f" stroke-width="1.8"/>
+    <text><tspan x="584" y="144">Verified record saved</tspan><tspan x="584" y="162">with its status</tspan></text>
+    <rect x="570" y="190" width="230" height="56" rx="6" fill="#e8eef5" stroke="#1f2d4f" stroke-width="1.8"/>
+    <text><tspan x="584" y="214">Every change kept in a</tspan><tspan x="584" y="232">tamper-evident audit trail</tspan></text>
+
+    <!-- USE -->
+    <rect x="840" y="120" width="230" height="56" rx="6" fill="#fff" stroke="#7b3fe4" stroke-width="1.8"/>
+    <text><tspan x="854" y="144">Live dashboards</tspan><tspan x="854" y="162">and monitoring</tspan></text>
+    <rect x="840" y="190" width="230" height="56" rx="6" fill="#fff" stroke="#7b3fe4" stroke-width="1.8"/>
+    <text><tspan x="854" y="214">Policy, accreditation and</tspan><tspan x="854" y="232">regulatory reports</tspan></text>
+    <rect x="840" y="260" width="230" height="56" rx="6" fill="#fff" stroke="#7b3fe4" stroke-width="1.8"/>
+    <text><tspan x="854" y="284">Consent-based record</tspan><tspan x="854" y="302">verification</tspan></text>
+  </g>
+
+  <!-- decision -->
+  <polygon points="415,352 485,382 415,412 345,382" fill="#fbe3c4" stroke="#e39a32" stroke-width="1.8"/>
+  <text x="415" y="387" font-size="13" font-weight="bold" fill="#8a5a17" text-anchor="middle">Issues found?</text>
+  <polyline points="485,382 550,382 550,148 567,148" fill="none" stroke="#8a8f98" stroke-width="1.5" marker-end="url(#g)"/>
+  <text x="494" y="374" font-size="12" font-weight="bold" font-style="italic" fill="#6b7280">NO</text>
+  <line x1="415" y1="412" x2="415" y2="467" stroke="#e39a32" stroke-width="1.5" marker-end="url(#o)"/>
+  <text x="424" y="436" font-size="12" font-weight="bold" font-style="italic" fill="#b3741d">YES</text>
+
+  <!-- review & update band -->
+  <rect x="300" y="446" width="770" height="108" rx="10" fill="#fff8ee" stroke="#e39a32" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="1058" y="464" font-size="12" font-weight="bold" fill="#b3741d" text-anchor="end" letter-spacing="1">REVIEW &amp; UPDATE LOOP</text>
+  <g font-size="14" fill="#1f2d4f">
+    <rect x="320" y="470" width="220" height="56" rx="6" fill="#fff" stroke="#e39a32" stroke-width="1.8"/>
+    <text><tspan x="334" y="494">Authorised reviewer</tspan><tspan x="334" y="512">examines the flag</tspan></text>
+    <rect x="580" y="470" width="220" height="56" rx="6" fill="#fff" stroke="#e39a32" stroke-width="1.8"/>
+    <text><tspan x="594" y="494">Approve, correct or reject;</tspan><tspan x="594" y="512">decision is logged</tspan></text>
+    <rect x="840" y="470" width="220" height="56" rx="6" fill="#fff" stroke="#e39a32" stroke-width="1.8"/>
+    <text><tspan x="854" y="494">Institution corrects or</tspan><tspan x="854" y="512">updates the record</tspan></text>
+  </g>
+  <g stroke="#e39a32" stroke-width="1.5" marker-end="url(#o)">
+    <line x1="540" y1="498" x2="578" y2="498"/>
+    <line x1="800" y1="498" x2="838" y2="498"/>
+  </g>
+  <!-- loop back to verification -->
+  <polyline points="950,526 950,590 282,590 282,148 298,148" fill="none" stroke="#e39a32" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#o)"/>
+  <text x="616" y="608" font-size="12" font-weight="bold" fill="#b3741d" text-anchor="middle" letter-spacing="1">CORRECTIONS AND LATER UPDATES ARE VERIFIED AGAIN</text>
+
+  <text x="30" y="634" font-size="12" fill="#6b7280">Every step is role-checked and consent-gated.</text>
+</svg>
