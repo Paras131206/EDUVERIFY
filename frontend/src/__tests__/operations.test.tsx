@@ -8,6 +8,7 @@ import { SettingsPage } from '@/features/settings/SettingsPage';
 import { InstitutionDashboardPage } from '@/features/institution/InstitutionDashboardPage';
 import { AuthContext, AuthContextType } from '@/lib/auth';
 import { resetOperationsMock } from '@/mocks/handlers';
+import { markDocumentUploaded } from '@/lib/uploadState';
 import { User } from '@/types/auth';
 
 const mockAdminUser: User = {
@@ -462,12 +463,26 @@ describe('Task A4: Institution Operations & Lifecycle Management', () => {
   });
 
   describe('5. Institution Portal (/institution)', () => {
-    it('renders institution portal overview metrics and ensures load demo doc button and banner are absent', async () => {
-      renderComponent(<InstitutionDashboardPage />, '/institution');
+    it('always starts stats from zero initially and populates stats only when documents are uploaded', async () => {
+      // 1. Initial state: no document uploaded
+      markDocumentUploaded(false);
+      const { unmount } = renderComponent(<InstitutionDashboardPage />, '/institution');
 
       expect(screen.getByText(/institution (portal|dashboard)/i)).toBeInTheDocument();
       expect(screen.queryByText(/load demo document/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/no student data uploaded/i)).not.toBeInTheDocument();
+
+      // Starts from zero
+      expect(screen.getByText('0')).toBeInTheDocument();
+      expect(screen.getByText(/0\.0%/)).toBeInTheDocument();
+      expect(screen.getByText('0 Active')).toBeInTheDocument();
+      expect(screen.getByText('0 Open Issues')).toBeInTheDocument();
+
+      unmount();
+
+      // 2. When documents/batches are uploaded
+      markDocumentUploaded(true);
+      renderComponent(<InstitutionDashboardPage />, '/institution');
 
       await waitFor(() => {
         expect(screen.getByTestId('kpi-dq-score')).toBeInTheDocument();
@@ -476,9 +491,11 @@ describe('Task A4: Institution Operations & Lifecycle Management', () => {
         expect(screen.getByTestId('kpi-open-issues')).toBeInTheDocument();
       });
 
-      // Check populated stats
+      // Check populated stats after upload
       expect(screen.getByText('480')).toBeInTheDocument();
       expect(screen.getByText(/92\.3%/)).toBeInTheDocument();
+      expect(screen.getByText('1 Active')).toBeInTheDocument();
+      expect(screen.getByText('4 Open Issues')).toBeInTheDocument();
 
       // Check chart containers
       expect(screen.getByTestId('card-dq-trend')).toBeInTheDocument();
