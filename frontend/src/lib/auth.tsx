@@ -26,12 +26,14 @@ const IDLE_LOGOUT_MS = 15 * 60 * 1000;
 export const getHomeRouteForRole = (role?: UserRole | string): string => {
   switch (role) {
     case 'AICTE_ADMIN':
+    case 'AICTE_ANALYST':
     case 'AICTE_VIEWER':
       return '/aicte';
     case 'INSTITUTION_ADMIN':
     case 'INSTITUTION_STAFF':
       return '/institution';
     case 'DAB_MEMBER':
+    case 'DAB_ADMIN':
       return '/dab';
     case 'STUDENT':
       return '/student';
