@@ -227,7 +227,10 @@ def bulk_ingest_institutions(
     updated = 0
     saved_records = []
     now_iso = datetime.now(timezone.utc).isoformat()
-    raw_hash_input = f"{data.source_authority}:{data.approval_order_ref}:{len(data.institutions)}:{now_iso}"
+    raw_hash_input = (
+        f"{data.source_authority}:{data.approval_order_ref}:"
+        f"{len(data.institutions)}:{now_iso}"
+    )
     batch_hash = f"sha256:{hashlib.sha256(raw_hash_input.encode()).hexdigest()}"
 
     for inst in data.institutions:
@@ -261,12 +264,16 @@ def bulk_ingest_institutions(
     for r in saved_records:
         db.refresh(r)
 
+    inst_by_id = {i.institution_aicte_id: i for i in data.institutions}
     response_records = []
     for r in saved_records:
         rec = InstitutionRecord.model_validate(r)
         rec.source_authority = data.source_authority
         rec.approval_order_ref = data.approval_order_ref
-        rec.aishe_code = getattr(inst, "aishe_code", None) or f"C-{r.state_code}{r.district_code}"
+        req_inst = inst_by_id.get(r.institution_aicte_id)
+        rec.aishe_code = (
+            getattr(req_inst, "aishe_code", None) or f"C-{r.state_code}{r.district_code}"
+        )
         rec.source_file_name = data.source_file_name
         rec.source_file_hash = batch_hash
         rec.verified_by = data.authorizing_officer
@@ -284,7 +291,6 @@ def bulk_ingest_institutions(
         ingested_at=now_iso,
         institutions=response_records,
     )
-
 
 
 # -----------------------------------------------------------------------------
