@@ -508,7 +508,6 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Outgoing Transfer Requests": "जावक स्थानांतरण अनुरोध",
   "Transfer ID": "स्थानांतरण आईडी",
   "Source Institution": "स्रोत संस्थान",
-  "Destination Institution": "गंतव्य संस्थान",
   "15d OVERDUE": "15-दिन अतिदेय",
   "15-Day AICTE Statutory Override Rule": "15-दिवसीय एआईसीटीई वैधानिक ओवरराइड नियम",
   "PENDING APPROVAL": "स्वीकृति लंबित",
