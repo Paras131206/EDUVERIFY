@@ -276,6 +276,7 @@ describe('Review Workspace & Decision Flow (Task A3)', () => {
 
       await waitFor(() => {
         expect(screen.queryByRole('button', { name: /accept selected fixes/i })).not.toBeInTheDocument();
+        expect(screen.getByText(/all validation issues resolved/i)).toBeInTheDocument();
       });
     });
 
