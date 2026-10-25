@@ -918,7 +918,124 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "AICTE National Directorate & Inspection Desk": "एआईसीटीई राष्ट्रीय निदेशालय एवं निरीक्षण डेस्क",
   "Affiliating University & Degree Awarding Body": "संबद्ध विश्वविद्यालय एवं डिग्री प्रदाता संस्था",
   "Certified Institutional Auditor": "प्रमाणित संस्थागत लेखा परीक्षक",
-  "Authorized Statutory & Employer Verification Agency": "अधिकृत वैधानिक एवं नियोक्ता सत्यापन एजेंसी"
+  "Authorized Statutory & Employer Verification Agency": "अधिकृत वैधानिक एवं नियोक्ता सत्यापन एजेंसी",
+
+  // Screenshot 1: Batch Registry & Batches Table
+  "Institution Batch Registry": "संस्थान बैच रजिस्ट्री",
+  "Institution बैच रजिस्ट्री": "संस्थान बैच रजिस्ट्री",
+  "Complete audit trail of all student admission uploads, data quality improvements, and AICTE commitment status.": "सभी छात्र प्रवेश अपलोड, डेटा गुणवत्ता सुधार और एआईसीटीई प्रतिबद्धता स्थिति का पूर्ण ऑडिट ट्रेल।",
+  "Complete audit trail of सभी विद्यार्थी admission uploads, data quality improvements, and AICTE commitment स्थिति.": "सभी छात्र प्रवेश अपलोड, डेटा गुणवत्ता सुधार और एआईसीटीई प्रतिबद्धता स्थिति का पूर्ण ऑडिट ट्रेल।",
+  "Complete audit trail of": "का पूर्ण ऑडिट ट्रेल",
+  "Upload New Batch": "नया बैच अपलोड करें",
+  "Upload नई Batch": "नया बैच अपलोड करें",
+  "Open Batch in Progress (Conflict Prevention)": "खुला बैच प्रगति पर है (विवाद रोकथाम)",
+  "OPEN BATCH IN PROGRESS (CONFLICT PREVENTION)": "खुला बैच प्रगति पर है (विवाद रोकथाम)",
+  "Go to Open Batch Review": "खुले बैच की समीक्षा पर जाएं",
+  "खुले बैच पर जाएं Review": "खुले बैच की समीक्षा पर जाएं",
+  "Uploaded Student Batches": "अपलोड किए गए छात्र बैच",
+  "UPLOADED STUDENT BATCHES": "अपलोड किए गए छात्र बैच",
+  "UPLOADED विद्यार्थी BATCHES": "अपलोड किए गए छात्र बैच",
+  "batch record(s)": "बैच रिकॉर्ड",
+  "Quality Score": "गुणवत्ता स्कोर",
+  "QUALITY SCORE": "गुणवत्ता स्कोर",
+  "QUALITY स्कोर": "गुणवत्ता स्कोर",
+  "Records Breakdown": "रिकॉर्ड विवरण",
+  "RECORDS BREAKDOWN": "रिकॉर्ड विवरण",
+  "रिकॉर्ड BREAKDOWN": "रिकॉर्ड विवरण",
+  "COMMITTED": "कमिटेड",
+  "IN REVIEW": "समीक्षाधीन",
+  "IN_REVIEW": "समीक्षाधीन",
+  "SUPERSEDED": "अतिक्रमित",
+  "VALIDATING": "सत्यापन जारी",
+  "MAPPING": "मैपिंग जारी",
+  "Review": "समीक्षा करें",
+  "Review →": "समीक्षा करें →",
+  "Total:": "कुल:",
+  "Total: ": "कुल: ",
+  "warn": "चेतावनी",
+
+  // Screenshot 2: Review Workspace Overview & KPIs
+  "← Batches": "← बैच",
+  "Batches": "बैच",
+  "ISSUE RESOLUTION": "मुद्दा समाधान",
+  "Issue Resolution": "मुद्दा समाधान",
+  "PRIORITY EXPOSURE": "प्राथमिकता जोखिम",
+  "Priority Exposure": "प्राथमिकता जोखिम",
+  "INTAKE RECONCILIATION": "प्रवेश समाधान",
+  "Intake Reconciliation": "प्रवेश समाधान",
+  "Resolved / Fixed:": "हल किया गया / ठीक किया गया:",
+  "हल किया गया / Fixed:": "हल किया गया / ठीक किया गया:",
+  "Total Flagged:": "कुल ध्वजांकित:",
+  "Total Flagged": "कुल ध्वजांकित",
+  "Pending Review:": "समीक्षा लंबित:",
+  "Critical:": "गंभीर:",
+  "High:": "उच्च:",
+  "Low / Info:": "निम्न / सूचना:",
+  "Uploaded: 65 students": "अपलोड किए गए: 65 छात्र",
+  "Approved Sanction: 60 intake": "स्वीकृत सीटें: 60",
+  "स्वीकृत Sanction: 60 intake": "स्वीकृत सीटें: 60",
+  "Over-intake variance: 3 students": "अतिरिक्त प्रवेश अंतर: 3 छात्र",
+  "Over-Intake variance: 3 students": "अतिरिक्त प्रवेश अंतर: 3 छात्र",
+  "Issues Queue": "मुद्दा कतार",
+  "Duplicates": "डुप्लिकेट",
+  "Before / After Report": "समीक्षा पूर्व / पश्चात रिपोर्ट",
+
+  // Screenshot 3: Explainable Issue Queue Table & Filters
+  "All Resolved": "सभी हल किए गए",
+  "Accept Selected Fixes": "चयनित सुधार स्वीकार करें",
+  "RULE": "नियम",
+  "FIELD": "फ़ील्ड",
+  "SEVERITY": "गंभीरता",
+  "PRIORITY": "प्राथमिकता",
+  "BUCKET": "श्रेणी",
+  "STATUS": "स्थिति",
+  "Rule": "नियम",
+  "Field": "फ़ील्ड",
+  "Priority": "प्राथमिकता",
+  "Bucket": "श्रेणी",
+  "Open (Pending)": "सक्रिय (लंबित)",
+  "Open (लंबित)": "सक्रिय (लंबित)",
+  "Reset Filters": "फ़िल्टर रीसेट करें",
+  "Field / Rule": "फ़ील्ड / नियम",
+  "Reason / Message": "कारण / संदेश",
+  "OPEN": "सक्रिय",
+  "PROPOSED": "प्रस्तावित",
+  "FIXED": "हल किया गया",
+  "DISMISSED": "खारिज",
+
+  // Screenshot 4: Issue Drawer & Diagnostics
+  "apaar_id missing or not 12 digits": "अपार आईडी गायब या 12 अंक नहीं",
+  "Registry name/DOB fuzzy mismatch": "रजिस्ट्री नाम/जन्म तिथि अस्पष्ट बेमेल",
+  "Intake sanction ceiling exceeded": "प्रवेश स्वीकृति सीमा पार",
+  "Canonical enum value mismatch": "प्रामाणिक प्रगणित मान बेमेल",
+  "Field:": "फ़ील्ड:",
+  "Field: ": "फ़ील्ड: ",
+  "Active Persona:": "सक्रिय भूमिका:",
+  "Key": "कुंजी",
+  "Value": "मान",
+  "Suggested Safe Fix": "सुझाया गया सुरक्षित समाधान",
+  "Requires Approval": "अनुमोदन आवश्यक",
+  "Suggested Value:": "सुझाया गया मान:",
+  "Suggested Value: ": "सुझाया गया मान: ",
+  "Rationale:": "औचित्य:",
+  "Rationale: ": "औचित्य: ",
+  "Rationale": "औचित्य",
+  "Prepend missing leading zero": "छूटा हुआ प्रारंभिक शून्य जोड़ें",
+  "Found 11 digits: Excel may have stripped leading zero or mangled scientific notation": "11 अंक मिले: एक्सेल ने प्रारंभिक शून्य हटा दिया होगा या वैज्ञानिक संकेतन में बदल दिया होगा",
+  "Current Uploaded Value": "वर्तमान अपलोड किया गया मान",
+  "Inspect Full Row": "पूरी पंक्ति का निरीक्षण करें",
+  "निरीक्षण करें Full पंक्ति": "पूरी पंक्ति का निरीक्षण करें",
+  "Full पंक्ति": "पूरी पंक्ति",
+  "Full Row": "पूरी पंक्ति",
+  "Full": "पूर्ण",
+  "admission year + duration": "प्रवेश वर्ष + अवधि",
+  "Fuzzy threshold between 0.75 and 0.92 requires human review": "0.75 और 0.92 के बीच फ़ज़ी सीमा के लिए मानव समीक्षा आवश्यक है",
+  "Set quota to NONE for Indian nationals": "भारतीय नागरिकों के लिए कोटा NONE पर सेट करें",
+  "Title casing normalization": "शीर्षक केस सामान्यीकरण",
+  "Confirm identical or twin identity": "समान या जुड़वां पहचान की पुष्टि करें",
+  "Nationality is IN but quota is marked as OCI": "राष्ट्रीयता IN है लेकिन कोटा OCI के रूप में चिह्नित है",
+  "Leading whitespace and non-standard casing in \" computer science\" normalized to canonical catalog form": "\" computer science\" में प्रारंभिक व्हाइटस्पेस और गैर-मानक केसिंग को प्रामाणिक कैटलॉग रूप में सामान्यीकृत किया गया",
+  "admission_date 2026-08-01 + B.Tech duration 4y indicates expected 2030, got 2028": "प्रवेश तिथि 2026-08-01 + बी.टेक अवधि 4 वर्ष से 2030 अपेक्षित है, 2028 मिला"
 };
 
 // Sorted keys by length descending to match longest phrases first
@@ -1313,9 +1430,105 @@ export function translateText(text: string): string {
     hasMatch = true;
   }
 
-  // Pattern: "Regulatory alerts, deadline notices, and ingestion events..." or Hinglish
-  if (/Regulatory\s+alerts,\s*(?:deadline|अंतिम\s+तिथि)\s+notices/i.test(result)) {
-    result = 'सक्रिय होने पर नियामक अलर्ट, अंतिम तिथि नोटिस और अंतर्ग्रहण घटनाएं यहाँ दिखाई देंगी।';
+  // Pattern: Conflict banner in Batch List Page
+  if (/Batch\s+([^\s(]+)\s*\(([^)]+)\)\s*for\s*(?:Academic\s+Year|शैक्षणिक\s+वर्ष)\s*(\d{4}-\d{2})\s+is\s+currently\s+([A-Z_]+)\.?\s*(?:New|नई)?\s*uploads\s*will\s*require\s*setting\s*this\s*batch\s*as\s*superseded\.?/i.test(result)) {
+    result = result.replace(
+      /Batch\s+([^\s(]+)\s*\(([^)]+)\)\s*for\s*(?:Academic\s+Year|शैक्षणिक\s+वर्ष)\s*(\d{4}-\d{2})\s+is\s+currently\s+([A-Z_]+)\.?\s*(?:New|नई)?\s*uploads\s*will\s*require\s*setting\s*this\s*batch\s*as\s*superseded\.?/gi,
+      'बैच $1 ($2) शैक्षणिक वर्ष $3 के लिए वर्तमान में समीक्षाधीन है। नए अपलोड के लिए इस बैच को अतिक्रमित के रूप में सेट करना होगा।'
+    );
+    hasMatch = true;
+  }
+  if (/^\s*is\s+currently\s+([A-Z_]+)\.?\s*(?:New|नई)?\s*uploads\s*will\s*require\s*setting\s*this\s*batch\s*as\s*superseded\.?/i.test(result.trim())) {
+    result = result.replace(
+      /^\s*is\s+currently\s+([A-Z_]+)\.?\s*(?:New|नई)?\s*uploads\s*will\s*require\s*setting\s*this\s*batch\s*as\s*superseded\.?/gi,
+      'वर्तमान में समीक्षाधीन है। नए अपलोड के लिए इस बैच को अतिक्रमित के रूप में सेट करना होगा।'
+    );
+    hasMatch = true;
+  }
+
+  // Pattern: "0 batch record(s)", "3 batch record(s)"
+  if (/(\d+)\s*batch\s*records?\(s\)?/i.test(result)) {
+    result = result.replace(/(\d+)\s*batch\s*records?\(s\)?/gi, '$1 बैच रिकॉर्ड');
+    hasMatch = true;
+  }
+
+  // Pattern: "2 warn", "5 warn"
+  if (/(\d+)\s*warn\b/i.test(result)) {
+    result = result.replace(/(\d+)\s*warn\b/gi, '$1 चेतावनी');
+    hasMatch = true;
+  }
+
+  // Pattern: "12 error(s)", "12 त्रुटि(s)"
+  if (/(\d+)\s*(?:error\(s\)|त्रुटि\(s\)|त्रुटियां)(?=[\s,.:;!?"'()•/\\-–—+*|~#]|$)/i.test(result)) {
+    result = result.replace(/(\d+)\s*(?:error\(s\)|त्रुटि\(s\)|त्रुटियां)(?=[\s,.:;!?"'()•/\\-–—+*|~#]|$)/gi, '$1 त्रुटियां');
+    hasMatch = true;
+  }
+
+  // Pattern: "Uploaded: 65 students"
+  if (/Uploaded:\s*(\d+)\s*students/i.test(result)) {
+    result = result.replace(/Uploaded:\s*(\d+)\s*students/gi, 'अपलोड किए गए: $1 छात्र');
+    hasMatch = true;
+  }
+
+  // Pattern: "Approved Sanction: 60 intake" or "स्वीकृत Sanction: 60 intake"
+  if (/(?:Approved\s+Sanction|स्वीकृत\s+Sanction)\s*:\s*(\d+)\s*(?:intake|सीटें)?/i.test(result)) {
+    result = result.replace(/(?:Approved\s+Sanction|स्वीकृत\s+Sanction)\s*:\s*(\d+)\s*(?:intake|सीटें)?/gi, 'स्वीकृत सीटें: $1');
+    hasMatch = true;
+  }
+
+  // Pattern: "Over-intake variance: 3 students" or "Over-Intake variance: 3 students"
+  if (/(?:Over-intake|Over-Intake)\s+variance\s*:\s*(\d+)\s*students/i.test(result)) {
+    result = result.replace(/(?:Over-intake|Over-Intake)\s+variance\s*:\s*(\d+)\s*students/gi, 'अतिरिक्त प्रवेश अंतर: $1 छात्र');
+    hasMatch = true;
+  }
+
+  // Pattern: "Issues Queue (5)"
+  if (/Issues\s+Queue\s*\((\d+)\)/i.test(result)) {
+    result = result.replace(/Issues\s+Queue\s*\((\d+)\)/gi, 'मुद्दा कतार ($1)');
+    hasMatch = true;
+  }
+
+  // Pattern: "Duplicates (1)"
+  if (/Duplicates\s*\((\d+)\)/i.test(result)) {
+    result = result.replace(/Duplicates\s*\((\d+)\)/gi, 'डुप्लिकेट ($1)');
+    hasMatch = true;
+  }
+
+  // Pattern: "5 Pending (5 Total)" or "5 लंबित (5 Total)"
+  if (/(\d+)\s*(?:Pending|लंबित)\s*\((\d+)\s*Total\)/i.test(result)) {
+    result = result.replace(/(\d+)\s*(?:Pending|लंबित)\s*\((\d+)\s*Total\)/gi, '$1 लंबित (कुल $2)');
+    hasMatch = true;
+  }
+
+  // Pattern: "Showing 5 of 5 issues (Sorted: Priority CRITICAL→LOW, then Row)" or Hinglish
+  if (/Showing\s*(\d+)\s*of\s*(\d+)\s*issues(?:\s*\((?:Sorted:\s*)?Priority\s*CRITICAL→LOW,\s*then\s*(?:Row|पंक्ति)\))?/i.test(result)) {
+    result = result.replace(
+      /Showing\s*(\d+)\s*of\s*(\d+)\s*issues(?:\s*\((?:Sorted:\s*)?Priority\s*CRITICAL→LOW,\s*then\s*(?:Row|पंक्ति)\))?/gi,
+      '$1 में से $2 मुद्दे प्रदर्शित (क्रमबद्ध: प्राथमिकता गंभीर→निम्न, फिर पंक्ति)'
+    );
+    hasMatch = true;
+  }
+  if (/^\s*Showing\s*$/i.test(result)) {
+    result = 'प्रदर्शित ';
+    hasMatch = true;
+  }
+  if (/^\s*of\s*(\d+)\s*issues(?:\s*\((?:Sorted:\s*)?Priority\s*CRITICAL→LOW,\s*then\s*(?:Row|पंक्ति)\))?/i.test(result)) {
+    result = result.replace(
+      /^\s*of\s*(\d+)\s*issues(?:\s*\((?:Sorted:\s*)?Priority\s*CRITICAL→LOW,\s*then\s*(?:Row|पंक्ति)\))?/gi,
+      ' में से $1 मुद्दे (क्रमबद्ध: प्राथमिकता गंभीर→निम्न, फिर पंक्ति)'
+    );
+    hasMatch = true;
+  }
+
+  // Pattern: "Field: apaar_id"
+  if (/^Field:\s*(.*)$/i.test(result.trim())) {
+    result = result.replace(/^Field:\s*/i, 'फ़ील्ड: ');
+    hasMatch = true;
+  }
+
+  // Pattern: "Rationale: Prepend missing leading zero"
+  if (/^Rationale:\s*(.*)$/i.test(result.trim())) {
+    result = result.replace(/^Rationale:\s*/i, 'औचित्य: ');
     hasMatch = true;
   }
 

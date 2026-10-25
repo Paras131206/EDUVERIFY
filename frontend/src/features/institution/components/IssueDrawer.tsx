@@ -108,7 +108,7 @@ export const IssueDrawer: React.FC<IssueDrawerProps> = ({
               </span>
             </div>
             <CardTitle className="text-base text-slate-900 font-bold flex items-center gap-2">
-              <span>Field: {issue.field}</span>
+              <span>{`Field: ${issue.field}`}</span>
               <span className="text-xs text-slate-400 font-normal font-mono">
                 (Row #{issue.row})
               </span>

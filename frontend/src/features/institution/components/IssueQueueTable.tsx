@@ -537,8 +537,7 @@ export const IssueQueueTable: React.FC<IssueQueueTableProps> = ({
         {/* Filter stats & reset */}
         <div className="flex items-center justify-between pt-2 text-[11px] text-slate-500">
           <span>
-            Showing <strong>{sortedIssues.length}</strong> of {issues.length} issues
-            {sortField === 'priority' && ' (Sorted: Priority CRITICAL→LOW, then Row)'}
+            {`Showing ${sortedIssues.length} of ${issues.length} issues${sortField === 'priority' ? ' (Sorted: Priority CRITICAL→LOW, then Row)' : ''}`}
           </span>
           <button
             onClick={handleResetFilters}
