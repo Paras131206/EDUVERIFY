@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="400" viewBox="0 0 1080 400" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#4a5568"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e39a32"/></marker>
+  </defs>
+
+  <rect x="1.5" y="1.5" width="1077" height="397" fill="#fff" stroke="#7b3fe4" stroke-width="3"/>
+  <text x="16" y="31" font-size="21" font-weight="bold" fill="#3c7a7f">SYSTEM ARCHITECTURE</text>
+  <text x="1064" y="28" font-size="14" font-weight="bold" fill="#222" text-anchor="end" font-family="Georgia, 'Times New Roman', serif">FIGURE NO: 02</text>
+
+  <!-- LEFT: who connects -->
+  <g font-size="10.5" font-weight="bold" fill="#6b7280" letter-spacing="1">
+    <text x="16" y="64">PEOPLE</text><text x="16" y="268">SYSTEMS</text>
+  </g>
+  <g font-size="12.5" font-weight="bold" text-anchor="middle">
+    <g fill="#3a7d7e">
+      <rect x="16" y="72" width="150" height="30" rx="15"/><rect x="16" y="108" width="150" height="30" rx="15"/><rect x="16" y="144" width="150" height="30" rx="15"/><rect x="16" y="180" width="150" height="30" rx="15"/><rect x="16" y="216" width="150" height="30" rx="15"/>
+    </g>
+    <g fill="#fff">
+      <text x="91" y="91">Institutions</text><text x="91" y="127">Reviewers</text><text x="91" y="163">AICTE</text><text x="91" y="199">Students</text><text x="91" y="235">Employers, regulators</text>
+    </g>
+    <g fill="#fff" stroke="#8a8f98" stroke-width="1.5" stroke-dasharray="5 3">
+      <rect x="16" y="276" width="150" height="30" rx="15"/><rect x="16" y="312" width="150" height="30" rx="15"/>
+    </g>
+    <g fill="#374151"><text x="91" y="295">Institution systems</text><text x="91" y="331">National ID registry</text></g>
+  </g>
+  <g stroke="#4a5568" stroke-width="1.4" marker-end="url(#a)">
+    <line x1="166" y1="87" x2="180" y2="87"/><line x1="166" y1="123" x2="180" y2="123"/><line x1="166" y1="159" x2="180" y2="159"/><line x1="166" y1="195" x2="180" y2="195"/><line x1="166" y1="231" x2="180" y2="231"/><line x1="166" y1="291" x2="180" y2="291"/><line x1="166" y1="327" x2="180" y2="327"/>
+  </g>
+
+  <!-- gateway -->
+  <rect x="182" y="72" width="44" height="270" rx="6" fill="#1f2d4f"/>
+  <text transform="translate(200,207) rotate(-90)" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">SECURE GATEWAY</text>
+  <text transform="translate(217,207) rotate(-90)" font-size="10.5" fill="#cbd5e1" text-anchor="middle">sign-in · roles · consent · rate limits</text>
+
+  <!-- CORE PLATFORM -->
+  <rect x="242" y="50" width="558" height="300" rx="10" fill="#f6f8fa" stroke="#4a5568" stroke-width="1.6"/>
+  <text x="258" y="70" font-size="11" font-weight="bold" fill="#4a5568" letter-spacing="1">CORE PLATFORM</text>
+  <g stroke="#4a5568" stroke-width="1.6" marker-end="url(#a)">
+    <line x1="226" y1="117" x2="256" y2="117"/><line x1="226" y1="293" x2="256" y2="293"/>
+  </g>
+
+  <g text-anchor="middle">
+    <!-- pipeline -->
+    <g fill="#fff" stroke="#3a7d7e" stroke-width="1.8">
+      <rect x="258" y="88" width="120" height="58" rx="5"/><rect x="394" y="88" width="120" height="58" rx="5"/><rect x="530" y="88" width="120" height="58" rx="5"/><rect x="666" y="88" width="120" height="58" rx="5"/>
+    </g>
+    <g font-size="13.5" font-weight="bold" fill="#1f2d4f"><text x="318" y="112">Intake</text><text x="454" y="112">Standardise</text><text x="590" y="112">Validate</text><text x="726" y="112">Match</text></g>
+    <g font-size="11.5" fill="#4b5563"><text x="318" y="130">files and APIs</text><text x="454" y="130">one common format</text><text x="590" y="130">rules and limits</text><text x="726" y="130">duplicates, anomalies</text></g>
+
+    <!-- services -->
+    <rect x="258" y="170" width="256" height="58" rx="5" fill="#fff" stroke="#4a5568" stroke-width="1.6"/>
+    <text x="386" y="194" font-size="13.5" font-weight="bold" fill="#1f2d4f">Alerts &amp; integration</text>
+    <text x="386" y="212" font-size="11.5" fill="#4b5563">notifications, webhooks, live updates</text>
+    <rect x="530" y="170" width="120" height="58" rx="5" fill="#fff" stroke="#4a5568" stroke-width="1.6" stroke-dasharray="5 3"/>
+    <text x="590" y="194" font-size="13.5" font-weight="bold" fill="#1f2d4f">Policy rules</text>
+    <text x="590" y="212" font-size="11.5" fill="#4b5563">configurable</text>
+    <rect x="666" y="170" width="120" height="58" rx="5" fill="#fff8ee" stroke="#e39a32" stroke-width="1.8"/>
+    <text x="726" y="194" font-size="13.5" font-weight="bold" fill="#1f2d4f">Human review</text>
+    <text x="726" y="212" font-size="11.5" fill="#4b5563">approve / correct</text>
+
+    <!-- outputs -->
+    <rect x="258" y="264" width="256" height="66" rx="5" fill="#fff" stroke="#7b3fe4" stroke-width="1.8"/>
+    <text x="386" y="292" font-size="13.5" font-weight="bold" fill="#1f2d4f">Dashboards &amp; reports</text>
+    <text x="386" y="311" font-size="11.5" fill="#4b5563">monitoring, policy, accreditation</text>
+    <rect x="530" y="264" width="256" height="66" rx="5" fill="#fff" stroke="#7b3fe4" stroke-width="1.8"/>
+    <text x="658" y="292" font-size="13.5" font-weight="bold" fill="#1f2d4f">Credentials &amp; verification</text>
+    <text x="658" y="311" font-size="11.5" fill="#4b5563">shareable, consent-based proofs</text>
+  </g>
+  <g stroke="#4a5568" stroke-width="1.5" marker-end="url(#a)">
+    <line x1="378" y1="117" x2="392" y2="117"/><line x1="514" y1="117" x2="528" y2="117"/><line x1="650" y1="117" x2="664" y2="117"/>
+    <line x1="590" y1="170" x2="590" y2="149"/>
+  </g>
+  <line x1="726" y1="146" x2="726" y2="167" stroke="#e39a32" stroke-width="1.5" marker-end="url(#o)"/>
+  <path d="M672,170 Q660,156 646,149" fill="none" stroke="#e39a32" stroke-width="1.5" marker-end="url(#o)"/>
+  <text x="664" y="245" font-size="10.5" font-style="italic" font-weight="bold" fill="#b3741d" text-anchor="middle">fixes are re-validated</text>
+
+  <!-- DATA LAYER -->
+  <text x="820" y="64" font-size="10.5" font-weight="bold" fill="#6b7280" letter-spacing="1">DATA LAYER</text>
+  <g stroke="#4a5568" stroke-width="1.5" marker-start="url(#a)" marker-end="url(#a)">
+    <line x1="803" y1="117" x2="817" y2="117"/><line x1="803" y1="205" x2="817" y2="205"/><line x1="803" y1="293" x2="817" y2="293"/>
+  </g>
+  <g fill="#e8eef5" stroke="#1f2d4f" stroke-width="1.6">
+    <path d="M820,84 a122,9 0 0,0 244,0 v62 a122,9 0 0,1 -244,0 z"/><ellipse cx="942" cy="84" rx="122" ry="9"/>
+    <path d="M820,172 a122,9 0 0,0 244,0 v62 a122,9 0 0,1 -244,0 z"/><ellipse cx="942" cy="172" rx="122" ry="9"/>
+    <path d="M820,260 a122,9 0 0,0 244,0 v62 a122,9 0 0,1 -244,0 z"/><ellipse cx="942" cy="260" rx="122" ry="9"/>
+  </g>
+  <g text-anchor="middle">
+    <g font-size="13.5" font-weight="bold" fill="#1f2d4f"><text x="942" y="120">Central repository</text><text x="942" y="208">Audit trail</text><text x="942" y="296">Reference data</text></g>
+    <g font-size="11.5" fill="#4b5563"><text x="942" y="138">verified records + status</text><text x="942" y="226">tamper-evident history</text><text x="942" y="314">institutions, programmes, intake</text></g>
+  </g>
+
+  <text x="16" y="386" font-size="11.5" fill="#6b7280">Every person and external system enters through the secure gateway. Data moves left to right through the core platform, and every action is recorded in the audit trail.</text>
+</svg>

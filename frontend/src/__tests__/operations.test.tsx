@@ -432,11 +432,21 @@ describe('Task A4: Institution Operations & Lifecycle Management', () => {
     });
   });
 
-  describe('5. Institution Dashboard (/institution)', () => {
-    it('renders KPI cards, DQ score gauge, DQ trend line, intake vs enrolment chart, and alerts', async () => {
+  describe('5. Institution Portal (/institution)', () => {
+    it('renders zero stats initially, shows no data uploaded message, and loads demo document stats on demand', async () => {
+      localStorage.removeItem('eduverify_data_uploaded');
       renderComponent(<InstitutionDashboardPage />, '/institution');
 
-      expect(screen.getByText(/institution dashboard/i)).toBeInTheDocument();
+      expect(screen.getByText(/institution (portal|dashboard)/i)).toBeInTheDocument();
+      expect(screen.getByText(/no student data uploaded/i)).toBeInTheDocument();
+
+      // Initially zero stats
+      expect(screen.getByText('0')).toBeInTheDocument();
+      expect(screen.getByText(/0\.0%/)).toBeInTheDocument();
+
+      // Click "Load Demo Document"
+      const loadDemoBtns = screen.getAllByRole('button', { name: /load demo document/i });
+      fireEvent.click(loadDemoBtns[0]);
 
       await waitFor(() => {
         expect(screen.getByTestId('kpi-dq-score')).toBeInTheDocument();
@@ -445,7 +455,7 @@ describe('Task A4: Institution Operations & Lifecycle Management', () => {
         expect(screen.getByTestId('kpi-open-issues')).toBeInTheDocument();
       });
 
-      // Check fill ratio calculation
+      // Check populated stats after demo document loaded
       expect(screen.getByText('480')).toBeInTheDocument();
       expect(screen.getByText(/92\.3%/)).toBeInTheDocument();
 

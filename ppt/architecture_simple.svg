@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="400" viewBox="0 0 1080 400" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#4a5568"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e39a32"/></marker>
+  </defs>
+
+  <rect x="1.5" y="1.5" width="1077" height="397" fill="#fff" stroke="#7b3fe4" stroke-width="3"/>
+  <text x="16" y="31" font-size="21" font-weight="bold" fill="#3c7a7f">SYSTEM ARCHITECTURE</text>
+  <text x="1064" y="28" font-size="14" font-weight="bold" fill="#222" text-anchor="end" font-family="Georgia, 'Times New Roman', serif">FIGURE NO: 02</text>
+
+  <!-- LEFT: who connects -->
+  <g font-size="10.5" font-weight="bold" fill="#6b7280" letter-spacing="1">
+    <text x="16" y="64">USERS</text><text x="16" y="268">SYSTEMS</text>
+  </g>
+  <g font-size="12.5" font-weight="bold" text-anchor="middle">
+    <g fill="#3a7d7e">
+      <rect x="16" y="72" width="150" height="48" rx="10"/><rect x="16" y="130" width="150" height="48" rx="10"/><rect x="16" y="188" width="150" height="48" rx="10"/>
+    </g>
+    <g fill="#fff">
+      <text x="91" y="100">Institutions</text>
+      <text x="91" y="158">AICTE &amp; reviewers</text>
+      <text><tspan x="91" y="208">Students, employers,</tspan><tspan x="91" y="224">regulators</tspan></text>
+    </g>
+    <rect x="16" y="276" width="150" height="66" rx="10" fill="#fff" stroke="#8a8f98" stroke-width="1.5" stroke-dasharray="5 3"/>
+    <text fill="#374151"><tspan x="91" y="304">Institution systems,</tspan><tspan x="91" y="320">ID registry</tspan></text>
+  </g>
+  <g stroke="#4a5568" stroke-width="1.4" marker-end="url(#a)">
+    <line x1="166" y1="96" x2="180" y2="96"/><line x1="166" y1="154" x2="180" y2="154"/><line x1="166" y1="212" x2="180" y2="212"/><line x1="166" y1="309" x2="180" y2="309"/>
+  </g>
+
+  <!-- gateway -->
+  <rect x="182" y="72" width="44" height="270" rx="6" fill="#1f2d4f"/>
+  <text transform="translate(200,207) rotate(-90)" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">SECURE GATEWAY</text>
+  <text transform="translate(217,207) rotate(-90)" font-size="10.5" fill="#cbd5e1" text-anchor="middle">sign-in · roles · consent</text>
+
+  <!-- CORE PLATFORM -->
+  <rect x="242" y="50" width="558" height="300" rx="10" fill="#f6f8fa" stroke="#4a5568" stroke-width="1.6"/>
+  <text x="258" y="70" font-size="11" font-weight="bold" fill="#4a5568" letter-spacing="1">CORE PLATFORM</text>
+  <g stroke="#4a5568" stroke-width="1.6" marker-end="url(#a)">
+    <line x1="226" y1="117" x2="256" y2="117"/><line x1="226" y1="297" x2="256" y2="297"/>
+  </g>
+
+  <g text-anchor="middle">
+    <rect x="258" y="88" width="256" height="58" rx="5" fill="#fff" stroke="#3a7d7e" stroke-width="1.8"/>
+    <text x="386" y="112" font-size="14" font-weight="bold" fill="#1f2d4f">Ingest &amp; standardise</text>
+    <text x="386" y="130" font-size="11.5" fill="#4b5563">files and APIs, one common format</text>
+
+    <rect x="530" y="88" width="256" height="58" rx="5" fill="#fff" stroke="#3a7d7e" stroke-width="1.8"/>
+    <text x="658" y="112" font-size="14" font-weight="bold" fill="#1f2d4f">Validate &amp; match</text>
+    <text x="658" y="130" font-size="11.5" fill="#4b5563">rules, limits, duplicates</text>
+
+    <rect x="258" y="170" width="392" height="58" rx="5" fill="#fff" stroke="#4a5568" stroke-width="1.6"/>
+    <text x="454" y="194" font-size="14" font-weight="bold" fill="#1f2d4f">Alerts &amp; integration</text>
+    <text x="454" y="212" font-size="11.5" fill="#4b5563">notifications and live updates</text>
+
+    <!-- correction workflow (unchanged) -->
+    <rect x="666" y="170" width="120" height="58" rx="5" fill="#fff8ee" stroke="#e39a32" stroke-width="1.8"/>
+    <text x="726" y="194" font-size="13.5" font-weight="bold" fill="#1f2d4f">Human review</text>
+    <text x="726" y="212" font-size="11.5" fill="#4b5563">approve / correct</text>
+
+    <rect x="258" y="264" width="528" height="66" rx="5" fill="#fff" stroke="#7b3fe4" stroke-width="1.8"/>
+    <text x="522" y="292" font-size="14" font-weight="bold" fill="#1f2d4f">Dashboards, reports &amp; verification</text>
+    <text x="522" y="311" font-size="11.5" fill="#4b5563">monitoring and consent-based proofs</text>
+  </g>
+  <line x1="514" y1="117" x2="528" y2="117" stroke="#4a5568" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="740" y1="146" x2="740" y2="167" stroke="#e39a32" stroke-width="1.5" marker-end="url(#o)"/>
+  <path d="M690,170 Q680,158 672,149" fill="none" stroke="#e39a32" stroke-width="1.5" marker-end="url(#o)"/>
+  <text x="726" y="245" font-size="10.5" font-style="italic" font-weight="bold" fill="#b3741d" text-anchor="middle">fixes re-validated</text>
+
+  <!-- DATA LAYER -->
+  <text x="820" y="64" font-size="10.5" font-weight="bold" fill="#6b7280" letter-spacing="1">DATA</text>
+  <g stroke="#4a5568" stroke-width="1.5" marker-start="url(#a)" marker-end="url(#a)">
+    <line x1="803" y1="117" x2="817" y2="117"/><line x1="803" y1="205" x2="817" y2="205"/><line x1="803" y1="293" x2="817" y2="293"/>
+  </g>
+  <g fill="#e8eef5" stroke="#1f2d4f" stroke-width="1.6">
+    <path d="M820,84 a122,9 0 0,0 244,0 v62 a122,9 0 0,1 -244,0 z"/><ellipse cx="942" cy="84" rx="122" ry="9"/>
+    <path d="M820,172 a122,9 0 0,0 244,0 v62 a122,9 0 0,1 -244,0 z"/><ellipse cx="942" cy="172" rx="122" ry="9"/>
+    <path d="M820,260 a122,9 0 0,0 244,0 v62 a122,9 0 0,1 -244,0 z"/><ellipse cx="942" cy="260" rx="122" ry="9"/>
+  </g>
+  <g font-size="14" font-weight="bold" fill="#1f2d4f" text-anchor="middle">
+    <text x="942" y="127">Student records</text><text x="942" y="215">Audit trail</text><text x="942" y="303">Reference data</text>
+  </g>
+
+  <text x="16" y="386" font-size="11.5" fill="#6b7280">All access goes through the secure gateway. Every action is recorded in the audit trail.</text>
+</svg>

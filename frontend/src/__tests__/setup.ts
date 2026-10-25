@@ -1,5 +1,21 @@
 import '@testing-library/jest-dom';
 import 'fake-indexeddb/auto';
+// Polyfill localStorage for Node 22+ jsdom environment
+if (typeof window !== 'undefined' && !window.localStorage) {
+  const store: Record<string, string> = {};
+  (window as any).localStorage = {
+    getItem: (key: string) => store[key] || null,
+    setItem: (key: string, value: string) => { store[key] = String(value); },
+    removeItem: (key: string) => { delete store[key]; },
+    clear: () => { Object.keys(store).forEach(k => delete store[k]); },
+    length: 0,
+    key: (index: number) => Object.keys(store)[index] || null,
+  };
+}
+if (typeof globalThis !== 'undefined' && !(globalThis as any).localStorage) {
+  (globalThis as any).localStorage = (typeof window !== 'undefined' ? window.localStorage : undefined);
+}
+
 import '@/lib/i18n';
 import { beforeAll, afterEach, afterAll } from 'vitest';
 import { server } from '@/mocks/server';

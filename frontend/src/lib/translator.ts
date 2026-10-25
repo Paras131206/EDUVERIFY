@@ -2,7 +2,7 @@ import i18n from './i18n';
 
 // Comprehensive dictionary mapping English UI text to Hindi
 export const HINDI_DICTIONARY: Record<string, string> = {
-  // Navigation & Shell
+  // Navigation, Personas & Roles
   "Institution Portal": "संस्थान पोर्टल",
   "Institution Dashboard": "संस्थान डैशबोर्ड",
   "AICTE Central Console": "एआईसीटीई केंद्रीय कंसोल",
@@ -29,6 +29,8 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Sign In": "साइन इन",
   "Sign Out": "साइन आउट",
   "Sign In to Portal": "पोर्टल में साइन इन करें",
+  "Dark Mode": "डार्क मोड",
+  "Light Mode": "लाइट मोड",
   "Home": "होम",
   "Government of India · Ministry of Education · AICTE": "भारत सरकार · शिक्षा मंत्रालय · एआईसीटीई",
   "National APAAR Student Verification & Repository System": "राष्ट्रीय अपार (APAAR) छात्र डेटा सत्यापन एवं केंद्रीय भंडार प्रणाली",
@@ -37,6 +39,19 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Accessibility Statement: WCAG 2.1 AA Compliant": "अभिगम्यता कथन: WCAG 2.1 AA अनुरूप",
   "© 2026 EduVerify System. All rights reserved.": "© 2026 एडुवेरीफाई प्रणाली। सर्वाधिकार सुरक्षित।",
   "You are currently offline. Actions will be queued.": "आप वर्तमान में ऑफ़लाइन हैं। कार्य कतार में जोड़े जाएंगे।",
+  "Institution Admin": "संस्थान व्यवस्थापक",
+  "Institution Staff": "संस्थान कर्मचारी",
+  "AICTE Admin": "एआईसीटीई व्यवस्थापक",
+  "AICTE Analyst": "एआईसीटीई विश्लेषक",
+  "DAB Member": "डीएबी सदस्य",
+  "Authorized Verifier": "अधिकृत सत्यापनकर्ता",
+  "Student": "विद्यार्थी",
+  "INSTITUTION ADMIN NAVIGATION": "संस्थान व्यवस्थापक नेविगेशन",
+  "INSTITUTION STAFF NAVIGATION": "संस्थान कर्मचारी नेविगेशन",
+  "AICTE ADMIN NAVIGATION": "एआईसीटीई व्यवस्थापक नेविगेशन",
+  "DAB MEMBER NAVIGATION": "डीएबी सदस्य नेविगेशन",
+  "STUDENT NAVIGATION": "विद्यार्थी नेविगेशन",
+  "VERIFIER NAVIGATION": "सत्यापनकर्ता नेविगेशन",
 
   // KPIs & Metrics
   "Data Quality Score": "डेटा गुणवत्ता स्कोर",
@@ -58,6 +73,14 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Total Enrolled": "कुल नामांकित",
   "Before Review": "समीक्षा पूर्व",
   "After Corrections": "सुधार के बाद",
+  "Needs Review": "समीक्षा आवश्यक",
+  "Critical Action Needed": "गंभीर कार्रवाई आवश्यक",
+  "Good": "अच्छा",
+  "Excellent": "उत्कृष्ट",
+  "pts improvement": "अंक सुधार",
+  "+6.0 pts improvement": "+6.0 अंक सुधार",
+  "seats": "सीटें",
+  "/ 520 seats": "/ 520 सीटें",
   "Within approved AICTE ceiling (0 excess)": "स्वीकृत एआईसीटीई सीमा के भीतर (0 अतिरिक्त)",
   "Historical progression of automated completeness, uniqueness, and format validation scores across batches": "बैचों में स्वचालित पूर्णता, विशिष्टता एवं प्रारूप सत्यापन का ऐतिहासिक रिकॉर्ड",
   "Program-by-program comparison against AICTE Approved Intake ceilings for Academic Year 2026-27": "शैक्षणिक वर्ष 2026-27 के लिए एआईसीटीई स्वीकृत सीटों के विरुद्ध कार्यक्रम-वार तुलना",
@@ -70,6 +93,47 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Overall data quality score improved from 68.0 to 74.0": "समग्र डेटा गुणवत्ता स्कोर 68.0 से बढ़कर 74.0 हो गया",
   "480 student records committed to Central Registry": "480 छात्र रिकॉर्ड केंद्रीय रजिस्ट्री में कमिट किए गए",
   "Inbound transfer TR-2026-0881 exceeds 15-day AICTE window": "आवक स्थानांतरण TR-2026-0881 15-दिवसीय एआईसीटीई समयसीमा से अधिक है",
+  "1 Pending Inbound (15d notice) • 1 Approved Outbound": "1 लंबित आवक (15-दिन नोटिस) • 1 स्वीकृत जावक",
+  "Pending Inbound": "लंबित आवक",
+  "Approved Outbound": "स्वीकृत जावक",
+  "Inbound": "आवक",
+  "Outbound": "जावक",
+  "15d notice": "15-दिन नोटिस",
+  "(15d notice)": "(15-दिन नोटिस)",
+
+  // Issues & Rules (from mock data and rules catalog)
+  "APAAR ID format invalid / Excel truncated": "अपार आईडी प्रारूप अमान्य / एक्सेल ट्रंकेटेड",
+  "format invalid / Excel truncated": "प्रारूप अमान्य / एक्सेल ट्रंकेटेड",
+  "Minor student enrolled without guardian consent record": "अभिभावक सहमति रिकॉर्ड के बिना नामांकित नाबालिग छात्र",
+  "Lateral entry student enrolled directly into Year 1 invalid": "प्रथम वर्ष में सीधे नामांकित पार्श्व प्रवेश (Lateral Entry) छात्र अमान्य",
+  "Department name whitespace and case normalisation": "विभाग के नाम में अतिरिक्त रिक्त स्थान और केस सामान्यीकरण",
+  "Graduation year inconsistent with admission year and program duration": "स्नातक वर्ष प्रवेश वर्ष और कार्यक्रम अवधि के साथ असंगत है",
+  "Invalid APAAR ID: length must be exactly 12 digits": "अमान्य अपार आईडी: लंबाई ठीक 12 अंक होनी चाहिए",
+  "Probable duplicate person under different APAAR ID within batch": "बैच के भीतर भिन्न अपार आईडी के तहत संभावित डुप्लिकेट व्यक्ति",
+  "Quota and nationality mismatch: OCI quota with Indian nationality": "कोटा और राष्ट्रीयता बेमेल: भारतीय राष्ट्रीयता के साथ ओसीआई कोटा",
+  "Department name formatted to standard title case and trimmed": "विभाग का नाम मानक शीर्षक केस में स्वरूपित और ट्रिम किया गया",
+
+  // Times & dynamic badges
+  "1 New": "1 नई",
+  "New": "नई",
+  "10 mins ago": "10 मिनट पहले",
+  "2 hours ago": "2 घंटे पहले",
+  "1 day ago": "1 दिन पहले",
+  "mins ago": "मिनट पहले",
+  "hours ago": "घंटे पहले",
+  "day ago": "दिन पहले",
+  "days ago": "दिन पहले",
+  "just now": "अभी-अभी",
+  "Row": "पंक्ति",
+  "Row #": "पंक्ति #",
+  "• Row #": "• पंक्ति #",
+
+  // Footer
+  "Privacy Policy (DPDP 2023)": "गोपनीयता नीति (DPDP 2023)",
+  "AICTE Guidelines": "एआईसीटीई दिशानिर्देश",
+  "Built with": "के साथ निर्मित",
+  "for Digital India": "डिजिटल इंडिया के लिए",
+  "Built with ❤️ for Digital India": "डिजिटल इंडिया के लिए ❤️ से निर्मित",
 
   // Batch Upload Wizard
   "Upload Batch": "बैच अपलोड करें",
@@ -132,7 +196,7 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Export Audit Trail": "ऑडिट ट्रेल निर्यात करें",
   "Re-run Validation": "सत्यापन पुनः चलाएं",
 
-  // Review Workspace
+  // Review Workspace, Drawers & Queues
   "Data Quality & Rule Validation": "डेटा गुणवत्ता एवं नियम सत्यापन",
   "Track, resolve, and audit student data issues before committing to the national registry.": "राष्ट्रीय रजिस्ट्री में कमिट करने से पहले छात्र डेटा मुद्दों को ट्रैक, हल और ऑडिट करें।",
   "Issue Queue": "मुद्दा कतार",
@@ -159,6 +223,34 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "This action will write student records to the permanent central repository with cryptographic audit hashing.": "यह कार्रवाई छात्र रिकॉर्ड को क्रिप्टोग्राफ़िक ऑडिट हैशिंग के साथ स्थायी केंद्रीय भंडार में दर्ज करेगी।",
   "Confirm & Commit": "पुष्टि करें एवं कमिट करें",
   "Resolve All Issues": "सभी मुद्दों का समाधान करें",
+  "Active Persona": "सक्रिय भूमिका",
+  "Approval Authority": "अनुमोदन प्राधिकरण",
+  "Propose Only (Requires Admin Approval)": "केवल प्रस्ताव (प्रशासक अनुमोदन आवश्यक)",
+  "Issue Resolved": "मुद्दा हल हुआ",
+  "Issue Dismissed": "मुद्दा खारिज किया गया",
+  "Change Proposed by Staff": "कर्मचारी द्वारा प्रस्तावित परिवर्तन",
+  "Proposed Value": "प्रस्तावित मान",
+  "Issue Description": "मुद्दा विवरण",
+  "AI Root Cause & Reason": "एआई मूल कारण एवं विवरण",
+  "Evidence Used": "उपयोग किया गया साक्ष्य",
+  "No explicit evidence attributes recorded.": "कोई स्पष्ट साक्ष्य विशेषताएँ दर्ज नहीं हैं।",
+  "Accept Fix": "सुधार स्वीकार करें",
+  "Edit Value": "मान संपादित करें",
+  "Dismiss with Note": "टिप्पणी के साथ खारिज करें",
+  "Inspect Row": "पंक्ति का निरीक्षण करें",
+  "All Issues": "सभी मुद्दे",
+  "Auto-flagged": "स्वतः चिह्नित",
+  "Needs human review": "मानव समीक्षा आवश्यक",
+  "Dismiss Selected": "चयनित खारिज करें",
+  "No Duplicate Clusters Detected": "कोई डुप्लिकेट समूह नहीं मिला",
+  "Identity deduplication algorithms found no duplicate student records across intra- or cross-institutional registries.": "पहचान निष्कासन एल्गोरिदम को अंतर-संस्थागत या अंतः-संस्थागत रजिस्ट्रियों में कोई डुप्लिकेट छात्र रिकॉर्ड नहीं मिला।",
+  "Same Person": "वही व्यक्ति",
+  "Different People": "भिन्न व्यक्ति",
+  "Transfer": "स्थानांतरण",
+  "Resolve Cluster": "क्लस्टर का समाधान करें",
+  "Compare Side-by-Side": "साथ-साथ तुलना करें",
+  "Confidence": "विश्वसनीयता",
+  "Score": "स्कोर",
 
   // Transfers
   "Track and adjudicate student transfers between AICTE approved institutions.": "एआईसीटीई अनुमोदित संस्थानों के बीच छात्र स्थानांतरण को ट्रैक एवं निर्णय करें।",
@@ -168,6 +260,7 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "APAAR ID": "अपार आईडी",
   "Origin Institution": "मूल संस्थान",
   "Destination Institution": "गंतव्य संस्थान",
+  "Target Institution": "गंतव्य संस्थान",
   "Transfer Reason": "स्थानांतरण का कारण",
   "Request Date": "अनुरोध तिथि",
   "Deadline": "अंतिम तिथि",
@@ -176,6 +269,14 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Reject Transfer": "स्थानांतरण अस्वीकार करें",
   "Transfer Approved": "स्थानांतरण स्वीकृत हुआ",
   "Transfer Rejected": "स्थानांतरण अस्वीकृत हुआ",
+  "Incoming Transfers": "आवक स्थानांतरण",
+  "Outgoing Transfers": "जावक स्थानांतरण",
+  "New Transfer Request": "नया स्थानांतरण अनुरोध",
+  "Decision Notes": "निर्णय टिप्पणियाँ",
+  "Target Program": "लक्षित कार्यक्रम",
+  "Evidence Reference": "साक्ष्य संदर्भ",
+  "15-day AICTE window": "15-दिवसीय एआईसीटीई समयसीमा",
+  "Expired / Urgent": "समाप्त / अति आवश्यक",
 
   // Student Registry & Aggregates
   "Enrolled student records across programs, academic years, and departments.": "कार्यक्रमों, शैक्षणिक वर्षों और विभागों में नामांकित छात्र रिकॉर्ड।",
@@ -192,6 +293,27 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Actual Admitted": "वास्तविक प्रवेश",
   "Excess Admitted": "अतिरिक्त प्रवेश",
   "Vacancy": "रिक्तियां",
+  "Enrolment Status": "नामांकन स्थिति",
+  "Enrolled": "नामांकित",
+  "Completed": "पूर्ण",
+  "Withdrawn": "वापस लिया गया",
+  "Suspended": "निलंबित",
+  "Transferred": "स्थानांतरित",
+  "Transition Status": "स्थिति परिवर्तित करें",
+  "Unmask All": "सभी अनमास्क करें",
+  "Mask All": "सभी मास्क करें",
+  "Student Details": "छात्र विवरण",
+  "Audit History": "ऑडिट इतिहास",
+  "Declared Intake": "घोषित इंटेक",
+  "Uploaded Records": "अपलोड किए गए रिकॉर्ड",
+  "Intake Discrepancy": "इंटेक विसंगति",
+  "Reconciliation Status": "सुलह स्थिति",
+  "Match": "सटीक मिलान",
+  "Mismatch": "बेमेल",
+  "Excess": "अतिरिक्त",
+  "Sanctioned": "स्वीकृत",
+  "Actual": "वास्तविक",
+  "Save Aggregates": "इंटेक सहेजें",
 
   // AICTE Console
   "National student data registry, compliance monitoring, and anomalous intake detection.": "राष्ट्रीय छात्र डेटा रजिस्ट्री, अनुपालन निगरानी, और विसंगतिपूर्ण प्रवेश पहचान।",
@@ -327,11 +449,109 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "OBC": "अन्य पिछड़ा वर्ग (OBC)",
   "SC": "अनुसूचित जाति (SC)",
   "ST": "अनुसूचित जनजाति (ST)",
-  "EWS": "आर्थिक रूप से कमजोर वर्ग (EWS)"
+  "EWS": "आर्थिक रूप से कमजोर वर्ग (EWS)",
+
+  // Review Workspace Extended
+  "Validation Review Workspace": "सत्यापन समीक्षा कार्यक्षेत्र",
+  "Explainable Issue Queue": "स्पष्टीकरण योग्य मुद्दा कतार",
+  "Prioritised verification errors with AI-driven root cause and safe suggestions": "एआई-संचालित मूल कारण और सुरक्षित सुझावों के साथ प्राथमिकता प्राप्त सत्यापन त्रुटियां",
+  "Accept All INFO Normalisations": "सभी सूचना सामान्यीकरण स्वीकार करें",
+  "Re-validate Batch": "बैच पुनः सत्यापित करें",
+  "Commit Batch to AICTE": "बैच एआईसीटीई को कमिट करें",
+  "Committed to AICTE": "एआईसीटीई को कमिट किया गया",
+  "Critical Errors Blocking Batch Commit:": "बैच कमिट को रोकने वाली गंभीर त्रुटियां:",
+  "APAAR ID formatting or registry mismatches must be corrected or dismissed before AICTE repository commit is allowed.": "एआईसीटीई भंडार कमिट की अनुमति देने से पहले अपार आईडी स्वरूपण या रजिस्ट्री बेमेल को ठीक या खारिज किया जाना चाहिए।",
+  "1 Critical Issue Open": "1 गंभीर मुद्दा खुला",
+  "Commit Disabled:": "कमिट अक्षम:",
+  "Unresolved CRITICAL validation issues remain (e.g. V002).": "अनसुलझे गंभीर (CRITICAL) सत्यापन मुद्दे शेष हैं (उदा. V002)।",
+  "All critical issues must be accepted or dismissed before committing.": "कमिट करने से पहले सभी गंभीर मुद्दों को स्वीकार या खारिज किया जाना चाहिए।",
+  "Academic Year:": "शैक्षणिक वर्ष:",
+  "Total Rows:": "कुल पंक्तियां:",
+  "Rule Catalog:": "नियम कैटलॉग:",
+  "Loading Batch Review Workspace...": "बैच समीक्षा कार्यक्षेत्र लोड हो रहा है...",
+  "Unable to Load Batch Review": "बैच समीक्षा लोड करने में असमर्थ",
+  "No Issues or Clusters Found": "कोई मुद्दा या समूह नहीं मिला",
+  "Return to Batches": "बैचों पर वापस जाएं",
+  "Identity & Deduplication Resolution": "पहचान एवं डुप्लिकेट समाधान",
+  "Side-by-side biometric & demographic comparison with per-field similarity weights": "फ़ील्ड-वार समानता भार के साथ बायोमेट्रिक एवं जनसांख्यिकीय तुलना",
+  "Select official human verification decision for this cluster:": "इस क्लस्टर के लिए आधिकारिक मानव सत्यापन निर्णय चुनें:",
+  "Same person (Merge)": "वही व्यक्ति (विलय करें)",
+  "Different people": "भिन्न व्यक्ति",
+  "Batch Row": "बैच पंक्ति",
+  "Resolved Issues": "हल किए गए मुद्दे",
+  "Pending Issues": "लंबित मुद्दे",
+  "Fixed or Justified": "सुधारा गया या उचित ठहराया गया",
+  "Remaining in Queue": "कतार में शेष",
+  "Download DQ comparison XLSX": "DQ तुलना XLSX डाउनलोड करें",
+  "Download DQ comparison PDF": "DQ तुलना PDF डाउनलोड करें",
+  "Priority Level Impact (Before vs After)": "प्राथमिकता स्तर प्रभाव (पूर्व बनाम पश्चात)",
+  "Distribution of open issues across priority bands before and after re-validation": "पुनः सत्यापन से पहले और बाद में प्राथमिकता बैंड में सक्रिय मुद्दों का वितरण",
+  "DQ Improvement": "DQ सुधार",
+  "+% DQ Improvement": "+% DQ सुधार",
+  "Quality Score Progression": "गुणवत्ता स्कोर प्रगति",
+  "All Rules": "सभी नियम",
+  "All Fields": "सभी फ़ील्ड",
+  "All Severities": "सभी गंभीरता",
+  "All Priorities": "सभी प्राथमिकताएं",
+  "All Buckets": "सभी श्रेणियां",
+  "All Statuses": "सभी स्थितियां",
+  "Filter by Rule": "नियम अनुसार फ़िल्टर",
+  "Filter by Field": "फ़ील्ड अनुसार फ़िल्टर",
+  "Filter by Severity": "गंभीरता अनुसार फ़िल्टर",
+  "Filter by Priority": "प्राथमिकता अनुसार फ़िल्टर",
+  "Filter by Bucket": "श्रेणी अनुसार फ़िल्टर",
+  "Filter by Status": "स्थिति अनुसार फ़िल्टर",
+
+  // Transfers Desk Extended
+  "Request Student Transfer": "छात्र स्थानांतरण का अनुरोध करें",
+  "Incoming Transfer Requests": "आवक स्थानांतरण अनुरोध",
+  "Outgoing Transfer Requests": "जावक स्थानांतरण अनुरोध",
+  "Transfer ID": "स्थानांतरण आईडी",
+  "Source Institution": "स्रोत संस्थान",
+  "15d OVERDUE": "15-दिन अतिदेय",
+  "15-Day AICTE Statutory Override Rule": "15-दिवसीय एआईसीटीई वैधानिक ओवरराइड नियम",
+  "PENDING APPROVAL": "स्वीकृति लंबित",
+  "AICTE OVERRIDDEN": "एआईसीटीई ओवरराइड",
+  "Loading transfer workflow registry...": "स्थानांतरण वर्कफ़्लो रजिस्ट्री लोड हो रही है...",
+  "Governed by Section 8.1: Destination requests, Source approves, AICTE 15-day statutory override": "अनुभाग 8.1 द्वारा शासित: गंतव्य अनुरोध करता है, स्रोत स्वीकृत करता है, एआईसीटीई 15-दिवसीय वैधानिक ओवरराइड",
+
+  // Aggregates Extended
+  "Aggregate Enrolment Reporting": "कुल नामांकन रिपोर्टिंग",
+  "Dedicated submission workspace for institutions in AGGREGATE_ONLY mode and statutory AICTE intake reconciliation": "AGGREGATE_ONLY मोड में संस्थानों के लिए समर्पित सबमिशन कार्यक्षेत्र और वैधानिक एआईसीटीई प्रवेश समाधान",
+  "Approved Declared Seats": "स्वीकृत घोषित सीटें",
+  "Total Submitted Enrolment": "कुल प्रस्तुत नामांकन",
+  "Reconciliation Variance": "सुलह भिन्नता",
+  "Sanctioned intake across all active programs": "सभी सक्रिय कार्यक्रमों में स्वीकृत प्रवेश",
+  "Fully Reconciled": "पूर्णतः सुलह पूर्ण",
+  "Variance Discrepancies": "भिन्नता विसंगतियां",
+  "Program Enrolment Breakdown Form": "कार्यक्रम नामांकन विवरण प्रपत्र",
+  "Enter total enrolled heads along with supernumerary and foreign quota sub-counts for each program": "प्रत्येक कार्यक्रम के लिए अतिरिक्त और विदेशी कोटा उप-गणना के साथ कुल नामांकित छात्र दर्ज करें",
+  "Evaluated under AICTE Rule V022": "एआईसीटीई नियम V022 के तहत मूल्यांकित",
+
+  // Students Registry Extended
+  "Student / Roll / PRN": "छात्र / रोल / पीआरएन",
+  "Full Legal Name": "पूर्ण कानूनी नाम",
+  "Date of Birth (YYYY-MM-DD)": "जन्म तिथि (YYYY-MM-DD)",
+  "Category (Social Reservation)": "श्रेणी (सामाजिक आरक्षण)",
+  "Program Code": "कार्यक्रम कोड",
+  "Course Level": "पाठ्यक्रम स्तर",
+  "Admission Date": "प्रवेश तिथि",
+  "Admission Type": "प्रवेश प्रकार",
+  "Seat Type": "सीट प्रकार",
+  "Quota Category": "कोटा श्रेणी",
+  "DPDP Consent Status": "DPDP सहमति स्थिति",
+  "Loading student records...": "छात्र रिकॉर्ड लोड हो रहे हैं...",
+  "Loading student registry...": "छात्र रजिस्ट्री लोड हो रही है..."
 };
 
 // Sorted keys by length descending to match longest phrases first
 const SORTED_KEYS = Object.keys(HINDI_DICTIONARY).sort((a, b) => b.length - a.length);
+
+// Lowercase lookup map for case-insensitive exact matching
+const LOWERCASE_MAP = new Map<string, string>();
+for (const [key, value] of Object.entries(HINDI_DICTIONARY)) {
+  LOWERCASE_MAP.set(key.toLowerCase(), value);
+}
 
 const originalTextMap = new WeakMap<Node, string>();
 const originalAttrMap = new WeakMap<Element, Record<string, string>>();
@@ -357,22 +577,138 @@ export function translateText(text: string): string {
 
   const trimmed = text.trim();
 
-  // 1. Direct exact match
+  // 1. Direct exact or case-insensitive match
   if (HINDI_DICTIONARY[trimmed]) {
     const leadingSpaces = text.match(/^\s*/)?.[0] || '';
     const trailingSpaces = text.match(/\s*$/)?.[0] || '';
     return leadingSpaces + HINDI_DICTIONARY[trimmed] + trailingSpaces;
   }
+  const lowerTrimmed = trimmed.toLowerCase();
+  if (LOWERCASE_MAP.has(lowerTrimmed)) {
+    const leadingSpaces = text.match(/^\s*/)?.[0] || '';
+    const trailingSpaces = text.match(/\s*$/)?.[0] || '';
+    return leadingSpaces + LOWERCASE_MAP.get(lowerTrimmed)! + trailingSpaces;
+  }
 
-  // 2. Phrase match for composite texts
+  // 2. Dynamic regular expression patterns for dynamic values
   let result = text;
   let hasMatch = false;
 
+  // Pattern: "Row #22", "• Row #22", "(Row #22)", "Row 22"
+  if (/(\b|•\s*|\()Row\s*(?:#|No\.?|Number)?\s*(\d+)(\)?)/i.test(result)) {
+    result = result.replace(/(\b|•\s*|\()Row\s*(?:#|No\.?|Number)?\s*(\d+)(\)?)/gi, '$1पंक्ति #$2$3');
+    hasMatch = true;
+  }
+
+  // Pattern: "/ 520 seats" or "520 seats"
+  if (/(\/\s*)?(\d+)\s*seats\b/i.test(result)) {
+    result = result.replace(/(\/\s*)?(\d+)\s*seats\b/gi, (_, slash, num) => (slash || '') + `${num} सीटें`);
+    hasMatch = true;
+  }
+
+  // Pattern: "+6.0 pts improvement" or "6.0 pts improvement"
+  if (/(\+?\d+(?:\.\d+)?)\s*pts\s+improvement\b/i.test(result)) {
+    result = result.replace(/(\+?\d+(?:\.\d+)?)\s*pts\s+improvement\b/gi, '$1 अंक सुधार');
+    hasMatch = true;
+  }
+
+  // Pattern: "+6.0% DQ Improvement"
+  if (/(\+?\d+(?:\.\d+)?%?)\s*DQ\s*Improvement\b/i.test(result)) {
+    result = result.replace(/(\+?\d+(?:\.\d+)?%?)\s*DQ\s*Improvement\b/gi, '$1 DQ सुधार');
+    hasMatch = true;
+  }
+
+  // Pattern: "10 mins ago" / "2 hours ago" / "1 day ago"
+  if (/(\d+)\s*mins?\s*ago\b/i.test(result)) {
+    result = result.replace(/(\d+)\s*mins?\s*ago\b/gi, '$1 मिनट पहले');
+    hasMatch = true;
+  }
+  if (/(\d+)\s*hours?\s*ago\b/i.test(result)) {
+    result = result.replace(/(\d+)\s*hours?\s*ago\b/gi, '$1 घंटे पहले');
+    hasMatch = true;
+  }
+  if (/(\d+)\s*days?\s*ago\b/i.test(result)) {
+    result = result.replace(/(\d+)\s*days?\s*ago\b/gi, '$1 दिन पहले');
+    hasMatch = true;
+  }
+  if (/(\d+)\s*secs?\s*ago\b/i.test(result)) {
+    result = result.replace(/(\d+)\s*secs?\s*ago\b/gi, '$1 सेकंड पहले');
+    hasMatch = true;
+  }
+  if (/\bjust\s+now\b/i.test(result)) {
+    result = result.replace(/\bjust\s+now\b/gi, 'अभी-अभी');
+    hasMatch = true;
+  }
+
+  // Pattern: "1 New", "3 New"
+  if (/(\d+)\s*New\b/i.test(result)) {
+    result = result.replace(/(\d+)\s*New\b/gi, '$1 नई');
+    hasMatch = true;
+  }
+
+  // Pattern: "Batch 1", "Batch 2"
+  if (/\bBatch\s*(\d+)\b/i.test(result)) {
+    result = result.replace(/\bBatch\s*(\d+)\b/gi, 'बैच $1');
+    hasMatch = true;
+  }
+
+  // Pattern: "(15d notice)" or "15d notice"
+  if (/\(?(\d+)d\s*notice\)?/i.test(result)) {
+    result = result.replace(/\(?(\d+)d\s*notice\)?/gi, '($1-दिन नोटिस)');
+    hasMatch = true;
+  }
+
+  // Pattern: "15d OVERDUE"
+  if (/(\d+)d\s*OVERDUE\b/i.test(result)) {
+    result = result.replace(/(\d+)d\s*OVERDUE\b/gi, '$1-दिन अतिदेय');
+    hasMatch = true;
+  }
+
+  // Pattern: "1 Pending", "1 Approved"
+  if (/(\d+)\s*Pending\b/i.test(result)) {
+    result = result.replace(/(\d+)\s*Pending\b/gi, '$1 लंबित');
+    hasMatch = true;
+  }
+  if (/(\d+)\s*Approved\b/i.test(result)) {
+    result = result.replace(/(\d+)\s*Approved\b/gi, '$1 स्वीकृत');
+    hasMatch = true;
+  }
+
+  // Pattern: "4 Open Issues"
+  if (/(\d+)\s*Open\s*Issues\b/i.test(result)) {
+    result = result.replace(/(\d+)\s*Open\s*Issues\b/gi, '$1 सक्रिय मुद्दे');
+    hasMatch = true;
+  }
+
+  // Pattern: "1 Critical Issue Open", "2 Critical Issues Open"
+  if (/(\d+)\s*Critical\s*Issues?\s*Open\b/i.test(result)) {
+    result = result.replace(/(\d+)\s*Critical\s*Issues?\s*Open\b/gi, '$1 गंभीर मुद्दा खुला');
+    hasMatch = true;
+  }
+
+  // Pattern: "1 CRITICAL", "3 HIGH"
+  if (/(\d+)\s*CRITICAL\b/i.test(result)) {
+    result = result.replace(/(\d+)\s*CRITICAL\b/gi, '$1 गंभीर');
+    hasMatch = true;
+  }
+  if (/(\d+)\s*HIGH\b/i.test(result)) {
+    result = result.replace(/(\d+)\s*HIGH\b/gi, '$1 उच्च');
+    hasMatch = true;
+  }
+  if (/(\d+)\s*MEDIUM\b/i.test(result)) {
+    result = result.replace(/(\d+)\s*MEDIUM\b/gi, '$1 मध्यम');
+    hasMatch = true;
+  }
+  if (/(\d+)\s*LOW\b/i.test(result)) {
+    result = result.replace(/(\d+)\s*LOW\b/gi, '$1 निम्न');
+    hasMatch = true;
+  }
+
+  // 3. Phrase match for composite texts with extended punctuation boundaries
   for (const key of SORTED_KEYS) {
-    if (key.length >= 3 && result.includes(key)) {
-      // Escape special characters in key for regex
+    if (key.length >= 3) {
       const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(`(?<=^|\\s|[,.:;!?"'()])` + escaped + `(?=$|\\s|[,.:;!?"'()])`, 'g');
+      const regex = new RegExp(`(?<=^|\\s|[,.:;!?"'()•/\\-–—+*|~#])` + escaped + `(?=$|\\s|[,.:;!?"'()•/\\-–—+*|~#])`, 'gi');
       if (regex.test(result)) {
         result = result.replace(regex, HINDI_DICTIONARY[key]);
         hasMatch = true;

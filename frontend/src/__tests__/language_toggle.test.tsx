@@ -63,4 +63,41 @@ describe('Site-Wide Language Translation System', () => {
 
     document.body.removeChild(input);
   });
+
+  it('translates elements from institution dashboard screenshots and cards', () => {
+    // TopBar & Sidebar
+    expect(translateText('Institution Admin')).toBe('संस्थान व्यवस्थापक');
+    expect(translateText('INSTITUTION ADMIN NAVIGATION')).toBe('संस्थान व्यवस्थापक नेविगेशन');
+
+    // KPI cards
+    expect(translateText('Needs Review')).toBe('समीक्षा आवश्यक');
+    expect(translateText('+6.0 pts improvement')).toBe('+6.0 अंक सुधार');
+    expect(translateText('/ 520 seats')).toBe('/ 520 सीटें');
+    expect(translateText('1 Pending Inbound (15d notice) • 1 Approved Outbound')).toBe('1 लंबित आवक (15-दिन नोटिस) • 1 स्वीकृत जावक');
+    expect(translateText('4 Open Issues')).toBe('4 सक्रिय मुद्दे');
+    expect(translateText('1 CRITICAL')).toBe('1 गंभीर');
+    expect(translateText('3 HIGH')).toBe('3 उच्च');
+
+    // Issues & Row numbers
+    expect(translateText('• Row #22')).toBe('• पंक्ति #22');
+    expect(translateText('• Row #14')).toBe('• पंक्ति #14');
+    expect(translateText('• Row #35')).toBe('• पंक्ति #35');
+    expect(translateText('• Row #50')).toBe('• पंक्ति #50');
+    expect(translateText('APAAR ID format invalid / Excel truncated')).toBe('अपार आईडी प्रारूप अमान्य / एक्सेल ट्रंकेटेड');
+    expect(translateText('Minor student enrolled without guardian consent record')).toBe('अभिभावक सहमति रिकॉर्ड के बिना नामांकित नाबालिग छात्र');
+    expect(translateText('Lateral entry student enrolled directly into Year 1 invalid')).toBe('प्रथम वर्ष में सीधे नामांकित पार्श्व प्रवेश (Lateral Entry) छात्र अमान्य');
+    expect(translateText('Department name whitespace and case normalisation')).toBe('विभाग के नाम में अतिरिक्त रिक्त स्थान और केस सामान्यीकरण');
+
+    // Alerts & timestamps
+    expect(translateText('1 New')).toBe('1 नई');
+    expect(translateText('10 mins ago')).toBe('10 मिनट पहले');
+    expect(translateText('2 hours ago')).toBe('2 घंटे पहले');
+    expect(translateText('1 day ago')).toBe('1 दिन पहले');
+
+    // Footer
+    expect(translateText('Privacy Policy (DPDP 2023)')).toBe('गोपनीयता नीति (DPDP 2023)');
+    expect(translateText('AICTE Guidelines')).toBe('एआईसीटीई दिशानिर्देश');
+    expect(translateText('Built with')).toBe('के साथ निर्मित');
+    expect(translateText('for Digital India')).toBe('डिजिटल इंडिया के लिए');
+  });
 });

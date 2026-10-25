@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="400" viewBox="0 0 1080 400" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8a8f98"/></marker>
+  </defs>
+
+  <rect x="1.5" y="1.5" width="1077" height="397" fill="#fff" stroke="#7b3fe4" stroke-width="3"/>
+  <text x="16" y="31" font-size="21" font-weight="bold" fill="#3c7a7f">SYSTEM ARCHITECTURE</text>
+  <text x="1064" y="28" font-size="14" font-weight="bold" fill="#222" text-anchor="end" font-family="Georgia, 'Times New Roman', serif">FIGURE NO: 02</text>
+
+  <!-- request / result flow between layers -->
+  <g stroke="#8a8f98" stroke-width="1.4" marker-start="url(#a)" marker-end="url(#a)">
+    <line x1="236" y1="114" x2="236" y2="128"/><line x1="428" y1="114" x2="428" y2="128"/><line x1="620" y1="114" x2="620" y2="128"/><line x1="812" y1="114" x2="812" y2="128"/>
+    <line x1="236" y1="198" x2="236" y2="212"/><line x1="428" y1="198" x2="428" y2="212"/><line x1="620" y1="198" x2="620" y2="212"/><line x1="812" y1="198" x2="812" y2="212"/>
+    <line x1="236" y1="282" x2="236" y2="296"/><line x1="428" y1="282" x2="428" y2="296"/><line x1="620" y1="282" x2="620" y2="296"/><line x1="812" y1="282" x2="812" y2="296"/>
+  </g>
+
+  <!-- layer labels -->
+  <g text-anchor="middle" fill="#fff">
+    <rect x="16" y="46" width="120" height="66" rx="4" fill="#3a7d7e"/>
+    <text x="76" y="76" font-size="14" font-weight="bold" letter-spacing="0.5">ACCESS</text><text x="76" y="94" font-size="11" opacity="0.9">who uses it</text>
+    <rect x="16" y="130" width="120" height="66" rx="4" fill="#1f2d4f"/>
+    <text x="76" y="160" font-size="14" font-weight="bold" letter-spacing="0.5">SERVICES</text><text x="76" y="178" font-size="11" opacity="0.9">business logic</text>
+    <rect x="16" y="214" width="120" height="66" rx="4" fill="#4a5568"/>
+    <text x="76" y="244" font-size="14" font-weight="bold" letter-spacing="0.5">INTELLIGENCE</text><text x="76" y="262" font-size="11" opacity="0.9">checks &amp; detection</text>
+    <rect x="16" y="298" width="120" height="66" rx="4" fill="#2f6b6b"/>
+    <text x="76" y="328" font-size="14" font-weight="bold" letter-spacing="0.5">DATA</text><text x="76" y="346" font-size="11" opacity="0.9">records &amp; history</text>
+  </g>
+
+  <g text-anchor="middle">
+    <!-- ACCESS -->
+    <g stroke="#3a7d7e" stroke-width="1.8" fill="#fff">
+      <rect x="146" y="46" width="180" height="66" rx="4"/><rect x="338" y="46" width="180" height="66" rx="4"/><rect x="530" y="46" width="180" height="66" rx="4"/><rect x="722" y="46" width="180" height="66" rx="4"/>
+    </g>
+    <g font-size="14" font-weight="bold" fill="#1f2d4f">
+      <text x="236" y="74">Institution portal</text><text x="428" y="74">Review workspace</text><text x="620" y="74">AICTE console</text><text x="812" y="74">Verification portal</text>
+    </g>
+    <g font-size="12.5" fill="#4b5563">
+      <text x="236" y="93">submit and correct data</text><text x="428" y="93">resolve flagged records</text><text x="620" y="93">monitor admissions</text><text x="812" y="93">employers, regulators</text>
+    </g>
+
+    <!-- SERVICES -->
+    <g stroke="#1f2d4f" stroke-width="1.8" fill="#fff">
+      <rect x="146" y="130" width="180" height="66" rx="4"/><rect x="338" y="130" width="180" height="66" rx="4"/><rect x="530" y="130" width="180" height="66" rx="4"/><rect x="722" y="130" width="180" height="66" rx="4"/>
+    </g>
+    <g font-size="14" font-weight="bold" fill="#1f2d4f">
+      <text x="236" y="158">Identity &amp; access</text><text x="428" y="158">Data intake</text><text x="620" y="158">Review workflow</text><text x="812" y="158">Reports &amp; credentials</text>
+    </g>
+    <g font-size="12.5" fill="#4b5563">
+      <text x="236" y="177">sign-in, roles, sessions</text><text x="428" y="177">uploads and system APIs</text><text x="620" y="177">decisions and corrections</text><text x="812" y="177">reports, verifiable proofs</text>
+    </g>
+
+    <!-- INTELLIGENCE -->
+    <g stroke="#4a5568" stroke-width="1.8" fill="#fff">
+      <rect x="146" y="214" width="180" height="66" rx="4"/><rect x="338" y="214" width="180" height="66" rx="4"/><rect x="530" y="214" width="180" height="66" rx="4"/><rect x="722" y="214" width="180" height="66" rx="4"/>
+    </g>
+    <g font-size="14" font-weight="bold" fill="#1f2d4f">
+      <text x="236" y="242">Data mapping</text><text x="428" y="242">Validation</text><text x="620" y="242">Policy rules</text><text x="812" y="242">Duplicate detection</text>
+    </g>
+    <g font-size="12.5" fill="#4b5563">
+      <text x="236" y="261">align to standard format</text><text x="428" y="261">format and consistency</text><text x="620" y="261">intake limits and quotas</text><text x="812" y="261">plus anomaly alerts</text>
+    </g>
+
+    <!-- DATA -->
+    <g stroke="#2f6b6b" stroke-width="1.8" fill="#eef4f4">
+      <rect x="146" y="298" width="180" height="66" rx="4"/><rect x="338" y="298" width="180" height="66" rx="4"/><rect x="530" y="298" width="180" height="66" rx="4"/><rect x="722" y="298" width="180" height="66" rx="4"/>
+    </g>
+    <g font-size="14" font-weight="bold" fill="#1f2d4f">
+      <text x="236" y="326">Central repository</text><text x="428" y="326">Audit trail</text><text x="620" y="326">Reference data</text><text x="812" y="326">Identity registry</text>
+    </g>
+    <g font-size="12.5" fill="#4b5563">
+      <text x="236" y="345">student records + status</text><text x="428" y="345">who, what, when, why</text><text x="620" y="345">institutions, programmes</text><text x="812" y="345">APAAR lookup via adapter</text>
+    </g>
+  </g>
+
+  <!-- cross-cutting governance -->
+  <rect x="916" y="46" width="148" height="318" rx="6" fill="#f5f0ff" stroke="#7b3fe4" stroke-width="1.8"/>
+  <text x="990" y="74" font-size="13" font-weight="bold" fill="#5b2bb5" text-anchor="middle">SECURITY &amp;</text>
+  <text x="990" y="91" font-size="13" font-weight="bold" fill="#5b2bb5" text-anchor="middle">GOVERNANCE</text>
+  <text x="990" y="108" font-size="11" fill="#6b7280" text-anchor="middle">applies to every layer</text>
+  <g font-size="12.5" fill="#1f2d4f">
+    <circle cx="932" cy="146" r="3" fill="#7b3fe4"/><text x="942" y="150">Authentication</text>
+    <circle cx="932" cy="182" r="3" fill="#7b3fe4"/><text x="942" y="186">Role-based access</text>
+    <circle cx="932" cy="218" r="3" fill="#7b3fe4"/><text x="942" y="222">Consent control</text>
+    <circle cx="932" cy="254" r="3" fill="#7b3fe4"/><text x="942" y="258">Encryption, masking</text>
+    <circle cx="932" cy="290" r="3" fill="#7b3fe4"/><text x="942" y="294">Audit logging</text>
+    <circle cx="932" cy="326" r="3" fill="#7b3fe4"/><text x="942" y="330">Secure integration</text>
+  </g>
+
+  <text x="16" y="388" font-size="11.5" fill="#6b7280">Requests flow down through the layers and results flow back up. External systems (institution ERPs, identity registry) connect through the service layer.</text>
+</svg>
