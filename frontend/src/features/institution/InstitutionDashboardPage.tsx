@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { QualityScoreGauge } from '@/components/shared/QualityScoreGauge';
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, fetchWithAuth } from '@/lib/api';
 import { Link } from 'react-router-dom';
 import {
   UploadCloud,
@@ -125,7 +125,7 @@ export const InstitutionDashboardPage: React.FC = () => {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/v1/dashboards/institution/summary`);
+        const res = await fetchWithAuth(`${API_BASE_URL}/v1/dashboards/institution/summary`);
         if (res.ok) {
           const data = await res.json();
           // If server reports batches/students, or local storage has uploaded flag

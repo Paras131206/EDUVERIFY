@@ -57,6 +57,10 @@ def get_current_principal(
                 raw_api_key = token
     elif x_api_key:
         raw_api_key = x_api_key.strip()
+    elif request.query_params.get("token"):
+        bearer_token = request.query_params.get("token")
+    elif request.cookies.get("access_token"):
+        bearer_token = request.cookies.get("access_token")
 
     # 1. Handle API Key Authentication
     if raw_api_key:

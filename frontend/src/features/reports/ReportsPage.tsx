@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, fetchWithAuth } from '@/lib/api';
 import {
   ReportType,
   ReportFormat,
@@ -56,7 +56,7 @@ export const ReportsPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE_URL}/v1/reports`);
+      const res = await fetchWithAuth(`${API_BASE_URL}/v1/reports`);
       if (!res.ok) {
         throw new Error(`Failed to load reports history (${res.status})`);
       }
@@ -89,7 +89,7 @@ export const ReportsPage: React.FC = () => {
     };
 
     try {
-      const res = await fetch(`${API_BASE_URL}/v1/reports/jobs`, {
+      const res = await fetchWithAuth(`${API_BASE_URL}/v1/reports/jobs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

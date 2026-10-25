@@ -91,6 +91,13 @@ def get_issuer_did_document(
     summary="Retrieve AICTE-signed list of authorized issuer DIDs",
     tags=["Verification"],
 )
+@router.get(
+    "/v1/admin/trust-list",
+    include_in_schema=False,
+    response_model=TrustListResponse,
+    summary="Retrieve AICTE-signed list of authorized issuer DIDs (admin alias)",
+    tags=["Verification"],
+)
 def get_trust_list(
     request: Request,
     db: Session = Depends(get_db),

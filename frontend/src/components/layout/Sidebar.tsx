@@ -56,13 +56,25 @@ export const Sidebar: React.FC = () => {
       to: '/institution/batches',
       label: t('nav.batches', 'Batch Registry'),
       icon: <Layers className="w-4 h-4" aria-hidden="true" />,
-      visible: !role || role === 'INSTITUTION_ADMIN' || role === 'INSTITUTION_STAFF',
+      visible:
+        !role ||
+        role === 'INSTITUTION_ADMIN' ||
+        role === 'INSTITUTION_STAFF' ||
+        role === 'AICTE_ADMIN' ||
+        role === 'AICTE_ANALYST' ||
+        role === 'AICTE_VIEWER',
     },
     {
       to: '/institution/batches/batch-demo-2/review',
       label: t('nav.review'),
       icon: <CheckSquare className="w-4 h-4" aria-hidden="true" />,
-      visible: !role || role === 'INSTITUTION_ADMIN' || role === 'INSTITUTION_STAFF',
+      visible:
+        !role ||
+        role === 'INSTITUTION_ADMIN' ||
+        role === 'INSTITUTION_STAFF' ||
+        role === 'AICTE_ADMIN' ||
+        role === 'AICTE_ANALYST' ||
+        role === 'AICTE_VIEWER',
     },
     {
       to: '/institution/transfers',
@@ -87,7 +99,11 @@ export const Sidebar: React.FC = () => {
       to: '/aicte',
       label: t('nav.aicte'),
       icon: <LayoutDashboard className="w-4 h-4" aria-hidden="true" />,
-      visible: !role || role === 'AICTE_ADMIN' || role === 'AICTE_VIEWER',
+      visible:
+        !role ||
+        role === 'AICTE_ADMIN' ||
+        role === 'AICTE_ANALYST' ||
+        role === 'AICTE_VIEWER',
     },
     // DAB items
     {

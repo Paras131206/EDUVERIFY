@@ -4,6 +4,7 @@ Complies with contracts/openapi.yaml, agents.md §12, and Task B5.
 """
 
 from datetime import datetime
+from typing import Any
 
 from app.db import get_db
 from app.schemas.audit import (
@@ -42,12 +43,12 @@ def list_audit_logs(
     ),
     limit: int = Query(default=50, ge=1, le=200, description="Page limit"),
     offset: int = Query(default=0, ge=0, description="Page offset"),
-    principal: Principal = Depends(require_roles("AICTE_ADMIN")),
+    principal: Principal = Depends(require_roles("AICTE_ADMIN", "AICTE_ANALYST")),
     db: Session = Depends(get_db),
 ) -> AuditListResponse:
     """
     Returns paginated tamper-evident audit log records with PII masked payloads.
-    Restricted to AICTE_ADMIN platform compliance officers.
+    Restricted to AICTE_ADMIN or AICTE_ANALYST compliance officers.
     """
     items, total = list_audit_logs_service(
         db,
@@ -65,6 +66,45 @@ def list_audit_logs(
     )
 
 
+def _format_timestamp(ts: Any) -> str:
+    if isinstance(ts, datetime):
+        return ts.isoformat()
+    return str(ts or "")
+
+
+@router.get(
+    "/v1/audit/log",
+    include_in_schema=False,
+    summary="Get flat list of audit log records for dashboard feed",
+)
+def list_audit_log_feed(
+    limit: int = Query(default=50, ge=1, le=200),
+    offset: int = Query(default=0, ge=0),
+    principal: Principal = Depends(require_roles("AICTE_ADMIN", "AICTE_ANALYST")),
+    db: Session = Depends(get_db),
+) -> list[dict]:
+    items, _ = list_audit_logs_service(
+        db,
+        limit=limit,
+        offset=offset,
+    )
+    return [
+        {
+            "id": it.get("id"),
+            "sequence": it.get("id"),
+            "timestamp": _format_timestamp(it.get("ts")),
+            "actor_id": it.get("actor_id"),
+            "action": it.get("action"),
+            "resource": it.get("resource"),
+            "record_id": it.get("resource_id"),
+            "sha256_hash": it.get("hash"),
+            "prev_hash": it.get("prev_hash"),
+            "payload_masked": it.get("payload") or {},
+        }
+        for it in items
+    ]
+
+
 @router.get(
     "/v1/audit/verify-chain",
     response_model=AuditChainVerificationResponse,
@@ -78,6 +118,19 @@ def verify_audit_chain_endpoint(
     recalculates sha256(prev_hash + canonical_json(payload)) for each record sequentially.
     Returns {valid: true, length, head_hash} or indicates first_broken_id.
     """
+    result = verify_audit_chain_detailed(db)
+    return AuditChainVerificationResponse.model_validate(result)
+
+
+@router.post(
+    "/v1/audit/verify-chain/recalculate",
+    include_in_schema=False,
+    response_model=AuditChainVerificationResponse,
+    summary="Recalculate audit chain cryptographic integrity on demand",
+)
+def recalculate_audit_chain_endpoint(
+    db: Session = Depends(get_db),
+) -> AuditChainVerificationResponse:
     result = verify_audit_chain_detailed(db)
     return AuditChainVerificationResponse.model_validate(result)
 

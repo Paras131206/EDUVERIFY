@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useOptionalAuth } from '@/lib/auth';
-import { authFetch } from '@/lib/api';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { QualityScoreGauge } from '@/components/shared/QualityScoreGauge';
@@ -30,11 +29,12 @@ import {
   BarChart3,
   ListFilter,
 } from 'lucide-react';
+import { API_BASE_URL, authFetch } from '@/lib/api';
 
 
 export const ReviewPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const batchId = id || 'batch-demo-2';
+  const batchId = id && id !== 'undefined' ? id : 'batch-demo-2';
 
   const auth = useOptionalAuth();
   const userRole = auth?.user?.role || 'INSTITUTION_ADMIN';
@@ -517,11 +517,11 @@ export const ReviewPage: React.FC = () => {
 
   // Downloads
   const handleDownloadXlsx = () => {
-    window.location.href = `/v1/batches/${batchId}/report.xlsx`;
+    window.location.href = `${API_BASE_URL}/v1/batches/${batchId}/report.xlsx`;
   };
 
   const handleDownloadPdf = () => {
-    window.location.href = `/v1/batches/${batchId}/report.pdf`;
+    window.location.href = `${API_BASE_URL}/v1/batches/${batchId}/report.pdf`;
   };
 
   // Loading, Offline, and Error Renders

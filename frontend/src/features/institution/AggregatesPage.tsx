@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from '@/components/ui/table';
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, fetchWithAuth } from '@/lib/api';
 import { ProgramAggregateItem, ReconciliationStatusItem } from './types';
 import {
   CheckCircle2,
@@ -27,8 +27,8 @@ export const AggregatesPage: React.FC = () => {
     try {
       setLoading(true);
       const [aggRes, recRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/v1/aggregates`),
-        fetch(`${API_BASE_URL}/v1/reconciliation`),
+        fetchWithAuth(`${API_BASE_URL}/v1/aggregates`),
+        fetchWithAuth(`${API_BASE_URL}/v1/reconciliation`),
       ]);
 
       if (aggRes.ok) {
@@ -68,7 +68,7 @@ export const AggregatesPage: React.FC = () => {
       setSaveError(null);
       setSaveSuccess(null);
 
-      const res = await fetch(`${API_BASE_URL}/v1/aggregates`, {
+      const res = await fetchWithAuth(`${API_BASE_URL}/v1/aggregates`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
