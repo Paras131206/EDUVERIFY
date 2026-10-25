@@ -37,6 +37,7 @@ import {
   mockStudentVersionHistory,
   mockConsentPurposes,
   mockConsentHistory,
+  mockUserTypeConsents,
   mockStudentCredentials,
   mockDabGraduates,
   mockReportItems,
@@ -49,6 +50,7 @@ import {
   ConsentHistoryRecord,
   StudentCredentialItem,
   DabGraduateItem,
+  UserTypeConsentSetting,
   EmployerHiringRequestItem,
 } from '@/features/student/types';
 import { ReportItem, ReportJob } from '@/features/reports/types';
@@ -106,6 +108,7 @@ export const setMockAicteSummary = (summary: Partial<typeof mockAicteSummary>) =
 export let studentOwnRecordState: StudentOwnRecord = JSON.parse(JSON.stringify(mockStudentOwnRecord));
 export let studentVersionHistoryState: StudentVersionHistoryItem[] = JSON.parse(JSON.stringify(mockStudentVersionHistory));
 export let consentPurposesState: ConsentPurposeSetting[] = JSON.parse(JSON.stringify(mockConsentPurposes));
+export let userTypeConsentsState: UserTypeConsentSetting[] = JSON.parse(JSON.stringify(mockUserTypeConsents));
 export let consentHistoryState: ConsentHistoryRecord[] = JSON.parse(JSON.stringify(mockConsentHistory));
 export let studentCredentialsState: StudentCredentialItem[] = JSON.parse(JSON.stringify(mockStudentCredentials));
 export let dabGraduatesState: DabGraduateItem[] = JSON.parse(JSON.stringify(mockDabGraduates));
@@ -116,6 +119,7 @@ export const resetTrustMock = () => {
   studentOwnRecordState = JSON.parse(JSON.stringify(mockStudentOwnRecord));
   studentVersionHistoryState = JSON.parse(JSON.stringify(mockStudentVersionHistory));
   consentPurposesState = JSON.parse(JSON.stringify(mockConsentPurposes));
+  userTypeConsentsState = JSON.parse(JSON.stringify(mockUserTypeConsents));
   consentHistoryState = JSON.parse(JSON.stringify(mockConsentHistory));
   studentCredentialsState = JSON.parse(JSON.stringify(mockStudentCredentials));
   dabGraduatesState = JSON.parse(JSON.stringify(mockDabGraduates));
@@ -1462,6 +1466,7 @@ export const handlers = [
   http.get('*/v1/students/me/consent', () => {
     return HttpResponse.json({
       purposes: consentPurposesState,
+      user_consents: userTypeConsentsState,
       history: consentHistoryState,
     });
   }),
@@ -1511,6 +1516,48 @@ export const handlers = [
       success: true,
       message: `Consent for ${purpose} set to ${action}`,
       purposes: consentPurposesState,
+      history: consentHistoryState,
+    });
+  }),
+
+  // 3b. Student user-type consent settings (Employer, University, Government, Bank, etc.)
+  http.get('*/v1/students/me/user-consents', () => {
+    return HttpResponse.json(userTypeConsentsState);
+  }),
+
+  // 4b. Update user-type consent
+  http.post('*/v1/students/me/user-consents', async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as any;
+    const { user_type, is_granted, can_view, can_verify, allowed_documents, data_disclosure_level, validity, notes } = body;
+
+    const target = userTypeConsentsState.find((c) => c.user_type === user_type);
+    if (!target) {
+      return HttpResponse.json({ message: 'User type not found' }, { status: 404 });
+    }
+
+    if (is_granted !== undefined) target.is_granted = is_granted;
+    if (can_view !== undefined) target.can_view = can_view;
+    if (can_verify !== undefined) target.can_verify = can_verify;
+    if (allowed_documents !== undefined) target.allowed_documents = allowed_documents;
+    if (data_disclosure_level !== undefined) target.data_disclosure_level = data_disclosure_level;
+    if (validity !== undefined) target.validity = validity;
+    target.last_updated = new Date().toISOString();
+
+    const action = target.is_granted ? 'GRANTED' : 'WITHDRAWN';
+    const historyRecord: ConsentHistoryRecord = {
+      id: `cst-ut-${Date.now()}`,
+      purpose: user_type,
+      action,
+      timestamp: new Date().toISOString(),
+      actor: 'Student (Self via Wallet)',
+      notes: notes || `User-Type Consent for ${target.title} updated (${action})`,
+    };
+    consentHistoryState = [historyRecord, ...consentHistoryState];
+
+    return HttpResponse.json({
+      success: true,
+      message: `Consent for ${target.title} updated`,
+      consents: userTypeConsentsState,
       history: consentHistoryState,
     });
   }),
@@ -1693,7 +1740,6 @@ export const handlers = [
     employerRequestsState = [newReq, ...employerRequestsState];
     return HttpResponse.json(newReq, { status: 201 });
   }),
-
   // Students & Lifecycle transitions
   http.get('*/v1/students', ({ request }) => {
     const url = new URL(request.url);
@@ -2132,7 +2178,7 @@ export const handlers = [
       // ignore
     }
 
-    const { sd_jwt_presentation } = body;
+    const { sd_jwt_presentation, verifier_type } = body;
     if (!sd_jwt_presentation || typeof sd_jwt_presentation !== 'string') {
       return HttpResponse.json(
         {
@@ -2192,6 +2238,29 @@ export const handlers = [
         holder_bound: false,
         error_message: 'Holder has withdrawn consent for third-party verification',
       });
+    }
+
+    // B2. Check User-Type Consent (Section 8.4 / Granular Relying Party Consent)
+    if (verifier_type) {
+      const typeConsent = userTypeConsentsState.find((c) => c.user_type === verifier_type);
+      if (typeConsent && (!typeConsent.is_granted || !typeConsent.can_verify)) {
+        return HttpResponse.json({
+          valid: false,
+          status: 'SUSPENDED',
+          issuer: 'Delhi College of Engineering & Technology',
+          issuer_trusted: true,
+          verified_at: new Date().toISOString(),
+          checked_at: new Date().toISOString(),
+          disclosed_claims: {}, // ZERO claims revealed
+          reasons: [
+            `Student has NOT granted verification consent to ${typeConsent.title} under DPDP Act 2023 Section 8.4`,
+            `Access restricted for verifier category: ${verifier_type}`,
+            `Holder policy does not permit document verification for this user role`,
+          ],
+          holder_bound: false,
+          error_message: `Holder has restricted document verification for ${typeConsent.title}`,
+        });
+      }
     }
 
     // C. Check if presentation is superseded

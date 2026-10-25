@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { StudentCredentialItem } from '../types';
+import { StudentCredentialItem, UserTypeConsentSetting, VerifierUserType } from '../types';
 import { API_BASE_URL } from '@/lib/api';
 import { buildSelectivePresentation } from '@/lib/sdjwt';
 import { getOrInitHolderKey } from '@/lib/holderKey';
@@ -19,6 +19,7 @@ import {
 
 interface SharePresentationModalProps {
   credential: StudentCredentialItem | null;
+  userConsents?: UserTypeConsentSetting[];
   isOpen: boolean;
   onClose: () => void;
   holderPrivateKey: CryptoKey | null;
@@ -31,6 +32,7 @@ export const SharePresentationModal: React.FC<SharePresentationModalProps> = ({
   holderPrivateKey,
 }) => {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  const [targetUserType, setTargetUserType] = useState<VerifierUserType>('EMPLOYER');
   const [audience, setAudience] = useState<string>('Acme Corp HR (Employer Verification)');
   const [isGenerating, setIsGenerating] = useState(false);
   const [presentationResult, setPresentationResult] = useState<{
@@ -116,7 +118,7 @@ export const SharePresentationModal: React.FC<SharePresentationModalProps> = ({
       );
 
       const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5173';
-      const shareUrl = `${origin}/verify?presentation=${encodeURIComponent(presentation)}`;
+      const shareUrl = `${origin}/verify?presentation=${encodeURIComponent(presentation)}&verifier_type=${targetUserType}`;
 
       setPresentationResult({
         presentation,
@@ -239,25 +241,70 @@ export const SharePresentationModal: React.FC<SharePresentationModalProps> = ({
             </div>
           </div>
 
-          {/* Builder Step 2: Audience Name / URL */}
-          <div>
-            <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1">
-              2. Target Verifier Audience (aud)
-            </label>
-            <div className="relative">
-              <Building className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-              <Input
-                type="text"
-                value={audience}
-                onChange={(e) => setAudience(e.target.value)}
-                placeholder="e.g. Acme Corp HR, TCS Verification Portal"
-                className="pl-9 text-xs"
-                data-testid="audience-input"
-              />
+          {/* Builder Step 2: Target Verifier Category & Audience */}
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1">
+                2. Target Verifier Category / Role
+              </label>
+              <select
+                value={targetUserType}
+                onChange={(e) => {
+                  const val = e.target.value as VerifierUserType;
+                  setTargetUserType(val);
+                  switch (val) {
+                    case 'EMPLOYER':
+                      setAudience('Acme Corp HR (Employer Verification)');
+                      break;
+                    case 'HIGHER_ED':
+                      setAudience('Admissions & Registrar Office (University)');
+                      break;
+                    case 'GOVERNMENT':
+                      setAudience('National Scholarship & Welfare Portal');
+                      break;
+                    case 'FINANCIAL':
+                      setAudience('State Bank / Canara Education Loan Desk');
+                      break;
+                    case 'REGULATORY':
+                      setAudience('AICTE / State Technical Council Audit');
+                      break;
+                    case 'PUBLIC':
+                    default:
+                      setAudience('Public Verifier Link');
+                      break;
+                  }
+                }}
+                className="w-full p-2 rounded-lg border border-slate-300 text-xs bg-white font-medium"
+                data-testid="target-verifier-select"
+              >
+                <option value="EMPLOYER">Corporate Employer / Recruiter (EMPLOYER)</option>
+                <option value="HIGHER_ED">University / Higher Education (HIGHER_ED)</option>
+                <option value="GOVERNMENT">Government / Scholarship Body (GOVERNMENT)</option>
+                <option value="FINANCIAL">Bank / Loan Provider (FINANCIAL)</option>
+                <option value="REGULATORY">AICTE / Regulatory Council (REGULATORY)</option>
+                <option value="PUBLIC">General / Public Verifier (PUBLIC)</option>
+              </select>
             </div>
-            <p className="text-[11px] text-slate-500 mt-1">
-              The audience identifier is embedded into the KB-JWT to prevent replay attacks on other verifiers.
-            </p>
+
+            <div>
+              <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1">
+                3. Verifier Audience Identifier (aud)
+              </label>
+              <div className="relative">
+                <Building className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                <Input
+                  type="text"
+                  value={audience}
+                  onChange={(e) => setAudience(e.target.value)}
+                  placeholder="e.g. Acme Corp HR, TCS Verification Portal"
+                  className="pl-9 text-xs"
+                  data-testid="audience-input"
+                />
+              </div>
+              <p className="text-[11px] text-slate-500 mt-1">
+                The audience identifier is embedded into the KB-JWT to prevent replay attacks on other verifiers.
+              </p>
+            </div>
           </div>
 
           {/* Action to Generate */}

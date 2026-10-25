@@ -6,10 +6,10 @@ import {
   ConsentPurposeSetting,
   ConsentHistoryRecord,
   StudentCredentialItem,
+  UserTypeConsentSetting,
   EmployerHiringRequestItem,
 } from './types';
 import { getOrInitHolderKey } from '@/lib/holderKey';
-import { HolderKeyBanner } from './components/HolderKeyBanner';
 import { StudentProfileCard } from './components/StudentProfileCard';
 import { ConsentManagementCard } from './components/ConsentManagementCard';
 import { EmployerRequestsCard } from './components/EmployerRequestsCard';
@@ -25,6 +25,7 @@ export const StudentWalletPage: React.FC = () => {
   const [record, setRecord] = useState<StudentOwnRecord | null>(null);
   const [versions, setVersions] = useState<StudentVersionHistoryItem[]>([]);
   const [purposes, setPurposes] = useState<ConsentPurposeSetting[]>([]);
+  const [userConsents, setUserConsents] = useState<UserTypeConsentSetting[]>([]);
   const [history, setHistory] = useState<ConsentHistoryRecord[]>([]);
   const [credentials, setCredentials] = useState<StudentCredentialItem[]>([]);
   const [employerRequests, setEmployerRequests] = useState<EmployerHiringRequestItem[]>([]);
@@ -35,8 +36,6 @@ export const StudentWalletPage: React.FC = () => {
 
   // WebCrypto Holder Key State
   const [holderPrivateKey, setHolderPrivateKey] = useState<CryptoKey | null>(null);
-  const [publicJwk, setPublicJwk] = useState<JsonWebKey | null>(null);
-  const [isKeyRegistered, setIsKeyRegistered] = useState<boolean>(false);
 
   // Modals
   const [selectedCredForShare, setSelectedCredForShare] = useState<StudentCredentialItem | null>(null);
@@ -59,8 +58,6 @@ export const StudentWalletPage: React.FC = () => {
     try {
       const keyResult = await getOrInitHolderKey(true);
       setHolderPrivateKey(keyResult.privateKey);
-      setPublicJwk(keyResult.publicJwk);
-      setIsKeyRegistered(true);
     } catch (err) {
       console.warn('Holder key initialization notice:', err);
     }
@@ -85,13 +82,14 @@ export const StudentWalletPage: React.FC = () => {
 
       const recData = await recRes.json();
       const verData = verRes.ok ? await verRes.json() : [];
-      const cstData = cstRes.ok ? await cstRes.json() : { purposes: [], history: [] };
+      const cstData = cstRes.ok ? await cstRes.json() : { purposes: [], history: [], user_consents: [] };
       const credData = credRes.ok ? await credRes.json() : [];
       const empReqData = empReqRes.ok ? await empReqRes.json() : [];
 
       setRecord(recData);
       setVersions(verData);
       setPurposes(cstData.purposes || []);
+      setUserConsents(cstData.user_consents || []);
       setHistory(cstData.history || []);
       setCredentials(credData);
       setEmployerRequests(empReqData);
@@ -189,12 +187,6 @@ export const StudentWalletPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 1. Holder Key Custody Banner (Req 2) */}
-      <HolderKeyBanner
-        publicJwk={publicJwk}
-        isRegistered={isKeyRegistered}
-        onKeyRefreshed={initHolderKey}
-      />
 
       {/* 2. Own Record Profile (Unmasked for Self per Req 1) */}
       <StudentProfileCard record={record} versions={versions} />
@@ -202,6 +194,7 @@ export const StudentWalletPage: React.FC = () => {
       {/* 3. Consent Management with Plain-Language Consequences (Req 1) */}
       <ConsentManagementCard
         purposes={purposes}
+        userConsents={userConsents}
         history={history}
         onConsentUpdated={(msg) => {
           fetchData();
@@ -234,6 +227,7 @@ export const StudentWalletPage: React.FC = () => {
       {/* Selective Disclosure Presentation Builder Modal */}
       <SharePresentationModal
         credential={selectedCredForShare}
+        userConsents={userConsents}
         isOpen={!!selectedCredForShare}
         onClose={() => setSelectedCredForShare(null)}
         holderPrivateKey={holderPrivateKey}

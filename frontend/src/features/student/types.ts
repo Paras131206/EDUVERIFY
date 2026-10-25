@@ -54,6 +54,39 @@ export interface EmployerHiringRequestItem {
   decided_at: string | null;
 }
 
+export type VerifierUserType =
+  | 'EMPLOYER'
+  | 'HIGHER_ED'
+  | 'GOVERNMENT'
+  | 'FINANCIAL'
+  | 'REGULATORY'
+  | 'PUBLIC';
+
+export type StudentDocumentType =
+  | 'ENROLMENT_CREDENTIAL'
+  | 'DEGREE_CERTIFICATE'
+  | 'MARKSHEET_TRANSCRIPT'
+  | 'CATEGORY_PROOF'
+  | 'BONAFIDE_ID';
+
+export interface UserTypeConsentSetting {
+  id: string;
+  user_type: VerifierUserType;
+  title: string;
+  title_hi: string;
+  category_label: string;
+  category_label_hi: string;
+  description: string;
+  description_hi: string;
+  is_granted: boolean;
+  can_view: boolean;
+  can_verify: boolean;
+  allowed_documents: StudentDocumentType[];
+  data_disclosure_level: 'MINIMAL' | 'ACADEMIC' | 'FULL';
+  validity: 'INDEFINITE' | '30_DAYS' | '90_DAYS' | 'ACADEMIC_YEAR';
+  last_updated?: string;
+}
+
 export interface ConsentPurposeSetting {
   purpose: ConsentPurpose;
   title: string;
@@ -67,7 +100,7 @@ export interface ConsentPurposeSetting {
 
 export interface ConsentHistoryRecord {
   id: string;
-  purpose: ConsentPurpose;
+  purpose: ConsentPurpose | VerifierUserType | string;
   action: 'GRANTED' | 'WITHDRAWN';
   timestamp: string;
   actor: string;

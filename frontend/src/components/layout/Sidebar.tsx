@@ -8,7 +8,6 @@ import {
   Layers,
   CheckSquare,
   ArrowLeftRight,
-  ShieldCheck,
   Wallet,
   FileBarChart2,
   Settings,
@@ -125,13 +124,6 @@ export const Sidebar: React.FC = () => {
       label: t('nav.student'),
       icon: <Wallet className="w-4 h-4" aria-hidden="true" />,
       visible: !role || role === 'STUDENT',
-    },
-    // Verifier items
-    {
-      to: '/verify',
-      label: t('nav.verifier'),
-      icon: <ShieldCheck className="w-4 h-4" aria-hidden="true" />,
-      visible: true,
     },
     // Employer items
     {

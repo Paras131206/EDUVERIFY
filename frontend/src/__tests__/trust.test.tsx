@@ -103,7 +103,7 @@ describe('Task A6: Trust UIs, Holder Key, Selective Disclosure & Verification', 
   });
 
   describe('3. Student Wallet UI (/student)', () => {
-    it('renders own unmasked record and device holder key notice', async () => {
+    it('renders own unmasked record for self', async () => {
       render(
         <MemoryRouter initialEntries={['/student']}>
           <Routes>
@@ -112,14 +112,8 @@ describe('Task A6: Trust UIs, Holder Key, Selective Disclosure & Verification', 
         </MemoryRouter>
       );
 
-      // Device custody banner
-      expect(
-        await screen.findByText(/This device holds your key; if you clear browser data you must request re-issue/i)
-      ).toBeInTheDocument();
-      expect(screen.getByTestId('holder-key-badge')).toHaveTextContent(/Hardware Key Active/i);
-
       // Unmasked Student Profile for self
-      expect(screen.getByText('Rahul Sharma')).toBeInTheDocument();
+      expect(await screen.findByText('Rahul Sharma')).toBeInTheDocument();
       expect(screen.getByText('984512349012')).toBeInTheDocument(); // Unmasked for self
       expect(screen.getByText('2026/UG/CSE/042')).toBeInTheDocument();
       expect(screen.getByText(/B.Tech Computer Science & Engineering/i)).toBeInTheDocument();
@@ -480,6 +474,148 @@ describe('Task A6: Trust UIs, Holder Key, Selective Disclosure & Verification', 
       expect(claimRows).toHaveLength(2);
       expect(screen.getByTestId('claim-full_name')).toHaveTextContent('Rahul Sharma');
       expect(screen.getByTestId('claim-program_name')).toHaveTextContent('B.Tech Computer Science & Engineering');
+    });
+  });
+
+  describe('6. User-Type Consent Governance & Document Verification Permissions', () => {
+    it('renders user-type consent controls for different verifier types in student wallet', async () => {
+      render(
+        <MemoryRouter initialEntries={['/student']}>
+          <Routes>
+            <Route path="/student" element={<StudentWalletPage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      expect(await screen.findByTestId('user-type-consents-section')).toBeInTheDocument();
+
+      // Check all 6 user types rendered
+      expect(screen.getByTestId('user-type-card-EMPLOYER')).toBeInTheDocument();
+      expect(screen.getByTestId('user-type-card-HIGHER_ED')).toBeInTheDocument();
+      expect(screen.getByTestId('user-type-card-GOVERNMENT')).toBeInTheDocument();
+      expect(screen.getByTestId('user-type-card-FINANCIAL')).toBeInTheDocument();
+      expect(screen.getByTestId('user-type-card-REGULATORY')).toBeInTheDocument();
+      expect(screen.getByTestId('user-type-card-PUBLIC')).toBeInTheDocument();
+
+      // Verify status badges
+      expect(screen.getByTestId('user-type-status-EMPLOYER')).toHaveTextContent('GRANTED');
+      expect(screen.getByTestId('user-type-status-FINANCIAL')).toHaveTextContent('WITHDRAWN');
+    });
+
+    it('allows student to toggle consent for specific user types', async () => {
+      render(
+        <MemoryRouter initialEntries={['/student']}>
+          <Routes>
+            <Route path="/student" element={<StudentWalletPage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      expect(await screen.findByTestId('user-type-card-FINANCIAL')).toBeInTheDocument();
+
+      // Financial is initially WITHDRAWN
+      const financialToggle = screen.getByTestId('user-type-toggle-FINANCIAL');
+      expect(financialToggle).toHaveTextContent('Grant');
+
+      // Click to grant consent
+      fireEvent.click(financialToggle);
+
+      // Verify toast / update
+      expect(await screen.findByTestId('student-toast-msg')).toHaveTextContent(/Consent for .* set to GRANTED/i);
+    });
+
+    it('allows student to configure document viewing and verification scope via modal', async () => {
+      render(
+        <MemoryRouter initialEntries={['/student']}>
+          <Routes>
+            <Route path="/student" element={<StudentWalletPage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      expect(await screen.findByTestId('user-type-card-EMPLOYER')).toBeInTheDocument();
+
+      // Click Configure Scope on EMPLOYER
+      const configBtn = screen.getByTestId('user-type-config-EMPLOYER');
+      fireEvent.click(configBtn);
+
+      // Modal appears
+      expect(await screen.findByTestId('user-type-config-modal')).toBeInTheDocument();
+      expect(screen.getByTestId('scope-toggle-view')).toBeChecked();
+      expect(screen.getByTestId('scope-toggle-verify')).toBeChecked();
+
+      // Toggle document permission (e.g. uncheck MARKSHEET_TRANSCRIPT)
+      const transcriptCheckbox = screen.getByTestId('scope-doc-MARKSHEET_TRANSCRIPT');
+      fireEvent.click(transcriptCheckbox);
+
+      // Save scope configuration
+      const saveBtn = screen.getByTestId('save-scope-config-btn');
+      fireEvent.click(saveBtn);
+
+      // Modal closes and toast confirms
+      await waitFor(() => {
+        expect(screen.queryByTestId('user-type-config-modal')).not.toBeInTheDocument();
+      });
+      expect(await screen.findByTestId('student-toast-msg')).toHaveTextContent(/Updated permissions and document scope/i);
+    });
+
+    it('enforces user-type consent on the Verifier page: blocks verification when role consent is withdrawn', async () => {
+      // 1. Verifying with FINANCIAL role where consent is withdrawn
+      render(
+        <MemoryRouter initialEntries={['/verify?presentation=valid_token&verifier_type=FINANCIAL']}>
+          <Routes>
+            <Route path="/verify" element={<VerifierPage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      expect(await screen.findByTestId('verification-result-card')).toBeInTheDocument();
+
+      // Status should be SUSPENDED with 0 disclosed claims
+      expect(screen.getByTestId('verification-status-badge')).toHaveTextContent('SUSPENDED');
+      expect(screen.getByText(/Holder has restricted document verification for Banks & Education Loan Lenders/i)).toBeInTheDocument();
+      expect(screen.getByText(/No claims disclosed/i)).toBeInTheDocument();
+    });
+
+    it('permits verification when user-type consent is granted and updates upon student revocation', async () => {
+      // 1. Verifying with EMPLOYER role where consent is granted
+      const { unmount } = render(
+        <MemoryRouter initialEntries={['/verify?presentation=valid_token&verifier_type=EMPLOYER']}>
+          <Routes>
+            <Route path="/verify" element={<VerifierPage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      expect(await screen.findByTestId('verification-result-card')).toBeInTheDocument();
+      expect(screen.getByTestId('verification-status-badge')).toHaveTextContent('VALID');
+      unmount();
+
+      // 2. Student withdraws consent for EMPLOYER
+      await fetch('/v1/students/me/user-consents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_type: 'EMPLOYER',
+          is_granted: false,
+          can_verify: false,
+          notes: 'Revoked employer verification consent',
+        }),
+      });
+
+      // 3. Verifying again with EMPLOYER is now blocked
+      render(
+        <MemoryRouter initialEntries={['/verify?presentation=valid_token&verifier_type=EMPLOYER']}>
+          <Routes>
+            <Route path="/verify" element={<VerifierPage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      expect(await screen.findByTestId('verification-result-card')).toBeInTheDocument();
+      expect(screen.getByTestId('verification-status-badge')).toHaveTextContent('SUSPENDED');
+      expect(screen.getByText(/Holder has restricted document verification for Corporate Employers & Recruiters/i)).toBeInTheDocument();
+      expect(screen.getByText(/No claims disclosed/i)).toBeInTheDocument();
     });
   });
 });
