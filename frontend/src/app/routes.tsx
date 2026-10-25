@@ -100,7 +100,7 @@ export const router = createBrowserRouter([
           {
             path: 'aicte',
             element: (
-              <RequireRole roles={['AICTE_ADMIN', 'AICTE_VIEWER']}>
+              <RequireRole roles={['AICTE_ADMIN', 'AICTE_ANALYST', 'AICTE_VIEWER']}>
                 <AicteDashboardPage />
               </RequireRole>
             ),
