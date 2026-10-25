@@ -172,6 +172,143 @@ describe('Site-Wide Language Translation System', () => {
       .toBe('एआईसीटीई सत्यापन इंजन से लाइव टेलीमेट्री स्ट्रीमिंग जारी');
   });
 
+  it('translates Settings tab elements from user screenshot to Hindi', () => {
+    // Header & Subtitle
+    expect(translateText('Institution Administration & Settings')).toBe('संस्थान प्रशासन एवं सेटिंग्स');
+    expect(translateText('Institution Administration & सेटिंग्स')).toBe('संस्थान प्रशासन एवं सेटिंग्स');
+    expect(translateText('Self-service institutional API keys, team role assignments, webhooks, and security compliance'))
+      .toBe('स्वयं-सेवा संस्थागत एपीआई कुंजियां, टीम भूमिका आवंटन, वेबहुक, और सुरक्षा अनुपालन');
+    expect(translateText('Self-service institutional एपीआई कुंजियां, team role assignments, webhooks, and security compliance'))
+      .toBe('स्वयं-सेवा संस्थागत एपीआई कुंजियां, टीम भूमिका आवंटन, वेबहुक, और सुरक्षा अनुपालन');
+
+    // Subtabs
+    expect(translateText('API Keys')).toBe('एपीआई कुंजियां');
+    expect(translateText('Webhooks')).toBe('वेबहुक्स');
+    expect(translateText('User Management')).toBe('उपयोगकर्ता प्रबंधन');
+    expect(translateText('Audit & Compliance')).toBe('ऑडिट एवं अनुपालन');
+
+    // API Keys Card
+    expect(translateText('Institutional API Keys')).toBe('संस्थागत एपीआई कुंजियां');
+    expect(translateText('Institutional एपीआई कुंजियां')).toBe('संस्थागत एपीआई कुंजियां');
+    expect(translateText('Provision high-throughput API credentials for programmatic CSV/JSON ingestion from your campus ERP'))
+      .toBe('अपने कैंपस ERP से प्रोग्रामेटिक CSV/JSON अंतर्ग्रहण हेतु उच्च-थ्रूपुट एपीआई क्रेडेंशियल्स प्राप्त करें');
+    expect(translateText('Provision उच्च-throughput API credentials for programmatic CSV/JSON ingestion from your campus ERP'))
+      .toBe('अपने कैंपस ERP से प्रोग्रामेटिक CSV/JSON अंतर्ग्रहण हेतु उच्च-थ्रूपुट एपीआई क्रेडेंशियल्स प्राप्त करें');
+    expect(translateText('+ Generate New Key')).toBe('+ नई कुंजी बनाएं');
+    expect(translateText('+ Generate नई Key')).toBe('+ नई कुंजी बनाएं');
+    expect(translateText('Generate New Key')).toBe('नई कुंजी बनाएं');
+
+    // Table Headers & Actions
+    expect(translateText('KEY NAME')).toBe('कुंजी का नाम');
+    expect(translateText('PREFIX')).toBe('उपसर्ग (Prefix)');
+    expect(translateText('SCOPES')).toBe('अनुमतियां (Scopes)');
+    expect(translateText('CREATED')).toBe('सृजन तिथि');
+    expect(translateText('LAST USED')).toBe('अंतिम उपयोग');
+    expect(translateText('Status')).toBe('स्थिति');
+    expect(translateText('Actions')).toBe('कार्रवाई');
+    expect(translateText('Revoke')).toBe('रद्द करें');
+  });
+
+  it('translates Reports & Statutory Audits tab elements from user screenshot to Hindi', () => {
+    // Header & Subtitle
+    expect(translateText('Statutory Reports & Quality Audits')).toBe('सांविधिक रिपोर्ट एवं गुणवत्ता ऑडिट');
+    expect(translateText('प्रतिवेदन एवं सांविधिक लेखापरीक्षा · Generate AICTE policy reports, NBA/NAAC accreditation summaries, intake monitoring, and reservation compliance packages.'))
+      .toBe('प्रतिवेदन एवं सांविधिक लेखापरीक्षा · एआईसीटीई नीति रिपोर्ट, NBA/NAAC प्रत्यायन सारांश, प्रवेश निगरानी और आरक्षण अनुपालन पैकेज तैयार करें।');
+    expect(translateText('Generate Authority Access Link')).toBe('प्राधिकरण एक्सेस लिंक उत्पन्न करें');
+    expect(translateText('Refresh')).toBe('ताज़ा करें');
+
+    // Preset Cards
+    expect(translateText('Annual Policy Report')).toBe('वार्षिक नीति रिपोर्ट');
+    expect(translateText('National intake ceilings, excess enrollments, and state seat utilization.'))
+      .toBe('राष्ट्रीय प्रवेश सीमाएं, अतिरिक्त नामांकन, और राज्य सीट उपयोग।');
+    expect(translateText('National intake ceilings, अतिरिक्त enrollments, and state seat utilization.'))
+      .toBe('राष्ट्रीय प्रवेश सीमाएं, अतिरिक्त नामांकन, और राज्य सीट उपयोग।');
+
+    expect(translateText('Accreditation Audit')).toBe('प्रत्यायन ऑडिट');
+    expect(translateText('NBA/NAAC multi-tab student intake, faculty ratios, and referential integrity.'))
+      .toBe('NBA/NAAC बहु-टैब छात्र प्रवेश, संकाय अनुपात, और संदर्भात्मक सत्यनिष्ठा।');
+    expect(translateText('NBA/NAAC multi-tab विद्यार्थी intake, faculty ratios, and referential integrity.'))
+      .toBe('NBA/NAAC बहु-टैब छात्र प्रवेश, संकाय अनुपात, और संदर्भात्मक सत्यनिष्ठा।');
+
+    expect(translateText('Seat Monitoring')).toBe('सीट निगरानी');
+    expect(translateText('Supernumerary schemes (TFW/PMSSS/JK), NRI/OCI/FN shares by state.'))
+      .toBe('अतिरिक्त सीटें (सुपरन्यूमरेरी योजनाएं - TFW/PMSSS/JK), राज्यवार NRI/OCI/FN हिस्सेदारी।');
+    expect(translateText('अतिरिक्त सीटें (Supernumerary) schemes (TFW/PMSSS/JK), NRI/OCI/FN shares by state.'))
+      .toBe('अतिरिक्त सीटें (सुपरन्यूमरेरी योजनाएं - TFW/PMSSS/JK), राज्यवार NRI/OCI/FN हिस्सेदारी।');
+
+    expect(translateText('Reservation Compliance')).toBe('आरक्षण अनुपालन');
+    expect(translateText('Statutory GEN/OBC/SC/ST/EWS breakdown and quota audit certificate.'))
+      .toBe('सांविधिक GEN/अन्य पिछड़ा वर्ग (OBC)/SC/ST/आर्थिक रूप से कमजोर वर्ग (EWS) विवरण और कोटा ऑडिट प्रमाणपत्र।');
+    expect(translateText('Statutory GEN/अन्य पिछड़ा वर्ग (OBC)/SC/ST/आर्थिक रूप से कमजोर वर्ग (EWS) breakdown and कोटा audit certificate.'))
+      .toBe('सांविधिक GEN/अन्य पिछड़ा वर्ग (OBC)/SC/ST/आर्थिक रूप से कमजोर वर्ग (EWS) विवरण और कोटा ऑडिट प्रमाणपत्र।');
+
+    // Custom Report Builder Form
+    expect(translateText('Custom Report Builder')).toBe('कस्टम रिपोर्ट बिल्डर');
+    expect(translateText('Configure report scope, institutional filters, target demographic dimensions, and output format.'))
+      .toBe('रिपोर्ट दायरा, संस्थागत फ़िल्टर, लक्षित जनसांख्यिकीय आयाम और आउटपुट प्रारूप कॉन्फ़िगर करें।');
+    expect(translateText('1. REPORT TYPE')).toBe('1. रिपोर्ट का प्रकार');
+    expect(translateText('POLICY — National & State Intake Policy Report')).toBe('नीति — राष्ट्रीय एवं राज्य प्रवेश नीति रिपोर्ट');
+    expect(translateText('2. Academic Year')).toBe('2. शैक्षणिक वर्ष');
+    expect(translateText('2026-27 (Current Active Batch)')).toBe('2026-27 (वर्तमान सक्रिय बैच)');
+    expect(translateText('2026-27 (Current सत्रिम Batch)')).toBe('2026-27 (वर्तमान सक्रिय बैच)');
+    expect(translateText('3. STATE SCOPE')).toBe('3. राज्य दायरा (Scope)');
+    expect(translateText('All India (National Aggregation)')).toBe('अखिल भारतीय (राष्ट्रीय संकलन)');
+    expect(translateText('सभी India (National Aggregation)')).toBe('अखिल भारतीय (राष्ट्रीय संकलन)');
+    expect(translateText('4. PROGRAM DISCIPLINE')).toBe('4. कार्यक्रम अनुशासन (Discipline)');
+    expect(translateText('All Disciplines & Programs')).toBe('सभी विषय एवं कार्यक्रम');
+    expect(translateText('सभी Disciplines & Programs')).toBe('सभी विषय एवं कार्यक्रम');
+    expect(translateText('5. RESERVATION CATEGORY')).toBe('5. आरक्षण श्रेणी');
+    expect(translateText('5. RESERVATION श्रेणी')).toBe('5. आरक्षण श्रेणी');
+    expect(translateText('All Social Categories')).toBe('सभी सामाजिक श्रेणियां');
+    expect(translateText('सभी Social Categories')).toBe('सभी सामाजिक श्रेणियां');
+    expect(translateText('6. OUTPUT FORMAT')).toBe('6. आउटपुट प्रारूप');
+    expect(translateText('PDF (Print A4)')).toBe('PDF (प्रिंट A4)');
+    expect(translateText('XLSX (Excel)')).toBe('XLSX (एक्सेल)');
+    expect(translateText('* Reports are compiled live from the central verified repository and rendered using WeasyPrint print styles.'))
+      .toBe('* रिपोर्ट केंद्रीय सत्यापित भंडार से लाइव संकलित की जाती हैं और WeasyPrint प्रिंट शैलियों का उपयोग करके प्रस्तुत की जाती हैं।');
+    expect(translateText('Generate PDF Report')).toBe('पीडीएफ रिपोर्ट तैयार करें');
+
+    // Generated Reports History
+    expect(translateText('Generated Reports History')).toBe('तैयार की गई रिपोर्ट का इतिहास');
+    expect(translateText('Audit trail of compiled policy documents, accreditation tables, and statutory downloads.'))
+      .toBe('संकलित नीति दस्तावेजों, प्रत्यायन तालिकाओं और सांविधिक डाउनलोड का ऑडिट ट्रेल।');
+    expect(translateText('Search reports...')).toBe('रिपोर्ट खोजें...');
+    expect(translateText('खोजें reports...')).toBe('रिपोर्ट खोजें...');
+    expect(translateText('All Types')).toBe('सभी प्रकार');
+    expect(translateText('सभी Types')).toBe('सभी प्रकार');
+    expect(translateText('All Formats')).toBe('सभी प्रारूप');
+    expect(translateText('सभी Formats')).toBe('सभी प्रारूप');
+    expect(translateText('REPORT ID')).toBe('रिपोर्ट आईडी');
+    expect(translateText('TITLE & SCOPE')).toBe('शीर्षक एवं दायरा');
+    expect(translateText('TYPE')).toBe('प्रकार');
+    expect(translateText('FORMAT')).toBe('प्रारूप');
+    expect(translateText('GENERATED AT')).toBe('तैयार करने का समय');
+    expect(translateText('SIZE')).toBe('आकार');
+  });
+
+  it('translates Verifier tab elements from user screenshot to Hindi', () => {
+    // Header & Badges
+    expect(translateText('PUBLIC VERIFIER')).toBe('सार्वजनिक सत्यापनकर्ता');
+    expect(translateText('Authorized Credential Verification Portal')).toBe('अधिकृत प्रमाणपत्र सत्यापन पोर्टल');
+    expect(translateText('Real-time verification of SD-JWT credentials against AICTE trust roots and national status lists'))
+      .toBe('एआईसीटीई ट्रस्ट रूट्स और राष्ट्रीय स्थिति सूचियों के विरुद्ध SD-JWT क्रेडेंशियल्स का रीयल-टाइम सत्यापन');
+    expect(translateText('Real-time verification of SD-JWT credentials against AICTE trust roots and national स्थिति lists'))
+      .toBe('एआईसीटीई ट्रस्ट रूट्स और राष्ट्रीय स्थिति सूचियों के विरुद्ध SD-JWT क्रेडेंशियल्स का रीयल-टाइम सत्यापन');
+    expect(translateText('AICTE Trust Root Connected')).toBe('एआईसीटीई ट्रस्ट रूट कनेक्टेड');
+
+    // Input Card
+    expect(translateText('Verify Student Presentation')).toBe('विद्यार्थी प्रस्तुति सत्यापित करें');
+    expect(translateText('Verify विद्यार्थी Presentation')).toBe('विद्यार्थी प्रस्तुति सत्यापित करें');
+    expect(translateText('Accepts raw SD-JWT presentation strings or full verification URLs generated from the Student Wallet'))
+      .toBe('छात्र वॉलेट से उत्पन्न रॉ SD-JWT प्रस्तुति स्ट्रिंग्स या पूर्ण सत्यापन URL स्वीकार करता है');
+    expect(translateText('Accepts raw SD-JWT presentation strings or full verification URLs generated from the छात्र वॉलेट'))
+      .toBe('छात्र वॉलेट से उत्पन्न रॉ SD-JWT प्रस्तुति स्ट्रिंग्स या पूर्ण सत्यापन URL स्वीकार करता है');
+    expect(translateText('PRESENTATION TOKEN / SHARE LINK:')).toBe('प्रस्तुति टोकन / साझाकरण लिंक:');
+    expect(translateText('Presentation Token / Share Link:')).toBe('प्रस्तुति टोकन / साझाकरण लिंक:');
+    expect(translateText('Verify Credential Presentation')).toBe('प्रमाणपत्र प्रस्तुति सत्यापित करें');
+    expect(translateText('प्रमाणपत्र सत्यापित करें Presentation')).toBe('प्रमाणपत्र प्रस्तुति सत्यापित करें');
+  });
+
   it('translates all elements from Institution Dashboard screenshots (Screenshots 1, 2, 3)', () => {
     // Toolbar buttons
     expect(translateText('Reset Stats to Zero')).toBe('आंकड़े शून्य पर रीसेट करें');
