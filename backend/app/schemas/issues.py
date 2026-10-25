@@ -69,3 +69,9 @@ class DQComparisonResponse(BaseModel):
     per_priority_deltas: dict[str, int] = Field(default_factory=dict)
     per_column_completeness_before: dict[str, float] = Field(default_factory=dict)
     per_column_completeness_after: dict[str, float] = Field(default_factory=dict)
+
+
+class IssueRevertRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    reason: str | None = Field(default=None, description="Audit justification for reverting decision")
+

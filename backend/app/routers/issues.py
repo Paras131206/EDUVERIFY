@@ -8,12 +8,14 @@ from app.schemas.batches import BatchIssueResponse
 from app.schemas.issues import (
     CorrectionResponse,
     IssueDecisionRequest,
+    IssueRevertRequest,
 )
 from app.security.deps import Principal, get_current_principal
 from app.services.issues import (
     approve_correction_service,
     decide_issue_service,
     list_corrections_service,
+    revert_issue_service,
 )
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
@@ -120,3 +122,38 @@ def approve_correction(
         created_at=r.created_at,
         decided_at=r.decided_at,
     )
+
+
+@router.post(
+    "/v1/issues/{id}/revert",
+    include_in_schema=False,
+    response_model=BatchIssueResponse,
+    summary="Revert decision on an issue back to original document state",
+)
+@router.post(
+    "/v1/batches/{batch_id}/issues/{id}/revert",
+    include_in_schema=False,
+    response_model=BatchIssueResponse,
+    summary="Revert decision on an issue within a batch",
+)
+def revert_issue(
+    id: str,
+    body: IssueRevertRequest | None = None,
+    batch_id: str | None = None,
+    principal: Principal = Depends(get_current_principal),
+    db: Session = Depends(get_db),
+) -> BatchIssueResponse:
+    """
+    Reverts an issue decision back to OPEN status.
+    Cancels associated corrections and records a tamper-evident audit log entry.
+    Restricted to INSTITUTION_ADMIN or AICTE_ADMIN.
+    """
+    reason = body.reason if body else None
+    updated_issue = revert_issue_service(
+        db,
+        issue_id=id,
+        reason=reason,
+        principal=principal,
+    )
+    return BatchIssueResponse.model_validate(updated_issue)
+

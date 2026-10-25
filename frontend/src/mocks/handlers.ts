@@ -650,11 +650,173 @@ export const handlers = [
       proposed_value: proposedVal,
       value_masked: valMasked,
       decided_by: body.user_role || 'INSTITUTION_ADMIN',
+      decided_at: new Date().toISOString(),
+      original_value: (issue as any).original_value || issue.value_masked,
     };
 
     currentBatchReport.issues[issueIndex] = updatedIssue;
     return HttpResponse.json(updatedIssue);
   }),
+
+  http.post('*/v1/issues/:id/revert', async ({ params, request }) => {
+    let body: { reason?: string } = {};
+    try {
+      body = (await request.json()) as { reason?: string };
+    } catch {
+      // empty body
+    }
+
+    const issueIndex = currentBatchReport.issues.findIndex(
+      (i: typeof currentBatchReport.issues[0]) => i.issue_id === params.id
+    );
+
+    if (issueIndex === -1) {
+      return HttpResponse.json({ detail: 'Issue not found' }, { status: 404 });
+    }
+
+    const issue = currentBatchReport.issues[issueIndex];
+    const originalVal = (issue as any).original_value || issue.value_masked;
+
+    const revertedIssue = {
+      ...issue,
+      status: 'OPEN' as const,
+      decision_note: undefined,
+      proposed_value: undefined,
+      value_masked: originalVal,
+      decided_by: undefined,
+      decided_at: undefined,
+      is_reverted: true,
+      revert_reason: body.reason || 'Rollback to original document value',
+    };
+
+    currentBatchReport.issues[issueIndex] = revertedIssue;
+
+    // Append to audit log
+    const auditEntry: AuditLogEntry = {
+      id: `aud-rev-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      actor_email: 'inst.admin@demo.local',
+      actor_role: 'INSTITUTION_ADMIN',
+      action: 'REVERT_ISSUE_DECISION',
+      resource: 'ISSUE',
+      record_hash: Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
+      prev_record_hash: auditLogState[0]?.record_hash || '0'.repeat(64),
+      metadata: {
+        issue_id: params.id,
+        revert_reason: body.reason || 'Reverted by Institution Admin',
+        batch_id: 'batch-demo-2',
+      },
+    };
+    auditLogState.unshift(auditEntry);
+
+    return HttpResponse.json(revertedIssue);
+  }),
+
+  http.post('*/v1/batches/:batch_id/issues/:id/revert', async ({ params, request }) => {
+    let body: { reason?: string } = {};
+    try {
+      body = (await request.json()) as { reason?: string };
+    } catch {
+      // empty body
+    }
+
+    const issueIndex = currentBatchReport.issues.findIndex(
+      (i: typeof currentBatchReport.issues[0]) => i.issue_id === params.id
+    );
+
+    if (issueIndex === -1) {
+      return HttpResponse.json({ detail: 'Issue not found' }, { status: 404 });
+    }
+
+    const issue = currentBatchReport.issues[issueIndex];
+    const originalVal = (issue as any).original_value || issue.value_masked;
+
+    const revertedIssue = {
+      ...issue,
+      status: 'OPEN' as const,
+      decision_note: undefined,
+      proposed_value: undefined,
+      value_masked: originalVal,
+      decided_by: undefined,
+      decided_at: undefined,
+      is_reverted: true,
+      revert_reason: body.reason || 'Rollback to original document value',
+    };
+
+    currentBatchReport.issues[issueIndex] = revertedIssue;
+    return HttpResponse.json(revertedIssue);
+  }),
+
+  http.get('*/v1/institution/audit-trail', ({ request }) => {
+    const url = new URL(request.url);
+    const filterBatchId = url.searchParams.get('batch_id');
+
+    let filteredBatches = batches;
+    if (filterBatchId) {
+      filteredBatches = batches.filter((b) => (b.id || b.batch_id) === filterBatchId);
+    }
+
+    const issues = currentBatchReport.issues.map((iss: typeof currentBatchReport.issues[0]) => {
+      const isModified = iss.status === 'FIXED' || iss.status === 'DISMISSED';
+      const isReverted = Boolean((iss as any).is_reverted);
+      return {
+        issue_id: iss.issue_id,
+        batch_id: 'batch-demo-2',
+        batch_filename: 'batch_2_errors.xlsx',
+        rule_id: iss.rule_id,
+        row: iss.row,
+        field: iss.field,
+        apaar_id: (iss as any).apaar_id || (iss.evidence as any)?.apaar_id || '987654321012',
+        severity: iss.severity,
+        priority: iss.priority,
+        message: iss.message,
+        reason: iss.reason,
+        original_value: (iss as any).original_value || iss.value_masked,
+        modified_value: isModified ? iss.value_masked : null,
+        status: iss.status,
+        decided_by_id: iss.decided_by || (isModified ? 'inst.admin@demo.local' : null),
+        decided_by_name: iss.decided_by ? 'Institution Admin' : (isModified ? 'Institution Admin' : null),
+        decided_by_role: isModified ? 'INSTITUTION_ADMIN' : null,
+        decided_at: (iss as any).decided_at || (isModified ? '2026-08-11T14:35:00Z' : null),
+        decision_note: iss.decision_note || (isModified ? 'Admin accepted suggested correction' : null),
+        is_reverted: isReverted,
+        revert_reason: (iss as any).revert_reason || null,
+        can_revert: isModified && !isReverted,
+      };
+    });
+
+    const totalModified = issues.filter((i: { status: string }) => i.status === 'FIXED' || i.status === 'DISMISSED').length;
+    const totalReverted = issues.filter((i: { is_reverted: boolean }) => i.is_reverted).length;
+
+    return HttpResponse.json({
+      batches: filteredBatches.map((b) => ({
+        batch_id: b.id || b.batch_id,
+        id: b.id || b.batch_id,
+        academic_year: b.academic_year,
+        filename: b.filename,
+        size_bytes: 48291,
+        status: b.status,
+        version: 1,
+        quality_score_before: b.quality_score_before,
+        quality_score_after: b.quality_score_after,
+        quality_score: b.quality_score ?? b.quality_score_after ?? b.quality_score_before,
+        created_at: b.created_at,
+        updated_at: b.updated_at,
+        rows_total: b.rows_total || 65,
+        rows_error: b.rows_error || 12,
+        rows_warning: b.rows_warning || 5,
+      })),
+      discrepancies: issues,
+      audit_logs: auditLogState.slice(0, 20),
+      stats: {
+        total_documents: filteredBatches.length,
+        total_discrepancies: issues.length,
+        total_modified: totalModified,
+        total_reverted: totalReverted,
+      },
+    });
+  }),
+
 
   http.post('*/v1/batches/:id/issues/bulk-decide', async ({ request }) => {
     const body = (await request.json()) as {

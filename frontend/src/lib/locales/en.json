@@ -21,7 +21,8 @@
     "aggregates": "Aggregate Intake",
     "dab": "DAB Portal & Degrees",
     "portals_modules": "Portals & Modules",
-    "signin_portal": "Sign In to Portal"
+    "signin_portal": "Sign In to Portal",
+    "audit_log": "Document Audit & Revert"
   },
   "roles": {
     "AICTE_ADMIN": "AICTE Admin",

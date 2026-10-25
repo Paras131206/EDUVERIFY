@@ -10,6 +10,7 @@ import { ReviewPage } from '@/features/institution/ReviewPage';
 import { TransfersPage } from '@/features/institution/TransfersPage';
 import { StudentsPage } from '@/features/institution/StudentsPage';
 import { AggregatesPage } from '@/features/institution/AggregatesPage';
+import { InstitutionAuditPage } from '@/features/institution/InstitutionAuditPage';
 import { AicteDashboardPage } from '@/features/aicte/AicteDashboardPage';
 import { DabDashboardPage } from '@/features/dab/DabDashboardPage';
 import { StudentWalletPage } from '@/features/student/StudentWalletPage';
@@ -114,6 +115,14 @@ export const router = createBrowserRouter([
             element: (
               <RequireRole roles={['INSTITUTION_ADMIN', 'INSTITUTION_STAFF']}>
                 <AggregatesPage />
+              </RequireRole>
+            ),
+          },
+          {
+            path: 'institution/audit',
+            element: (
+              <RequireRole roles={['INSTITUTION_ADMIN', 'INSTITUTION_STAFF']}>
+                <InstitutionAuditPage />
               </RequireRole>
             ),
           },

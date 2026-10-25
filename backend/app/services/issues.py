@@ -285,3 +285,80 @@ def approve_correction_service(
     db.commit()
     db.refresh(correction)
     return correction
+
+
+def revert_issue_service(
+    db: Session,
+    *,
+    issue_id: str,
+    reason: str | None = None,
+    principal: Principal,
+) -> Issue:
+    """Reverts an issue decision back to OPEN status and records tamper-evident audit log."""
+    if principal.role not in ("INSTITUTION_ADMIN", "AICTE_ADMIN"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"code": "FORBIDDEN", "message": "Only administrators can revert decisions"},
+        )
+
+    issue = db.scalars(select(Issue).where(Issue.id == issue_id)).first()
+    if not issue:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"code": "NOT_FOUND", "message": f"Issue '{issue_id}' not found"},
+        )
+
+    batch = db.scalars(select(Batch).where(Batch.batch_id == issue.batch_id)).first()
+    if not batch:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"code": "NOT_FOUND", "message": "Associated batch not found"},
+        )
+
+    if principal.role != "AICTE_ADMIN" and principal.role != "AICTE_ANALYST":
+        if (
+            principal.institution_aicte_id
+            and principal.institution_aicte_id != batch.institution_aicte_id
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail={"code": "FORBIDDEN", "message": "Cannot revert issues for another institution"},
+            )
+
+    old_status = issue.status
+    old_decided_by = issue.decided_by
+
+    # Revert issue to OPEN
+    issue.status = "OPEN"
+    issue.decided_by = None
+    issue.decided_at = None
+
+    # Mark corrections as REVERTED
+    corrections = db.scalars(select(Correction).where(Correction.issue_id == issue.id)).all()
+    for corr in corrections:
+        corr.status = "REVERTED"
+        revert_note = f"[Reverted by {principal.id}: {reason or 'Rollback to original document state'}]"
+        corr.note = f"{corr.note} {revert_note}" if corr.note else revert_note
+
+    # Record tamper-evident audit log entry
+    append_audit_log(
+        db,
+        action="REVERT_ISSUE_DECISION",
+        actor_type="API_KEY" if principal.is_api_key else "USER",
+        actor_id=principal.id,
+        role=principal.role,
+        resource="ISSUE",
+        resource_id=issue.id,
+        payload={
+            "action": "REVERT",
+            "batch_id": issue.batch_id,
+            "previous_status": old_status,
+            "previous_decided_by": old_decided_by,
+            "reason": reason or "Rollback to original document state",
+        },
+    )
+
+    db.commit()
+    db.refresh(issue)
+    return issue
+
