@@ -17,12 +17,16 @@ import {
   LogIn,
   Users,
   BarChart3,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
+import { useTheme } from '@/lib/theme';
 
 export const Sidebar: React.FC = () => {
   const { t } = useTranslation();
   const { user, isAuthenticated, logout } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -150,6 +154,39 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       <div className="p-4 border-t border-slate-200 bg-slate-50/50 space-y-3">
+        {/* Dark Mode Switcher */}
+        <div className="flex items-center justify-between p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
+          <div className="flex items-center gap-2">
+            {isDark ? (
+              <Moon className="w-4 h-4 text-gov-saffron" aria-hidden="true" />
+            ) : (
+              <Sun className="w-4 h-4 text-amber-500" aria-hidden="true" />
+            )}
+            <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
+              {isDark ? t('shell.dark_mode', 'Dark Mode') : t('shell.light_mode', 'Light Mode')}
+            </span>
+          </div>
+          <button
+            id="dark-mode-toggle"
+            data-testid="dark-mode-toggle"
+            type="button"
+            role="switch"
+            aria-checked={isDark}
+            onClick={toggleTheme}
+            className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-gov-saffron focus:ring-offset-1 ${
+              isDark ? 'bg-gov-saffron' : 'bg-slate-300'
+            }`}
+            aria-label="Toggle Dark Mode"
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            <span
+              className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                isDark ? 'translate-x-4' : 'translate-x-0'
+              }`}
+            />
+          </button>
+        </div>
+
         {isAuthenticated && user ? (
           <button
             onClick={handleLogout}

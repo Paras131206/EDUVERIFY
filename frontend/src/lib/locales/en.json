@@ -41,7 +41,9 @@
     "navigation": "Navigation",
     "offline_warning": "You are currently offline. Actions will be queued.",
     "apaar_keyed": "APAAR Keyed",
-    "apaar_secured": "All data secured via 12-digit APAAR format with hash chain audit."
+    "apaar_secured": "All data secured via 12-digit APAAR format with hash chain audit.",
+    "dark_mode": "Dark Mode",
+    "light_mode": "Light Mode"
   },
   "badges": {
     "critical": "Critical",

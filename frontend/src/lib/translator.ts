@@ -29,6 +29,8 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Sign In": "साइन इन",
   "Sign Out": "साइन आउट",
   "Sign In to Portal": "पोर्टल में साइन इन करें",
+  "Dark Mode": "डार्क मोड",
+  "Light Mode": "लाइट मोड",
   "Home": "होम",
   "Government of India · Ministry of Education · AICTE": "भारत सरकार · शिक्षा मंत्रालय · एआईसीटीई",
   "National APAAR Student Verification & Repository System": "राष्ट्रीय अपार (APAAR) छात्र डेटा सत्यापन एवं केंद्रीय भंडार प्रणाली",
