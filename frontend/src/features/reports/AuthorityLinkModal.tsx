@@ -5,10 +5,8 @@ import {
   Link2,
   Copy,
   Check,
-  ShieldCheck,
   Lock,
   ExternalLink,
-  Clock,
   UserCheck,
 } from 'lucide-react';
 import { useOptionalAuth } from '@/lib/auth';

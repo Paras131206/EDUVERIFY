@@ -230,6 +230,7 @@ export interface CanonicalStudentRecord {
   admission_date: string;
   admission_type: string;
   seat_type: string;
+  supernumerary_scheme?: string | null;
   quota: string;
   nationality: string;
   enrolment_status: EnrolmentStatus;

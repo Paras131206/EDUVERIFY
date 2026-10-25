@@ -7,12 +7,9 @@ import {
   Lock,
   Download,
   FileText,
-  Clock,
-  UserCheck,
   AlertTriangle,
   ArrowLeft,
   CheckCircle2,
-  ExternalLink,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -30,12 +27,12 @@ export const AuthorityAccessPage: React.FC = () => {
   const [downloaded, setDownloaded] = useState(false);
 
   const isExpired = expires ? new Date(expires).getTime() < Date.now() : false;
-  const isAuthorized = user && (user.role === targetRole || user.role === 'AICTE_ADMIN');
+  const isAuthorized = user && !isExpired && (user.role === targetRole || user.role === 'AICTE_ADMIN');
 
   const handleDownload = () => {
     setDownloaded(true);
     // Simulate downloading statutory file
-    const content = `GOVERNMENT OF INDIA - AICTE STATUTORY CLEARANCE\nResource: ${resource}\nToken: ${token}\nAuthority Role: ${targetRole}\nAccessed By: ${user?.name} (${user?.email})\nTimestamp: ${new Date().toISOString()}\nStatus: VERIFIED_AND_SIGNED`;
+    const content = `GOVERNMENT OF INDIA - AICTE STATUTORY CLEARANCE\nResource: ${resource}\nToken: ${token}\nAuthority Role: ${targetRole}\nAccessed By: ${user?.full_name || 'Authorized Official'} (${user?.email || 'N/A'})\nTimestamp: ${new Date().toISOString()}\nStatus: VERIFIED_AND_SIGNED`;
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -62,7 +59,7 @@ export const AuthorityAccessPage: React.FC = () => {
           <span className="text-slate-300">Active Identity:</span>
           {user ? (
             <span className="font-mono bg-white/10 px-2.5 py-1 rounded text-white font-semibold">
-              {user.name} ({user.role})
+              {user.full_name} ({user.role})
             </span>
           ) : (
             <span className="font-mono bg-red-500/20 text-red-200 px-2 py-0.5 rounded">
