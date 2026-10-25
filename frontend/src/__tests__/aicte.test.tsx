@@ -582,4 +582,98 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
       });
     });
   });
+
+  describe('12. Institution Registration & Sanctioned Seat Matrix Tab', () => {
+    it('switches to Seat Matrix tab, registers a new institution with quotas, uploads seat matrix doc, and inspects certificate', async () => {
+      renderAictePage();
+
+      await waitFor(() => {
+        expect(screen.getByTestId('tab-seat-matrix')).toBeInTheDocument();
+      });
+
+      // Switch to the tab
+      const tabBtn = screen.getByTestId('tab-seat-matrix');
+      fireEvent.click(tabBtn);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('institution-seat-matrix-section')).toBeInTheDocument();
+      });
+
+      const section = screen.getByTestId('institution-seat-matrix-section');
+      expect(within(section).getByText(/Institution Registration & Sanctioned Seat Matrix/i)).toBeInTheDocument();
+      expect(within(section).getByText(/Delhi College of Engineering & Technology/i)).toBeInTheDocument();
+
+      // Test 1: Register New Institution
+      const regBtn = within(section).getByTestId('register-institution-btn');
+      fireEvent.click(regBtn);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('register-institution-modal')).toBeInTheDocument();
+      });
+
+      const regModal = screen.getByTestId('register-institution-modal');
+      const quickFillBtn = within(regModal).getByTestId('quick-fill-sample-btn');
+      fireEvent.click(quickFillBtn);
+
+      expect(within(regModal).getByDisplayValue(/Indian Institute of Information Technology Pune/i)).toBeInTheDocument();
+      expect(within(regModal).getByDisplayValue('420')).toBeInTheDocument();
+
+      const submitRegBtn = within(regModal).getByTestId('submit-register-institution-btn');
+      fireEvent.click(submitRegBtn);
+
+      await waitFor(() => {
+        expect(within(regModal).getByText(/Institution Registered Successfully!/i)).toBeInTheDocument();
+      });
+
+      const closeRegBtn = within(regModal).getByTestId('close-reg-modal-btn');
+      fireEvent.click(closeRegBtn);
+
+      // Verify newly registered institution appears in section table
+      await waitFor(() => {
+        expect(within(section).getByText(/Indian Institute of Information Technology Pune/i)).toBeInTheDocument();
+      });
+
+      // Test 2: Upload Seat Matrix Document for an institution
+      const uploadDocBtn = within(section).getByTestId('upload-doc-btn-1-100010001');
+      fireEvent.click(uploadDocBtn);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('upload-seat-matrix-modal')).toBeInTheDocument();
+      });
+
+      const uploadModal = screen.getByTestId('upload-seat-matrix-modal');
+      const intakeInput = within(uploadModal).getByTestId('seat-intake-input');
+      fireEvent.change(intakeInput, { target: { value: '480' } });
+
+      const submitUploadBtn = within(uploadModal).getByTestId('submit-seat-matrix-btn');
+      fireEvent.click(submitUploadBtn);
+
+      await waitFor(() => {
+        expect(within(uploadModal).getByText(/Seat Matrix Document & Capacity Updated Successfully!/i)).toBeInTheDocument();
+      });
+
+      const closeUploadBtn = within(uploadModal).getByTestId('close-upload-seat-modal-btn');
+      fireEvent.click(closeUploadBtn);
+
+      // Test 3: Inspect Certificate
+      const certBtn = within(section).getByTestId('inspect-seat-cert-1-100010001');
+      fireEvent.click(certBtn);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('seat-matrix-certificate-modal')).toBeInTheDocument();
+      });
+
+      const certModal = screen.getByTestId('seat-matrix-certificate-modal');
+      expect(within(certModal).getByText(/AICTE Sanctioned Intake & Seat Matrix Certificate/i)).toBeInTheDocument();
+      expect(within(certModal).getByText(/General \(GEN - Open\)/i)).toBeInTheDocument();
+      expect(within(certModal).getByText(/Other Backward Classes \(OBC-NCL\)/i)).toBeInTheDocument();
+
+      const closeCertBtn = within(certModal).getByTestId('close-seat-cert-modal');
+      fireEvent.click(closeCertBtn);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('seat-matrix-certificate-modal')).not.toBeInTheDocument();
+      });
+    });
+  });
 });
