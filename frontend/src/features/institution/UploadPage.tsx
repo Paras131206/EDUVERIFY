@@ -26,7 +26,11 @@ export const UploadPage: React.FC = () => {
     filename: string;
     academic_year: string;
   }) => {
-    setBatchInfo(createdBatch);
+    setBatchInfo({
+      id: createdBatch.id || 'batch-demo-2',
+      filename: createdBatch.filename || 'batch_2_errors.xlsx',
+      academic_year: createdBatch.academic_year || '2026-27',
+    });
     setCurrentStep(2);
   };
 
