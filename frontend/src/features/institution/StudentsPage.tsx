@@ -27,7 +27,6 @@ import {
   UserPlus,
   ArrowRightLeft,
   GraduationCap,
-  Building2,
   Sparkles,
 } from 'lucide-react';
 

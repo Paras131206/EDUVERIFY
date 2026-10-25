@@ -78,6 +78,7 @@ export const RowInspectorModal: React.FC<RowInspectorModalProps> = ({
     admission_date: 'Admission Date',
     admission_type: 'Admission Type',
     seat_type: 'Seat Type',
+    supernumerary_scheme: 'Supernumerary Scheme',
     quota: 'Quota Category',
     nationality: 'Nationality',
     enrolment_status: 'Enrolment Status',
