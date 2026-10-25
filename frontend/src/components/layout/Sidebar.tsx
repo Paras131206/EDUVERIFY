@@ -62,10 +62,7 @@ export const Sidebar: React.FC = () => {
       visible:
         !role ||
         role === 'INSTITUTION_ADMIN' ||
-        role === 'INSTITUTION_STAFF' ||
-        role === 'AICTE_ADMIN' ||
-        role === 'AICTE_ANALYST' ||
-        role === 'AICTE_VIEWER',
+        role === 'INSTITUTION_STAFF',
     },
     {
       to: '/institution/batches/batch-demo-2/review',
