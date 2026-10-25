@@ -386,5 +386,99 @@ describe('Site-Wide Language Translation System', () => {
     expect(translateText(' warning(s) require review. You can accept automated suggestions, edit cells with inline rationale, or dismiss items.'))
       .toBe(' चेतावनी(यां) समीक्षा योग्य हैं। आप स्वचालित सुझाव स्वीकार कर सकते हैं, इनलाइन औचित्य के साथ सेल संपादित कर सकते हैं, या खारिज कर सकते हैं।');
   });
+
+  it('translates Batch Registry, Review Workspace, Issue Queue, and Issue Drawer elements (Screenshots 1-4)', () => {
+    // Screenshot 1: Batch Registry
+    expect(translateText('Institution Batch Registry')).toBe('संस्थान बैच रजिस्ट्री');
+    expect(translateText('Institution बैच रजिस्ट्री')).toBe('संस्थान बैच रजिस्ट्री');
+    expect(translateText('Complete audit trail of all student admission uploads, data quality improvements, and AICTE commitment status.'))
+      .toBe('सभी छात्र प्रवेश अपलोड, डेटा गुणवत्ता सुधार और एआईसीटीई प्रतिबद्धता स्थिति का पूर्ण ऑडिट ट्रेल।');
+    expect(translateText('Complete audit trail of सभी विद्यार्थी admission uploads, data quality improvements, and AICTE commitment स्थिति.'))
+      .toBe('सभी छात्र प्रवेश अपलोड, डेटा गुणवत्ता सुधार और एआईसीटीई प्रतिबद्धता स्थिति का पूर्ण ऑडिट ट्रेल।');
+    expect(translateText('Upload New Batch')).toBe('नया बैच अपलोड करें');
+    expect(translateText('Upload नई Batch')).toBe('नया बैच अपलोड करें');
+    expect(translateText('Open Batch in Progress (Conflict Prevention)')).toBe('खुला बैच प्रगति पर है (विवाद रोकथाम)');
+    expect(translateText('OPEN BATCH IN PROGRESS (CONFLICT PREVENTION)')).toBe('खुला बैच प्रगति पर है (विवाद रोकथाम)');
+    expect(translateText('Batch batch-demo-2 (batch_2_errors.xlsx) for Academic Year 2026-27 is currently IN_REVIEW. New uploads will require setting this batch as superseded.'))
+      .toBe('बैच batch-demo-2 (batch_2_errors.xlsx) शैक्षणिक वर्ष 2026-27 के लिए वर्तमान में समीक्षाधीन है। नए अपलोड के लिए इस बैच को अतिक्रमित के रूप में सेट करना होगा।');
+    expect(translateText('Batch batch-demo-2 (batch_2_errors.xlsx) for शैक्षणिक वर्ष 2026-27 is currently IN_REVIEW. नई uploads will require setting this batch as superseded.'))
+      .toBe('बैच batch-demo-2 (batch_2_errors.xlsx) शैक्षणिक वर्ष 2026-27 के लिए वर्तमान में समीक्षाधीन है। नए अपलोड के लिए इस बैच को अतिक्रमित के रूप में सेट करना होगा।');
+    expect(translateText('Go to Open Batch Review')).toBe('खुले बैच की समीक्षा पर जाएं');
+    expect(translateText('खुले बैच पर जाएं Review')).toBe('खुले बैच की समीक्षा पर जाएं');
+    expect(translateText('Uploaded Student Batches')).toBe('अपलोड किए गए छात्र बैच');
+    expect(translateText('UPLOADED STUDENT BATCHES')).toBe('अपलोड किए गए छात्र बैच');
+    expect(translateText('UPLOADED विद्यार्थी BATCHES')).toBe('अपलोड किए गए छात्र बैच');
+    expect(translateText('0 batch record(s)')).toBe('0 बैच रिकॉर्ड');
+    expect(translateText('3 batch record(s)')).toBe('3 बैच रिकॉर्ड');
+    expect(translateText('Quality Score')).toBe('गुणवत्ता स्कोर');
+    expect(translateText('QUALITY SCORE')).toBe('गुणवत्ता स्कोर');
+    expect(translateText('QUALITY स्कोर')).toBe('गुणवत्ता स्कोर');
+    expect(translateText('Records Breakdown')).toBe('रिकॉर्ड विवरण');
+    expect(translateText('RECORDS BREAKDOWN')).toBe('रिकॉर्ड विवरण');
+    expect(translateText('रिकॉर्ड BREAKDOWN')).toBe('रिकॉर्ड विवरण');
+    expect(translateText('COMMITTED')).toBe('कमिटेड');
+    expect(translateText('IN REVIEW')).toBe('समीक्षाधीन');
+    expect(translateText('SUPERSEDED')).toBe('अतिक्रमित');
+    expect(translateText('VALIDATING')).toBe('सत्यापन जारी');
+    expect(translateText('MAPPING')).toBe('मैपिंग जारी');
+    expect(translateText('Total:')).toBe('कुल:');
+    expect(translateText('2 warn')).toBe('2 चेतावनी');
+    expect(translateText('12 त्रुटि(s) 5 warn')).toBe('12 त्रुटियां 5 चेतावनी');
+    expect(translateText('Review')).toBe('समीक्षा करें');
+
+    // Screenshot 2: Review Workspace Overview & KPIs
+    expect(translateText('← Batches')).toBe('← बैच');
+    expect(translateText('Batches')).toBe('बैच');
+    expect(translateText('ISSUE RESOLUTION')).toBe('मुद्दा समाधान');
+    expect(translateText('PRIORITY EXPOSURE')).toBe('प्राथमिकता जोखिम');
+    expect(translateText('INTAKE RECONCILIATION')).toBe('प्रवेश समाधान');
+    expect(translateText('Resolved / Fixed:')).toBe('हल किया गया / ठीक किया गया:');
+    expect(translateText('हल किया गया / Fixed:')).toBe('हल किया गया / ठीक किया गया:');
+    expect(translateText('Total Flagged:')).toBe('कुल ध्वजांकित:');
+    expect(translateText('Uploaded: 65 students')).toBe('अपलोड किए गए: 65 छात्र');
+    expect(translateText('Approved Sanction: 60 intake')).toBe('स्वीकृत सीटें: 60');
+    expect(translateText('स्वीकृत Sanction: 60 intake')).toBe('स्वीकृत सीटें: 60');
+    expect(translateText('Over-intake variance: 3 students')).toBe('अतिरिक्त प्रवेश अंतर: 3 छात्र');
+    expect(translateText('Over-Intake variance: 3 students')).toBe('अतिरिक्त प्रवेश अंतर: 3 छात्र');
+    expect(translateText('Issues Queue (5)')).toBe('मुद्दा कतार (5)');
+    expect(translateText('Duplicates (1)')).toBe('डुप्लिकेट (1)');
+    expect(translateText('Before / After Report')).toBe('समीक्षा पूर्व / पश्चात रिपोर्ट');
+
+    // Screenshot 3: Explainable Issue Queue
+    expect(translateText('Explainable Issue Queue')).toBe('स्पष्टीकरण योग्य मुद्दा कतार');
+    expect(translateText('5 Pending (5 Total)')).toBe('5 लंबित (कुल 5)');
+    expect(translateText('5 लंबित (5 Total)')).toBe('5 लंबित (कुल 5)');
+    expect(translateText('RULE')).toBe('नियम');
+    expect(translateText('FIELD')).toBe('फ़ील्ड');
+    expect(translateText('PRIORITY')).toBe('प्राथमिकता');
+    expect(translateText('BUCKET')).toBe('श्रेणी');
+    expect(translateText('Open (Pending)')).toBe('सक्रिय (लंबित)');
+    expect(translateText('Open (लंबित)')).toBe('सक्रिय (लंबित)');
+    expect(translateText('Showing 5 of 5 issues (Sorted: Priority CRITICAL→LOW, then Row)'))
+      .toBe('5 में से 5 मुद्दे प्रदर्शित (क्रमबद्ध: प्राथमिकता गंभीर→निम्न, फिर पंक्ति)');
+    expect(translateText('Showing 5 of 5 issues (Sorted: Priority CRITICAL→LOW, then पंक्ति)'))
+      .toBe('5 में से 5 मुद्दे प्रदर्शित (क्रमबद्ध: प्राथमिकता गंभीर→निम्न, फिर पंक्ति)');
+    expect(translateText('Reset Filters')).toBe('फ़िल्टर रीसेट करें');
+    expect(translateText('Field / Rule')).toBe('फ़ील्ड / नियम');
+    expect(translateText('Priority')).toBe('प्राथमिकता');
+    expect(translateText('Bucket')).toBe('श्रेणी');
+    expect(translateText('Reason / Message')).toBe('कारण / संदेश');
+    expect(translateText('OPEN')).toBe('सक्रिय');
+
+    // Screenshot 4: Issue Drawer
+    expect(translateText('apaar_id missing or not 12 digits')).toBe('अपार आईडी गायब या 12 अंक नहीं');
+    expect(translateText('Field: apaar_id')).toBe('फ़ील्ड: apaar_id');
+    expect(translateText('Found 11 digits: Excel may have stripped leading zero or mangled scientific notation'))
+      .toBe('11 अंक मिले: एक्सेल ने प्रारंभिक शून्य हटा दिया होगा या वैज्ञानिक संकेतन में बदल दिया होगा');
+    expect(translateText('Key')).toBe('कुंजी');
+    expect(translateText('Value')).toBe('मान');
+    expect(translateText('Suggested Safe Fix')).toBe('सुझाया गया सुरक्षित समाधान');
+    expect(translateText('Requires Approval')).toBe('अनुमोदन आवश्यक');
+    expect(translateText('Suggested Value:')).toBe('सुझाया गया मान:');
+    expect(translateText('Rationale: Prepend missing leading zero')).toBe('औचित्य: छूटा हुआ प्रारंभिक शून्य जोड़ें');
+    expect(translateText('Current Uploaded Value')).toBe('वर्तमान अपलोड किया गया मान');
+    expect(translateText('Inspect Full Row')).toBe('पूरी पंक्ति का निरीक्षण करें');
+    expect(translateText('निरीक्षण करें Full पंक्ति')).toBe('पूरी पंक्ति का निरीक्षण करें');
+  });
 });
 

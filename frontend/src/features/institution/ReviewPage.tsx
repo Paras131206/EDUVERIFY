@@ -822,12 +822,12 @@ export const ReviewPage: React.FC = () => {
           </span>
           <div className="mt-2 space-y-1 text-xs text-slate-600">
             <p>
-              Uploaded: <strong className="text-slate-900">{report.rows_total}</strong> students
+              {`Uploaded: ${report.rows_total} students`}
             </p>
             <p>
-              Approved Sanction: <strong className="text-slate-900">60</strong> intake
+              {`Approved Sanction: 60 intake`}
             </p>
-            <p className="text-amber-700 font-semibold">Over-intake variance: 3 students</p>
+            <p className="text-amber-700 font-semibold">{`Over-intake variance: 3 students`}</p>
           </div>
         </Card>
       </div>

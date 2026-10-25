@@ -188,9 +188,7 @@ export const BatchListPage: React.FC = () => {
                 Open Batch in Progress (Conflict Prevention)
               </h4>
               <p className="text-xs text-amber-800 mt-0.5">
-                Batch <strong>{openBatch.id || openBatch.batch_id}</strong> ({openBatch.filename}) for Academic Year{' '}
-                <strong>{openBatch.academic_year}</strong> is currently {openBatch.status}. New uploads
-                will require setting this batch as superseded.
+                {`Batch ${openBatch.id || openBatch.batch_id} (${openBatch.filename}) for Academic Year ${openBatch.academic_year} is currently ${openBatch.status}. New uploads will require setting this batch as superseded.`}
               </p>
             </div>
           </div>
