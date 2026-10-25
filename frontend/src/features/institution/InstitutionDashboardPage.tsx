@@ -32,6 +32,33 @@ import {
   Legend,
 } from 'recharts';
 
+import { isDocumentUploaded } from '@/lib/uploadState';
+
+const ZERO_SUMMARY = {
+  institution_name: 'Delhi Institute of Engineering & Technology (AICTE ID: 1-1234567890)',
+  total_enrolled: 0,
+  approved_intake: 520,
+  batches_count: 0,
+  latest_quality_score: 0.0,
+  pending_review_count: 0,
+  active_transfers_count: 0,
+  dq_trend: [] as { date: string; score: number }[],
+  intake_distribution: [
+    { program: 'UG-CSE', approved: 60, enrolled: 0 },
+    { program: 'UG-ECE', approved: 60, enrolled: 0 },
+    { program: 'UG-ME', approved: 60, enrolled: 0 },
+    { program: 'PG-MBA', approved: 40, enrolled: 0 },
+  ],
+  notifications: [] as {
+    id: string;
+    title: string;
+    message: string;
+    priority: string;
+    time: string;
+    unread: boolean;
+  }[],
+};
+
 const DEMO_SUMMARY = {
   institution_name: 'Delhi Institute of Engineering & Technology (AICTE ID: 1-1234567890)',
   total_enrolled: 480,
@@ -81,33 +108,46 @@ const DEMO_SUMMARY = {
 };
 
 export const InstitutionDashboardPage: React.FC = () => {
-  const [summary, setSummary] = useState(DEMO_SUMMARY);
+  const [hasUploaded, setHasUploaded] = useState<boolean>(() => isDocumentUploaded());
+  const [summary, setSummary] = useState(() => (isDocumentUploaded() ? DEMO_SUMMARY : ZERO_SUMMARY));
   const [authorityModalOpen, setAuthorityModalOpen] = useState<boolean>(false);
-  const hasUploaded = true;
 
   useEffect(() => {
+    // Stats strictly start from zero on reload / when no documents have been uploaded
+    if (!isDocumentUploaded()) {
+      setHasUploaded(false);
+      setSummary(ZERO_SUMMARY);
+      return;
+    }
+
     const fetchDashboard = async () => {
       try {
         const res = await fetchWithAuth(`${API_BASE_URL}/v1/dashboards/institution/summary`);
         if (res.ok) {
           const data = await res.json();
-          const qualityScore = data.latest_quality_score ?? data.avg_quality_score;
-          const totalEnrolled = data.total_students ?? data.total_enrolled ?? 0;
-          const approvedIntake = data.sanctioned_intake ?? data.approved_intake ?? 520;
-          const batchesCount = data.active_batches ?? data.batches_count ?? 0;
-          const pendingReviews = data.pending_reviews ?? data.pending_review_count ?? 0;
+          const isUploaded = Boolean(data.total_enrolled > 0 || data.batches_count > 0 || isDocumentUploaded());
+          setHasUploaded(isUploaded);
+          if (isUploaded) {
+            const qualityScore = data.latest_quality_score ?? data.avg_quality_score;
+            const totalEnrolled = data.total_students ?? data.total_enrolled ?? 0;
+            const approvedIntake = data.sanctioned_intake ?? data.approved_intake ?? 520;
+            const batchesCount = data.active_batches ?? data.batches_count ?? 0;
+            const pendingReviews = data.pending_reviews ?? data.pending_review_count ?? 0;
 
-          setSummary((prev) => ({
-            ...prev,
-            ...data,
-            institution_name: data.institution_name || prev.institution_name,
-            total_enrolled: totalEnrolled || prev.total_enrolled,
-            approved_intake: approvedIntake || prev.approved_intake,
-            batches_count: batchesCount || prev.batches_count,
-            latest_quality_score:
-              qualityScore !== undefined ? qualityScore : prev.latest_quality_score,
-            pending_review_count: pendingReviews,
-          }));
+            setSummary((prev) => ({
+              ...prev,
+              ...data,
+              institution_name: data.institution_name || prev.institution_name,
+              total_enrolled: totalEnrolled || prev.total_enrolled,
+              approved_intake: approvedIntake || prev.approved_intake,
+              batches_count: batchesCount || prev.batches_count,
+              latest_quality_score:
+                qualityScore !== undefined ? qualityScore : prev.latest_quality_score,
+              pending_review_count: pendingReviews,
+            }));
+          } else {
+            setSummary(ZERO_SUMMARY);
+          }
         }
       } catch (err) {
         console.error('Failed to load dashboard summary:', err);
