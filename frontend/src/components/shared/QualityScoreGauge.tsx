@@ -18,16 +18,20 @@ export const QualityScoreGauge: React.FC<QualityScoreGaugeProps> = ({
   const safeScore = Math.max(0, Math.min(100, Math.round(score)));
 
   let color = 'text-green-600 bg-green-50 border-green-200';
-  let badgeText = 'Excellent';
+  let badgeKey = 'excellent';
+  let defaultBadgeText = 'Excellent';
   if (safeScore < 60) {
     color = 'text-red-600 bg-red-50 border-red-200';
-    badgeText = 'Critical Action Needed';
+    badgeKey = 'critical_action';
+    defaultBadgeText = 'Critical Action Needed';
   } else if (safeScore < 80) {
     color = 'text-amber-600 bg-amber-50 border-amber-200';
-    badgeText = 'Needs Review';
+    badgeKey = 'needs_review';
+    defaultBadgeText = 'Needs Review';
   } else if (safeScore < 90) {
     color = 'text-blue-600 bg-blue-50 border-blue-200';
-    badgeText = 'Good';
+    badgeKey = 'good';
+    defaultBadgeText = 'Good';
   }
 
   const dimensions = {
@@ -54,7 +58,7 @@ export const QualityScoreGauge: React.FC<QualityScoreGaugeProps> = ({
 
       <div className="flex flex-col items-center text-center">
         <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
-          {badgeText}
+          {t(`score.${badgeKey}`, defaultBadgeText)}
         </span>
         {typeof scoreBefore === 'number' && (
           <span className="text-xs text-slate-500 mt-1">
