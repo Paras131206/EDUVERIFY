@@ -88,7 +88,7 @@ export const Sidebar: React.FC = () => {
     // DAB items
     {
       to: '/dab',
-      label: 'DAB Portal & Degrees',
+      label: t('nav.dab', 'DAB Portal & Degrees'),
       icon: <Scale className="w-4 h-4" aria-hidden="true" />,
       visible: !role || role === 'DAB_MEMBER' || role === 'DAB_ADMIN',
     },
@@ -126,7 +126,7 @@ export const Sidebar: React.FC = () => {
     <aside className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 shadow-sm min-h-[calc(100vh-100px)]">
       <nav className="p-4 space-y-1.5" aria-label="Main Navigation">
         <div className="px-3 py-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-          {role ? `${role.replace('_', ' ')} Navigation` : 'Portals & Modules'}
+          {role ? `${t(`roles.${role}`, role.replace('_', ' '))} ${t('shell.navigation', 'Navigation')}` : t('nav.portals_modules', 'Portals & Modules')}
         </div>
         {navItems
           .filter((item) => item.visible)
@@ -156,7 +156,7 @@ export const Sidebar: React.FC = () => {
             className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 hover:text-red-700 hover:bg-red-50 rounded-lg transition"
           >
             <LogOut className="w-4 h-4" />
-            <span>Sign Out ({user.email.split('@')[0]})</span>
+            <span>{t('nav.logout', 'Sign Out')} ({user.email.split('@')[0]})</span>
           </button>
         ) : (
           <NavLink
@@ -164,15 +164,15 @@ export const Sidebar: React.FC = () => {
             className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-gov-navy hover:bg-gov-navy/10 rounded-lg transition"
           >
             <LogIn className="w-4 h-4" />
-            <span>Sign In to Portal</span>
+            <span>{t('nav.signin_portal', 'Sign In to Portal')}</span>
           </NavLink>
         )}
 
         <div className="bg-amber-50 rounded p-2.5 border border-amber-200 text-[11px] text-amber-900 leading-relaxed">
           <p className="font-semibold text-amber-800 flex items-center gap-1.5">
-            <span>APAAR Keyed</span>
+            <span>{t('shell.apaar_keyed', 'APAAR Keyed')}</span>
           </p>
-          <p className="mt-0.5 text-slate-600">All data secured via 12-digit APAAR format with hash chain audit.</p>
+          <p className="mt-0.5 text-slate-600">{t('shell.apaar_secured', 'All data secured via 12-digit APAAR format with hash chain audit.')}</p>
         </div>
       </div>
     </aside>
