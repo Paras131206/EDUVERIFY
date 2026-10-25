@@ -2,6 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
+import { resetUploadStateOnReload } from '@/lib/uploadState';
+
+// Guarantee: Always start stats from zero on site reload
+resetUploadStateOnReload();
 
 async function enableMocking() {
   // Enable MSW in dev mode by default unless explicitly disabled

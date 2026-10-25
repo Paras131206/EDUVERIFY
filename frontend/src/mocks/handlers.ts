@@ -51,6 +51,7 @@ import {
 } from '@/features/student/types';
 import { ReportItem, ReportJob } from '@/features/reports/types';
 import { parsePresentation } from '@/lib/sdjwt';
+import { isDocumentUploaded, markDocumentUploaded } from '@/lib/uploadState';
 
 import {
   BatchItem,
@@ -122,6 +123,7 @@ export const resetOperationsMock = () => {
   aggregatesState = JSON.parse(JSON.stringify(mockAggregates));
   reconciliationState = JSON.parse(JSON.stringify(mockReconciliationStatus));
   webhooksState = JSON.parse(JSON.stringify(mockWebhooks));
+  markDocumentUploaded(false);
   resetAicteMock();
   resetReportsMock();
 };
@@ -496,11 +498,7 @@ export const handlers = [
     };
 
     batches = [newBatch, ...batches];
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        window.localStorage.setItem('eduverify_data_uploaded', 'true');
-      }
-    } catch {}
+    markDocumentUploaded(true);
     return HttpResponse.json(newBatch, { status: 201 });
   }),
 
@@ -1036,12 +1034,7 @@ export const handlers = [
   }),
 
   http.get('*/v1/dashboards/institution/summary', () => {
-    let hasUploaded = false;
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        hasUploaded = window.localStorage.getItem('eduverify_data_uploaded') === 'true';
-      }
-    } catch {}
+    const hasUploaded = isDocumentUploaded();
 
     if (!hasUploaded) {
       return HttpResponse.json({
