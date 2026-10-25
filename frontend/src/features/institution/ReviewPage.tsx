@@ -275,27 +275,117 @@ export const ReviewPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'ACCEPT_INFO' }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.issues) {
-          setIssues(data.issues);
-          if (selectedIssue) {
-            const updatedSel = data.issues.find(
-              (i: IssueItem) => i.issue_id === selectedIssue.issue_id
-            );
-            if (updatedSel) setSelectedIssue(updatedSel);
-          }
+      if (!res.ok) {
+        throw new Error(`Bulk accept INFO failed (HTTP ${res.status})`);
+      }
+      const data = await res.json();
+      if (data.issues) {
+        setIssues(data.issues);
+        if (selectedIssue) {
+          const updatedSel = data.issues.find(
+            (i: IssueItem) => i.issue_id === selectedIssue.issue_id
+          );
+          if (updatedSel) setSelectedIssue(updatedSel);
         }
+        return;
+      }
+    } catch {
+      // Local fallback
+      setIssues((prev) =>
+        prev.map((i) => {
+          const isInfo =
+            i.severity === 'INFO' ||
+            i.bucket === 'INFO' ||
+            i.priority === 'LOW' ||
+            i.rule_id === 'V030' ||
+            (i.suggested_fix && !i.suggested_fix.requires_approval);
+          return isInfo
+            ? {
+                ...i,
+                status: 'FIXED',
+                value_masked: i.suggested_fix?.value ? String(i.suggested_fix.value) : i.value_masked,
+                decision_note: 'Bulk accepted standard normalisation',
+              }
+            : i;
+        })
+      );
+      if (selectedIssue) {
+        const isInfo =
+          selectedIssue.severity === 'INFO' ||
+          selectedIssue.bucket === 'INFO' ||
+          selectedIssue.priority === 'LOW' ||
+          selectedIssue.rule_id === 'V030' ||
+          (selectedIssue.suggested_fix && !selectedIssue.suggested_fix.requires_approval);
+        if (isInfo) {
+          setSelectedIssue((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  status: 'FIXED',
+                  value_masked: prev.suggested_fix?.value
+                    ? String(prev.suggested_fix.value)
+                    : prev.value_masked,
+                  decision_note: 'Bulk accepted standard normalisation',
+                }
+              : prev
+          );
+        }
+      }
+    }
+  };
+
+  const handleBulkAcceptSelected = async (issueIds: string[]) => {
+    try {
+      const res = await authFetch(`/v1/batches/${batchId}/issues/bulk-decide`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'ACCEPT_SELECTED',
+          issue_ids: issueIds,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error(`Bulk accept selected failed (HTTP ${res.status})`);
+      }
+      const data = await res.json();
+      if (data.issues) {
+        setIssues(data.issues);
+        if (selectedIssue) {
+          const updatedSel = data.issues.find(
+            (i: IssueItem) => i.issue_id === selectedIssue.issue_id
+          );
+          if (updatedSel) setSelectedIssue(updatedSel);
+        }
+        return;
       }
     } catch {
       // Local fallback
       setIssues((prev) =>
         prev.map((i) =>
-          i.severity === 'INFO' || i.bucket === 'INFO'
-            ? { ...i, status: 'FIXED' }
+          issueIds.includes(i.issue_id)
+            ? {
+                ...i,
+                status: 'FIXED',
+                value_masked: i.suggested_fix?.value ? String(i.suggested_fix.value) : i.value_masked,
+                decision_note: 'Bulk accepted selected safe fix',
+              }
             : i
         )
       );
+      if (selectedIssue && issueIds.includes(selectedIssue.issue_id)) {
+        setSelectedIssue((prev) =>
+          prev
+            ? {
+                ...prev,
+                status: 'FIXED',
+                value_masked: prev.suggested_fix?.value
+                  ? String(prev.suggested_fix.value)
+                  : prev.value_masked,
+                decision_note: 'Bulk accepted selected safe fix',
+              }
+            : prev
+        );
+      }
     }
   };
 
@@ -310,17 +400,19 @@ export const ReviewPage: React.FC = () => {
           remarks: note,
         }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.issues) {
-          setIssues(data.issues);
-          if (selectedIssue) {
-            const updatedSel = data.issues.find(
-              (i: IssueItem) => i.issue_id === selectedIssue.issue_id
-            );
-            if (updatedSel) setSelectedIssue(updatedSel);
-          }
+      if (!res.ok) {
+        throw new Error(`Bulk dismiss failed (HTTP ${res.status})`);
+      }
+      const data = await res.json();
+      if (data.issues) {
+        setIssues(data.issues);
+        if (selectedIssue) {
+          const updatedSel = data.issues.find(
+            (i: IssueItem) => i.issue_id === selectedIssue.issue_id
+          );
+          if (updatedSel) setSelectedIssue(updatedSel);
         }
+        return;
       }
     } catch {
       setIssues((prev) =>
@@ -330,6 +422,11 @@ export const ReviewPage: React.FC = () => {
             : i
         )
       );
+      if (selectedIssue && issueIds.includes(selectedIssue.issue_id)) {
+        setSelectedIssue((prev) =>
+          prev ? { ...prev, status: 'DISMISSED', decision_note: note } : prev
+        );
+      }
     }
   };
 
@@ -702,6 +799,7 @@ export const ReviewPage: React.FC = () => {
               selectedIssueId={selectedIssue?.issue_id || null}
               onSelectIssue={(iss) => setSelectedIssue(iss)}
               onBulkAcceptInfo={handleBulkAcceptInfo}
+              onBulkAcceptSelected={handleBulkAcceptSelected}
               onBulkDismissSelected={handleBulkDismissSelected}
             />
           </div>

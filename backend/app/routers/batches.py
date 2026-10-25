@@ -4,6 +4,7 @@ Complies with contracts/openapi.yaml and prompt B3.
 """
 
 import json
+from datetime import UTC, datetime
 from typing import Any
 
 from app.db import get_db
@@ -12,12 +13,14 @@ from app.models.core import BatchReport as BatchReportModel
 from app.schemas.batches import (
     BatchIssueResponse,
     BatchSummary,
+    BulkDecideRequest,
     ColumnMappingModel,
     CommitRequest,
     CommitResponse,
     ConfirmMappingRequest,
 )
 from app.security.deps import Principal, get_current_principal
+from app.services.audit import append_audit_log
 from app.services.batches import (
     commit_batch_service,
     confirm_mapping_service,
@@ -365,6 +368,108 @@ def get_batch_issues(
         key=lambda i: (PRIORITY_SORT_ORDER.get(i.priority, 99), i.row_index or 0),
     )
     return [BatchIssueResponse.model_validate(iss) for iss in sorted_issues]
+
+
+@router.post(
+    "/{id}/issues/bulk-decide",
+    summary="Bulk decide issues (ACCEPT_INFO, ACCEPT_SELECTED, DISMISS_SELECTED)",
+)
+def bulk_decide_batch_issues(
+    id: str,
+    body: BulkDecideRequest,
+    principal: Principal = Depends(get_current_principal),
+    db: Session = Depends(get_db),
+):
+    batch = db.scalars(select(Batch).where(Batch.batch_id == id)).first()
+    if not batch:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Batch not found")
+
+    is_admin = principal.role in ("INSTITUTION_ADMIN", "AICTE_ADMIN")
+    target_status = "FIXED" if is_admin else "PROPOSED"
+    now = datetime.now(UTC)
+
+    issues = db.scalars(select(Issue).where(Issue.batch_id == id)).all()
+    updated_count = 0
+
+    if body.action == "ACCEPT_INFO":
+        for iss in issues:
+            if (
+                iss.severity == "INFO"
+                or iss.bucket == "INFO"
+                or iss.priority == "LOW"
+                or iss.rule_id == "V030"
+                or (
+                    iss.suggested_fix_json
+                    and not iss.suggested_fix_json.get("requires_approval", True)
+                )
+            ):
+                iss.status = target_status
+                iss.decided_by = principal.id
+                iss.decided_at = now
+                if iss.suggested_fix_json and "value" in iss.suggested_fix_json:
+                    iss.value_masked = str(iss.suggested_fix_json["value"])
+                updated_count += 1
+    elif body.action == "ACCEPT_SELECTED":
+        for iss in issues:
+            if iss.id in body.issue_ids:
+                iss.status = target_status
+                iss.decided_by = principal.id
+                iss.decided_at = now
+                if iss.suggested_fix_json and "value" in iss.suggested_fix_json:
+                    iss.value_masked = str(iss.suggested_fix_json["value"])
+                updated_count += 1
+    elif body.action == "DISMISS_SELECTED":
+        for iss in issues:
+            if iss.id in body.issue_ids:
+                iss.status = "DISMISSED" if is_admin else "PROPOSED"
+                iss.decided_by = principal.id
+                iss.decided_at = now
+                updated_count += 1
+
+    # Also update the BatchReportModel report_json if present
+    db_report = db.scalars(
+        select(BatchReportModel).where(BatchReportModel.batch_id == id)
+    ).first()
+    if db_report and isinstance(db_report.report_json, dict) and "issues" in db_report.report_json:
+        report_data = dict(db_report.report_json)
+        updated_issues_list = []
+        for rep_iss in report_data.get("issues", []):
+            iss_id = rep_iss.get("issue_id") or rep_iss.get("id")
+            matched = next((i for i in issues if i.id == iss_id), None)
+            if matched:
+                rep_iss["status"] = matched.status
+                if matched.value_masked:
+                    rep_iss["value_masked"] = matched.value_masked
+            updated_issues_list.append(rep_iss)
+        report_data["issues"] = updated_issues_list
+        db_report.report_json = report_data
+
+    append_audit_log(
+        db,
+        action="BULK_DECIDE",
+        actor_type="USER",
+        actor_id=principal.id,
+        role=principal.role,
+        resource="BATCH",
+        payload={
+            "batch_id": id,
+            "action": body.action,
+            "updated_count": updated_count,
+            "remarks": body.remarks,
+        },
+    )
+    db.commit()
+
+    if db_report and isinstance(db_report.report_json, dict) and "issues" in db_report.report_json:
+        formatted_issues = db_report.report_json["issues"]
+    else:
+        formatted_issues = [BatchIssueResponse.model_validate(i).model_dump() for i in issues]
+
+    return {
+        "success": True,
+        "count": updated_count,
+        "issues": formatted_issues,
+    }
 
 
 @router.post(
