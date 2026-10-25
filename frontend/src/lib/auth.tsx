@@ -39,6 +39,8 @@ export const getHomeRouteForRole = (role?: UserRole | string): string => {
       return '/student';
     case 'VERIFIER':
       return '/verify';
+    case 'EMPLOYER':
+      return '/employer';
     default:
       return '/institution';
   }

@@ -35,7 +35,24 @@ export interface StudentVersionHistoryItem {
   changes: Record<string, { old_val: string | number | null; new_val: string | number | null }>;
 }
 
-export type ConsentPurpose = 'REPOSITORY' | 'VERIFICATION_SHARE' | 'ANALYTICS_AGGREGATE';
+export type ConsentPurpose =
+  | 'REPOSITORY'
+  | 'VERIFICATION_SHARE'
+  | 'ANALYTICS_AGGREGATE'
+  | 'EMPLOYER_HIRING';
+
+export interface EmployerHiringRequestItem {
+  id: string;
+  employer_id: string;
+  employer_name: string;
+  apaar_id: string;
+  job_title: string | null;
+  organization: string | null;
+  purpose: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'REVOKED';
+  requested_at: string;
+  decided_at: string | null;
+}
 
 export interface ConsentPurposeSetting {
   purpose: ConsentPurpose;

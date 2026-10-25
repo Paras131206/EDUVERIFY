@@ -33,6 +33,7 @@ export const LoginPage: React.FC = () => {
     { label: '⚖️ DAB Member', email: 'dab.member@demo.local', role: 'DAB_MEMBER' },
     { label: '🎓 Student', email: 'student@demo.local', role: 'STUDENT' },
     { label: '🔍 Verifier', email: 'verifier@demo.local', role: 'VERIFIER' },
+    { label: '🏢 Employer (Hiring)', email: 'employer@demo.local', role: 'EMPLOYER' },
   ];
 
   const handleSelectDemoUser = (demoEmail: string) => {

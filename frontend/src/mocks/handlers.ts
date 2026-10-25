@@ -40,6 +40,7 @@ import {
   mockStudentCredentials,
   mockDabGraduates,
   mockReportItems,
+  mockEmployerRequests,
 } from './data';
 import {
   StudentOwnRecord,
@@ -48,6 +49,7 @@ import {
   ConsentHistoryRecord,
   StudentCredentialItem,
   DabGraduateItem,
+  EmployerHiringRequestItem,
 } from '@/features/student/types';
 import { ReportItem, ReportJob } from '@/features/reports/types';
 import { parsePresentation } from '@/lib/sdjwt';
@@ -107,6 +109,7 @@ export let consentPurposesState: ConsentPurposeSetting[] = JSON.parse(JSON.strin
 export let consentHistoryState: ConsentHistoryRecord[] = JSON.parse(JSON.stringify(mockConsentHistory));
 export let studentCredentialsState: StudentCredentialItem[] = JSON.parse(JSON.stringify(mockStudentCredentials));
 export let dabGraduatesState: DabGraduateItem[] = JSON.parse(JSON.stringify(mockDabGraduates));
+export let employerRequestsState: EmployerHiringRequestItem[] = JSON.parse(JSON.stringify(mockEmployerRequests));
 export let holderRegisteredKeyState: any = null;
 
 export const resetTrustMock = () => {
@@ -116,6 +119,7 @@ export const resetTrustMock = () => {
   consentHistoryState = JSON.parse(JSON.stringify(mockConsentHistory));
   studentCredentialsState = JSON.parse(JSON.stringify(mockStudentCredentials));
   dabGraduatesState = JSON.parse(JSON.stringify(mockDabGraduates));
+  employerRequestsState = JSON.parse(JSON.stringify(mockEmployerRequests));
   holderRegisteredKeyState = null;
 };
 
@@ -1509,6 +1513,185 @@ export const handlers = [
       purposes: consentPurposesState,
       history: consentHistoryState,
     });
+  }),
+
+  // Student Employer Access Requests
+  http.get('*/v1/students/me/employer-requests', () => {
+    return HttpResponse.json(employerRequestsState);
+  }),
+
+  http.post('*/v1/students/me/employer-requests/:id/decision', async ({ params, request }) => {
+    const { id } = params;
+    const body = (await request.json().catch(() => ({}))) as any;
+    const decision = body.decision; // 'APPROVED' | 'REJECTED'
+
+    const reqItem = employerRequestsState.find((r) => r.id === id);
+    if (!reqItem) {
+      return HttpResponse.json({ detail: 'Access request not found' }, { status: 404 });
+    }
+
+    reqItem.status = decision === 'APPROVED' ? 'APPROVED' : 'REJECTED';
+    reqItem.decided_at = new Date().toISOString();
+
+    // If approved, update EMPLOYER_HIRING purpose state
+    const hiringPurpose = consentPurposesState.find((p) => p.purpose === 'EMPLOYER_HIRING');
+    if (hiringPurpose && decision === 'APPROVED') {
+      hiringPurpose.is_granted = true;
+    }
+
+    const historyRecord: ConsentHistoryRecord = {
+      id: `cst-${Date.now()}`,
+      purpose: 'EMPLOYER_HIRING',
+      action: decision === 'APPROVED' ? 'GRANTED' : 'WITHDRAWN',
+      timestamp: new Date().toISOString(),
+      actor: 'Student (Self via Wallet)',
+      notes: `${decision === 'APPROVED' ? 'Approved' : 'Rejected'} employer access request for ${reqItem.employer_name}`,
+    };
+    consentHistoryState = [historyRecord, ...consentHistoryState];
+
+    return HttpResponse.json(reqItem);
+  }),
+
+  // Employer Portal Handlers
+  http.get('*/v1/employer/candidates', ({ request }) => {
+    const url = new URL(request.url);
+    const search = url.searchParams.get('q')?.toLowerCase() || '';
+    const consentOnly = url.searchParams.get('consent_only') === 'true';
+
+    const hiringPurpose = consentPurposesState.find((p) => p.purpose === 'EMPLOYER_HIRING');
+    const hasGlobalConsent = !!hiringPurpose?.is_granted;
+
+    const candidates = studentsState.slice(0, 50).map((s) => {
+      // For demo student, check matching request or global consent
+      const isDemoStudent = s.apaar_id === mockStudentOwnRecord.apaar_id;
+      const approvedReq = employerRequestsState.find(
+        (r) => r.apaar_id === s.apaar_id && r.status === 'APPROVED'
+      );
+      const consented = isDemoStudent ? (hasGlobalConsent || !!approvedReq) : s.apaar_id.endsWith('1') || s.apaar_id.endsWith('7');
+      const latestReq = employerRequestsState.find((r) => r.apaar_id === s.apaar_id);
+
+      return {
+        apaar_id: s.apaar_id,
+        full_name: s.full_name,
+        institution_aicte_id: s.institution_aicte_id,
+        institution_name: s.institution_aicte_id === '1-1234567890' ? 'Indian Institute of Technology, Bombay' : 'Delhi Technological University',
+        program_code: s.program_code,
+        course_level: s.course_level,
+        academic_year: s.academic_year,
+        enrolment_status: s.enrolment_status,
+        cgpa: consented ? 8.92 : null,
+        has_consent: consented,
+        consent_status: consented ? 'GRANTED' : (latestReq ? latestReq.status : 'WITHDRAWN'),
+        request_status: latestReq?.status || null,
+      };
+    });
+
+    let filtered = candidates;
+    if (search) {
+      filtered = filtered.filter(
+        (c) =>
+          c.full_name.toLowerCase().includes(search) ||
+          c.apaar_id.includes(search) ||
+          c.program_code.toLowerCase().includes(search)
+      );
+    }
+    if (consentOnly) {
+      filtered = filtered.filter((c) => c.has_consent);
+    }
+
+    return HttpResponse.json(filtered);
+  }),
+
+  http.get('*/v1/employer/candidates/:apaarId', ({ params }) => {
+    const { apaarId } = params;
+    const student = studentsState.find((s) => s.apaar_id === apaarId) || studentsState[0];
+
+    const hiringPurpose = consentPurposesState.find((p) => p.purpose === 'EMPLOYER_HIRING');
+    const hasGlobalConsent = !!hiringPurpose?.is_granted;
+    const approvedReq = employerRequestsState.find(
+      (r) => r.apaar_id === apaarId && r.status === 'APPROVED'
+    );
+    const hasConsent = hasGlobalConsent || !!approvedReq || (typeof apaarId === 'string' && (apaarId.endsWith('1') || apaarId.endsWith('7')));
+
+    if (!hasConsent) {
+      return HttpResponse.json({
+        apaar_id: apaarId,
+        has_consent: false,
+        consent_status: 'WITHDRAWN',
+        student: {
+          full_name: student?.full_name || 'Student Candidate',
+          institution_aicte_id: student?.institution_aicte_id || '1-1234567890',
+          program_code: student?.program_code || 'BTECH-CSE',
+          course_level: student?.course_level || 'UG',
+          academic_year: student?.academic_year || '2024-25',
+          enrolment_status: student?.enrolment_status || 'ACTIVE',
+        },
+        academic_record: null,
+        message: 'Student consent is required before previous marks and transcripts can be viewed.',
+      });
+    }
+
+    return HttpResponse.json({
+      apaar_id: apaarId,
+      has_consent: true,
+      consent_status: 'GRANTED',
+      student: {
+        full_name: student?.full_name || 'Aarav Patel',
+        institution_aicte_id: student?.institution_aicte_id || '1-1234567890',
+        program_code: student?.program_code || 'BTECH-CSE',
+        course_level: student?.course_level || 'UG',
+        academic_year: student?.academic_year || '2024-25',
+        enrolment_status: student?.enrolment_status || 'ACTIVE',
+      },
+      academic_record: {
+        tenth_board: 'CBSE',
+        tenth_percentage: 94.2,
+        tenth_year: 2020,
+        tenth_school: 'Delhi Public School, R.K. Puram',
+        twelfth_board: 'CBSE',
+        twelfth_percentage: 96.8,
+        twelfth_stream: 'Science (PCM)',
+        twelfth_year: 2022,
+        twelfth_school: 'Delhi Public School, R.K. Puram',
+        cgpa: 8.92,
+        total_credits: 160,
+        completed_credits: 120,
+        active_backlogs: 0,
+        semester_marks: [
+          { semester: 1, sgpa: 8.8, credits: 20, status: 'PASS' },
+          { semester: 2, sgpa: 9.1, credits: 20, status: 'PASS' },
+          { semester: 3, sgpa: 8.7, credits: 20, status: 'PASS' },
+          { semester: 4, sgpa: 9.0, credits: 20, status: 'PASS' },
+          { semester: 5, sgpa: 9.2, credits: 20, status: 'PASS' },
+          { semester: 6, sgpa: 8.7, credits: 20, status: 'PASS' },
+        ],
+        skills: ['Python', 'Distributed Systems', 'Cryptography', 'TypeScript', 'Docker', 'PostgreSQL'],
+        achievements: [
+          'Ranked 1st in ACM ICPC Regional Qualifier 2025',
+          'Published paper on SD-JWT Identity at IEEE Conf 2025',
+          'Dean Merit List for Academic Excellence (Consecutive 3 Years)',
+        ],
+      },
+      message: 'Consent verified: Academic record and previous marks unlocked.',
+    });
+  }),
+
+  http.post('*/v1/employer/requests', async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as any;
+    const newReq: EmployerHiringRequestItem = {
+      id: `req-${Date.now()}`,
+      employer_id: 'usr-employer-1',
+      employer_name: 'Infosys Talent Acquisition Desk',
+      apaar_id: body.apaar_id,
+      job_title: body.job_title || 'Campus Placement 2026',
+      organization: body.organization || 'Infosys Limited',
+      purpose: body.purpose || 'Hiring academic marks review',
+      status: 'PENDING',
+      requested_at: new Date().toISOString(),
+      decided_at: null,
+    };
+    employerRequestsState = [newReq, ...employerRequestsState];
+    return HttpResponse.json(newReq, { status: 201 });
   }),
 
   // Students & Lifecycle transitions

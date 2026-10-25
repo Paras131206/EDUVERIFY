@@ -8,7 +8,12 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-ConsentPurpose = Literal["REPOSITORY", "VERIFICATION_SHARE", "ANALYTICS_AGGREGATE"]
+ConsentPurpose = Literal[
+    "REPOSITORY",
+    "VERIFICATION_SHARE",
+    "ANALYTICS_AGGREGATE",
+    "EMPLOYER_HIRING",
+]
 ConsentAction = Literal["GRANT", "WITHDRAW"]
 
 

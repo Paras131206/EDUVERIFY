@@ -26,6 +26,7 @@ import {
   ConsentHistoryRecord,
   StudentCredentialItem,
   DabGraduateItem,
+  EmployerHiringRequestItem,
 } from '@/features/student/types';
 import { ReportItem } from '@/features/reports/types';
 
@@ -108,6 +109,15 @@ export const mockUsers: Record<string, User> = {
     email: 'verifier@demo.local',
     full_name: 'TCS Background Verification Desk',
     role: 'VERIFIER',
+    institution_aicte_id: null,
+    dab_id: null,
+    student_apaar_hash: null,
+  },
+  'employer@demo.local': {
+    id: 'usr-employer-1',
+    email: 'employer@demo.local',
+    full_name: 'Infosys Talent Acquisition Desk',
+    role: 'EMPLOYER',
     institution_aicte_id: null,
     dab_id: null,
     student_apaar_hash: null,
@@ -2484,6 +2494,43 @@ export const mockConsentPurposes: ConsentPurposeSetting[] = [
     consequences: 'Used only for aggregated macro planning without any student identification or individual disclosure.',
     is_granted: true,
     can_toggle: true,
+  },
+  {
+    purpose: 'EMPLOYER_HIRING',
+    title: 'Corporate Hiring & Academic Marks Inspection',
+    title_hi: 'कॉर्पोरेट भर्ती और पिछले शैक्षणिक अंकों का निरीक्षण',
+    description: 'Permits verified corporate recruiters and background verification agencies to inspect your detailed previous academic marks (10th, 12th/Diploma, Semester SGPA/CGPA, verified skills) for hiring evaluation.',
+    consequences: 'If granted or approved, employers can view your verified academic dossier. If withdrawn, employer access to your marks is strictly locked and masked under Section 8.4 DPDP Act.',
+    is_granted: false,
+    can_toggle: true,
+    warning_on_withdraw: 'Withdrawing EMPLOYER_HIRING immediately revokes all employer access to your 10th/12th marks, semester breakdowns, and transcripts.',
+  },
+];
+
+export const mockEmployerRequests: EmployerHiringRequestItem[] = [
+  {
+    id: 'req-emp-101',
+    employer_id: 'usr-employer-1',
+    employer_name: 'Infosys Talent Acquisition Desk',
+    apaar_id: '984572912301',
+    job_title: 'Software Development Engineer - Campus 2026',
+    organization: 'Infosys Limited',
+    purpose: 'Technical interview academic evaluation & background screening',
+    status: 'PENDING',
+    requested_at: '2026-10-24T14:30:00Z',
+    decided_at: null,
+  },
+  {
+    id: 'req-emp-102',
+    employer_id: 'usr-employer-2',
+    employer_name: 'Tata Consultancy Services Recruitment',
+    apaar_id: '984572912301',
+    job_title: 'Digital Systems Engineer',
+    organization: 'Tata Consultancy Services',
+    purpose: 'Pre-placement credential and CGPA verification',
+    status: 'APPROVED',
+    requested_at: '2026-10-20T10:15:00Z',
+    decided_at: '2026-10-21T09:00:00Z',
   },
 ];
 
