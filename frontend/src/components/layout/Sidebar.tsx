@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Building2,
@@ -28,6 +28,7 @@ export const Sidebar: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     await logout();
@@ -56,6 +57,7 @@ export const Sidebar: React.FC = () => {
       to: '/institution/batches',
       label: t('nav.batches', 'Batch Registry'),
       icon: <Layers className="w-4 h-4" aria-hidden="true" />,
+      end: true,
       visible:
         !role ||
         role === 'INSTITUTION_ADMIN' ||
@@ -150,23 +152,35 @@ export const Sidebar: React.FC = () => {
         </div>
         {navItems
           .filter((item) => item.visible)
-          .map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all ${
-                  isActive
-                    ? 'bg-gov-navy text-white shadow-sm font-semibold'
-                    : 'text-slate-700 hover:bg-slate-100/80 hover:text-gov-navy'
-                }`
-              }
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </NavLink>
-          ))}
+          .map((item) => {
+            const isReviewItem = item.to.includes('/review');
+            const isBatchesItem = item.to === '/institution/batches';
+
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end ?? (!isReviewItem)}
+                className={({ isActive }) => {
+                  const effectivelyActive = isReviewItem
+                    ? location.pathname.includes('/review')
+                    : isBatchesItem
+                    ? location.pathname === '/institution/batches' ||
+                      (location.pathname.startsWith('/institution/batches') && !location.pathname.includes('/review'))
+                    : isActive;
+
+                  return `flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all ${
+                    effectivelyActive
+                      ? 'bg-gov-navy text-white shadow-sm font-semibold'
+                      : 'text-slate-700 hover:bg-slate-100/80 hover:text-gov-navy'
+                  }`;
+                }}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </NavLink>
+            );
+          })}
       </nav>
 
       <div className="p-4 border-t border-slate-200 bg-slate-50/50 space-y-3">
@@ -220,13 +234,6 @@ export const Sidebar: React.FC = () => {
             <span>{t('nav.signin_portal', 'Sign In to Portal')}</span>
           </NavLink>
         )}
-
-        <div className="bg-amber-50 rounded p-2.5 border border-amber-200 text-[11px] text-amber-900 leading-relaxed">
-          <p className="font-semibold text-amber-800 flex items-center gap-1.5">
-            <span>{t('shell.apaar_keyed', 'APAAR Keyed')}</span>
-          </p>
-          <p className="mt-0.5 text-slate-600">{t('shell.apaar_secured', 'All data secured via 12-digit APAAR format with hash chain audit.')}</p>
-        </div>
       </div>
     </aside>
   );

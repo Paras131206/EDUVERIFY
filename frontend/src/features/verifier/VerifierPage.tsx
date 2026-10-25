@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,25 +7,17 @@ import { VerificationResult } from '@/features/student/types';
 import { API_BASE_URL } from '@/lib/api';
 import {
   ShieldCheck,
-  QrCode,
   CheckCircle2,
   AlertTriangle,
   Clock,
   Ban,
-  Camera,
-  CameraOff,
 } from 'lucide-react';
-import { Html5Qrcode } from 'html5-qrcode';
 
 export const VerifierPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [presentationInput, setPresentationInput] = useState<string>('');
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const [result, setResult] = useState<VerificationResult | null>(null);
-  const [scannerActive, setScannerActive] = useState<boolean>(false);
-  const [scannerError, setScannerError] = useState<string | null>(null);
-
-  const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
 
   // Helper to extract presentation string from full URL or raw string
   const cleanPresentationString = (raw: string): string => {
@@ -91,58 +83,9 @@ export const VerifierPage: React.FC = () => {
     }
   }, [searchParams, handleVerify]);
 
-  // Clean up camera scanner on unmount
-  useEffect(() => {
-    return () => {
-      if (html5QrCodeRef.current && html5QrCodeRef.current.isScanning) {
-        html5QrCodeRef.current.stop().catch(() => {});
-      }
-    };
-  }, []);
-
-  const startScanner = async () => {
-    setScannerError(null);
-    setScannerActive(true);
-
-    try {
-      if (!html5QrCodeRef.current) {
-        html5QrCodeRef.current = new Html5Qrcode('qr-reader-container');
-      }
-
-      await html5QrCodeRef.current.start(
-        { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        (decodedText) => {
-          setPresentationInput(decodedText);
-          stopScanner();
-          handleVerify(decodedText);
-        },
-        () => {
-          // scanning in progress
-        }
-      );
-    } catch (err: any) {
-      console.warn('QR camera scanner error:', err);
-      setScannerError('Camera access unavailable. Please paste the presentation string or share URL below.');
-      setScannerActive(false);
-    }
-  };
-
-  const stopScanner = async () => {
-    if (html5QrCodeRef.current && html5QrCodeRef.current.isScanning) {
-      try {
-        await html5QrCodeRef.current.stop();
-      } catch {
-        // ignore
-      }
-    }
-    setScannerActive(false);
-  };
-
   const handleReset = () => {
     setPresentationInput('');
     setResult(null);
-    stopScanner();
   };
 
   return (
@@ -171,12 +114,12 @@ export const VerifierPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Input / Scanner Section */}
+      {/* Input Section */}
       <Card className="border-slate-200 bg-white shadow-xs" data-testid="verifier-input-card">
         <CardHeader className="pb-3 border-b border-slate-100">
           <CardTitle className="text-base font-bold text-gov-navy flex items-center gap-2">
-            <QrCode className="w-4 h-4 text-gov-saffron" />
-            <span>Scan QR Code or Paste Presentation</span>
+            <ShieldCheck className="w-4 h-4 text-gov-saffron" />
+            <span>Verify Student Presentation</span>
           </CardTitle>
           <CardDescription className="text-xs text-slate-500">
             Accepts raw SD-JWT presentation strings or full verification URLs generated from the Student Wallet
@@ -184,39 +127,6 @@ export const VerifierPage: React.FC = () => {
         </CardHeader>
 
         <CardContent className="pt-4 space-y-4">
-          {/* Camera Scanner Viewport */}
-          {scannerActive ? (
-            <div className="p-4 bg-slate-900 rounded-xl text-center space-y-3" data-testid="camera-scanner-viewport">
-              <div id="qr-reader-container" className="max-w-xs mx-auto overflow-hidden rounded-lg bg-black" />
-              <p className="text-xs text-slate-300">Point device camera at the student credential QR code</p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={stopScanner}
-                className="bg-white/10 text-white border-white/20 hover:bg-white/20 text-xs"
-              >
-                <CameraOff className="w-3.5 h-3.5 mr-1.5" /> Stop Camera Scanner
-              </Button>
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button
-                variant="outline"
-                onClick={startScanner}
-                className="border-slate-300 text-gov-navy hover:bg-slate-50 text-xs font-semibold h-10 flex-1"
-                data-testid="start-camera-scan-btn"
-              >
-                <Camera className="w-4 h-4 mr-2 text-gov-saffron" />
-                Scan QR with Camera
-              </Button>
-            </div>
-          )}
-
-          {scannerError && (
-            <p className="text-xs text-amber-700 font-medium bg-amber-50 p-2.5 rounded-lg border border-amber-200">
-              {scannerError}
-            </p>
-          )}
 
           {/* Paste Presentation or Share URL */}
           <div className="space-y-1.5">
