@@ -8,6 +8,7 @@ import { AnomalyDriftFeedSection } from './components/AnomalyDriftFeedSection';
 import { ReconciliationViewSection } from './components/ReconciliationViewSection';
 import { AuditChainSection } from './components/AuditChainSection';
 import { AdminSection } from './components/AdminSection';
+import { InstitutionSeatMatrixSection } from './components/InstitutionSeatMatrixSection';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { OfflineBanner } from '@/components/shared/OfflineBanner';
@@ -48,6 +49,7 @@ import {
   ShieldAlert,
   RotateCw,
   LayoutDashboard,
+  Building2,
   Map as MapIcon,
   Trophy,
   PieChart,
@@ -62,6 +64,7 @@ import {
 export type AicteTab =
   | 'all'
   | 'overview'
+  | 'seat-matrix'
   | 'map'
   | 'leaderboards'
   | 'quotas'
@@ -424,6 +427,22 @@ export const AicteDashboardPage: React.FC = () => {
         </button>
 
         <button
+          onClick={() => setActiveTab('seat-matrix')}
+          data-testid="tab-seat-matrix"
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-t-md transition-colors ${
+            activeTab === 'seat-matrix'
+              ? 'bg-white border-b-2 border-gov-navy font-semibold text-gov-navy shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
+        >
+          <Building2 className="w-3.5 h-3.5 text-amber-500" />
+          <span>Institution & Seat Matrix</span>
+          <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-blue-100 text-blue-800 font-bold">
+            Sanctioned
+          </span>
+        </button>
+
+        <button
           onClick={() => setActiveTab('map')}
           className={`flex items-center gap-1.5 px-3 py-2 rounded-t-md transition-colors ${
             activeTab === 'map'
@@ -543,6 +562,13 @@ export const AicteDashboardPage: React.FC = () => {
           {(activeTab === 'all' || activeTab === 'overview') && (
             <section data-testid="section-overview">
               <AicteKpiOverview summary={summary} initialEvents={tickerEvents} />
+            </section>
+          )}
+
+          {/* Section: Institution Registration & Seat Matrix */}
+          {(activeTab === 'all' || activeTab === 'seat-matrix') && (
+            <section data-testid="section-seat-matrix">
+              <InstitutionSeatMatrixSection />
             </section>
           )}
 

@@ -350,4 +350,53 @@ export interface WebhookConfigItem {
   deliveries: WebhookDeliveryLog[];
 }
 
+export interface DiscrepancyAuditItem {
+  issue_id: string;
+  batch_id: string;
+  batch_filename: string;
+  rule_id: string;
+  row?: number;
+  field?: string;
+  apaar_id?: string;
+  severity: IssueSeverity;
+  priority: IssuePriority;
+  message: string;
+  reason?: string;
+  original_value?: string | null;
+  modified_value?: string | null;
+  status: IssueStatus | string;
+  decided_by_id?: string | null;
+  decided_by_name?: string | null;
+  decided_by_role?: string | null;
+  decided_at?: string | null;
+  decision_note?: string | null;
+  is_reverted?: boolean;
+  revert_reason?: string | null;
+  can_revert?: boolean;
+}
+
+export interface InstitutionAuditStats {
+  total_documents: number;
+  total_discrepancies: number;
+  total_modified: number;
+  total_reverted: number;
+}
+
+export interface InstitutionAuditResponse {
+  batches: BatchItem[];
+  discrepancies: DiscrepancyAuditItem[];
+  audit_logs: Array<{
+    id: string | number;
+    timestamp?: string;
+    action: string;
+    actor_id?: string;
+    role?: string;
+    resource?: string;
+    resource_id?: string;
+    sha256_hash?: string;
+  }>;
+  stats: InstitutionAuditStats;
+}
+
+
 

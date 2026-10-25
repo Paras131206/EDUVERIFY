@@ -22,6 +22,7 @@ import {
   RefreshCw,
   Archive,
   Layers,
+  History,
 } from 'lucide-react';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ErrorState } from '@/components/shared/ErrorState';
@@ -160,6 +161,17 @@ export const BatchListPage: React.FC = () => {
             <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${isLoading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
+
+          <Link to="/institution/audit">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs border-purple-300 text-purple-700 bg-purple-50/50 hover:bg-purple-100 font-semibold"
+            >
+              <History className="w-3.5 h-3.5 mr-1.5 text-purple-600" />
+              Document Audit & Revert
+            </Button>
+          </Link>
 
           <Link to="/institution/upload">
             <Button
