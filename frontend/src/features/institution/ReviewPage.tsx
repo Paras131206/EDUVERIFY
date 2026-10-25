@@ -30,6 +30,7 @@ import {
   BarChart3,
   ListFilter,
   Clock,
+  History,
 } from 'lucide-react';
 import { API_BASE_URL, authFetch } from '@/lib/api';
 
@@ -872,6 +873,14 @@ export const ReviewPage: React.FC = () => {
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
           )}
         </button>
+
+        <Link
+          to={`/institution/audit`}
+          className="px-4 py-2.5 border-b-2 border-transparent text-slate-500 hover:text-purple-700 transition flex items-center gap-2"
+        >
+          <History className="w-4 h-4 text-purple-600" />
+          <span>Audit Log & Revert Desk</span>
+        </Link>
       </div>
 
       {/* Tab Panels */}

@@ -19,6 +19,7 @@ import {
   BarChart3,
   Sun,
   Moon,
+  History,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { useTheme } from '@/lib/theme';
@@ -94,6 +95,12 @@ export const Sidebar: React.FC = () => {
       to: '/institution/aggregates',
       label: t('nav.aggregates', 'Aggregate Intake'),
       icon: <BarChart3 className="w-4 h-4" aria-hidden="true" />,
+      visible: !role || role === 'INSTITUTION_ADMIN' || role === 'INSTITUTION_STAFF',
+    },
+    {
+      to: '/institution/audit',
+      label: t('nav.audit_log', 'Document Audit & Revert'),
+      icon: <History className="w-4 h-4" aria-hidden="true" />,
       visible: !role || role === 'INSTITUTION_ADMIN' || role === 'INSTITUTION_STAFF',
     },
     // AICTE items
