@@ -29,6 +29,7 @@ class UserRole(str, Enum):
     INSTITUTION_STAFF = "INSTITUTION_STAFF"
     VERIFIER = "VERIFIER"
     STUDENT = "STUDENT"
+    EMPLOYER = "EMPLOYER"
 
 
 class UserProfile(BaseModel):

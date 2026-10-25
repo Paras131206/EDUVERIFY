@@ -17,6 +17,7 @@ import { VerifierPage } from '@/features/verifier/VerifierPage';
 import { ReportsPage } from '@/features/reports/ReportsPage';
 import { AuthorityAccessPage } from '@/features/reports/AuthorityAccessPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
+import { EmployerPortalPage } from '@/features/employer/EmployerPortalPage';
 
 const RootLayout: React.FC = () => (
   <AuthProvider>
@@ -148,6 +149,15 @@ export const router = createBrowserRouter([
           {
             path: 'verify',
             element: <VerifierPage />,
+          },
+          // Employer Hiring Portal
+          {
+            path: 'employer',
+            element: (
+              <RequireRole roles={['EMPLOYER', 'AICTE_ADMIN']}>
+                <EmployerPortalPage />
+              </RequireRole>
+            ),
           },
           // Reports
           {

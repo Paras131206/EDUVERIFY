@@ -284,7 +284,13 @@ def get_consent_summary_service(
                     },
                 )
             target_apaar = student_match.apaar_id
-    elif principal.role in ("INSTITUTION_ADMIN", "AICTE_ADMIN", "AICTE_ANALYST"):
+    elif principal.role in (
+        "INSTITUTION_ADMIN",
+        "AICTE_ADMIN",
+        "AICTE_ANALYST",
+        "EMPLOYER",
+        "VERIFIER",
+    ):
         if not target_apaar:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -324,6 +330,7 @@ def get_consent_summary_service(
         "REPOSITORY": "GRANTED",
         "VERIFICATION_SHARE": "GRANTED",
         "ANALYTICS_AGGREGATE": "GRANTED",
+        "EMPLOYER_HIRING": "WITHDRAWN",
     }
     # Walk chronologically forwards to compute current active states
     for row in reversed(history_rows):

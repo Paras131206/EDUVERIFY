@@ -17,6 +17,7 @@ import {
   LogIn,
   Users,
   BarChart3,
+  Briefcase,
   Sun,
   Moon,
 } from 'lucide-react';
@@ -127,6 +128,13 @@ export const Sidebar: React.FC = () => {
       label: t('nav.verifier'),
       icon: <ShieldCheck className="w-4 h-4" aria-hidden="true" />,
       visible: true,
+    },
+    // Employer items
+    {
+      to: '/employer',
+      label: t('nav.employer', 'Employer Hiring Portal'),
+      icon: <Briefcase className="w-4 h-4" aria-hidden="true" />,
+      visible: !role || role === 'EMPLOYER' || role === 'AICTE_ADMIN',
     },
     // Reports
     {

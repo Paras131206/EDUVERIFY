@@ -809,3 +809,66 @@ class ReportRecord(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
     )
+
+
+class StudentAcademicRecord(Base):
+    """Academic marks, previous schooling, CGPA, and competencies for employer hiring."""
+
+    __tablename__ = "student_academic_records"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid.uuid4())
+    )
+    apaar_id: Mapped[str] = mapped_column(String(12), unique=True, nullable=False, index=True)
+    tenth_board: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    tenth_percentage: Mapped[float | None] = mapped_column(Float, nullable=True)
+    tenth_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    tenth_school: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    twelfth_board: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    twelfth_percentage: Mapped[float | None] = mapped_column(Float, nullable=True)
+    twelfth_stream: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    twelfth_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    twelfth_school: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    cgpa: Mapped[float | None] = mapped_column(Float, nullable=True)
+    total_credits: Mapped[int | None] = mapped_column(Integer, nullable=True, default=160)
+    completed_credits: Mapped[int | None] = mapped_column(Integer, nullable=True, default=120)
+    active_backlogs: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    semester_marks_json: Mapped[list[dict[str, Any]] | None] = mapped_column(JSON, nullable=True)
+    skills_json: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
+    achievements_json: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+        nullable=False,
+    )
+
+
+class EmployerAccessRequest(Base):
+    """Explicit employer hiring access request to inspect student academic marks."""
+
+    __tablename__ = "employer_access_requests"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid.uuid4())
+    )
+    employer_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    employer_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    apaar_id: Mapped[str] = mapped_column(String(12), nullable=False, index=True)
+    job_title: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    organization: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    purpose: Mapped[str] = mapped_column(
+        String(255), nullable=False, default="HIRING_SCREENING"
+    )
+    status: Mapped[str] = mapped_column(
+        String(30), nullable=False, default="PENDING", index=True
+    )  # PENDING, APPROVED, REJECTED, REVOKED
+    requested_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
