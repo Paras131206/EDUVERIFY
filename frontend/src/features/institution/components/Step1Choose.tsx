@@ -215,6 +215,11 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
 
       const createdBatch = await response.json();
       const resolvedBatchId = createdBatch.batch_id || createdBatch.id || '';
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.setItem('eduverify_data_uploaded', 'true');
+        }
+      } catch {}
       setIsUploading(false);
       onSuccess({
         id: resolvedBatchId,
