@@ -28,11 +28,12 @@ export const AuthorityAccessPage: React.FC = () => {
 
   const isExpired = expires ? new Date(expires).getTime() < Date.now() : false;
   const isAuthorized = Boolean(user && (user.role === targetRole || user.role === 'AICTE_ADMIN') && !isExpired);
+  const userName = user?.full_name || user?.name || user?.email || 'Authorized User';
 
   const handleDownload = () => {
     setDownloaded(true);
     // Simulate downloading statutory file
-    const content = `GOVERNMENT OF INDIA - AICTE STATUTORY CLEARANCE\nResource: ${resource}\nToken: ${token}\nAuthority Role: ${targetRole}\nAccessed By: ${user?.full_name || user?.email} (${user?.email})\nTimestamp: ${new Date().toISOString()}\nStatus: VERIFIED_AND_SIGNED`;
+    const content = `GOVERNMENT OF INDIA - AICTE STATUTORY CLEARANCE\nResource: ${resource}\nToken: ${token}\nAuthority Role: ${targetRole}\nAccessed By: ${userName} (${user?.email})\nTimestamp: ${new Date().toISOString()}\nStatus: VERIFIED_AND_SIGNED`;
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -59,7 +60,7 @@ export const AuthorityAccessPage: React.FC = () => {
           <span className="text-slate-300">Active Identity:</span>
           {user ? (
             <span className="font-mono bg-white/10 px-2.5 py-1 rounded text-white font-semibold">
-              {user.full_name || user.email} ({user.role})
+              {userName} ({user.role})
             </span>
           ) : (
             <span className="font-mono bg-red-500/20 text-red-200 px-2 py-0.5 rounded">
@@ -92,8 +93,34 @@ export const AuthorityAccessPage: React.FC = () => {
           </div>
         )}
 
+        {/* Scenario: Expired Token */}
+        {user && isExpired && (
+          <div className="bg-white rounded-xl shadow-xl border border-amber-200 overflow-hidden animate-in fade-in">
+            <div className="bg-amber-600 text-white p-5 flex items-center gap-3">
+              <AlertTriangle className="w-6 h-6 shrink-0" />
+              <div>
+                <h2 className="text-base font-bold">Authority Access Link Expired</h2>
+                <p className="text-xs text-amber-100">
+                  This secure access link has exceeded its validity window
+                </p>
+              </div>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-slate-700">
+                The access token expired on <strong className="text-slate-900">{new Date(expires || '').toLocaleString()}</strong>.
+                Please contact the authorized administrative issuer to request a new cryptographic link.
+              </p>
+              <div className="pt-2">
+                <Button variant="outline" onClick={() => navigate(-1)} className="gap-2 text-xs">
+                  <ArrowLeft className="w-3.5 h-3.5" /> Return to Previous Page
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Scenario 2: Logged In but Unauthorized Role */}
-        {user && !isAuthorized && (
+        {user && !isExpired && !isAuthorized && (
           <div className="bg-white rounded-xl shadow-xl border border-red-200 overflow-hidden animate-in fade-in">
             <div className="bg-red-600 text-white p-5 flex items-center gap-3">
               <ShieldAlert className="w-6 h-6 shrink-0" />
