@@ -388,6 +388,10 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   // Settings
   "Manage institution profile, API credentials, webhooks, and security access.": "संस्थान प्रोफ़ाइल, एपीआई क्रेडेंशियल, वेबहुक और सुरक्षा एक्सेस प्रबंधित करें।",
   "API Keys": "एपीआई कुंजियां",
+  "Webhooks": "वेबहुक्स",
+  "Webhook": "वेबहुक",
+  "User Management": "उपयोगकर्ता प्रबंधन",
+  "Audit & Compliance": "ऑडिट एवं अनुपालन",
   "Generate New API Key": "नई एपीआई कुंजी बनाएं",
   "Webhook Subscriptions": "वेबहुक सदस्यताएं",
   "Add Webhook Endpoint": "वेबहुक समापन बिंदु जोड़ें",
@@ -814,7 +818,257 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Pending Human Review": "मानव समीक्षा लंबित",
   "Excluded / Unapproved Rows:": "बहिष्कृत / अस्वीकृत पंक्तियां:",
   "Excluded rows will remain in draft status and will NOT be committed until resolved.": "बहिष्कृत पंक्तियां ड्राफ्ट स्थिति में रहेंगी और समाधान होने तक कमिट नहीं की जाएंगी।",
-  "Once committed, students will be issued SD-JWT credentials keyed to their 12-digit APAAR ID and become eligible for verification desks.": "एक बार कमिट होने के बाद, छात्रों को उनके 12-अंकीय अपार आईडी से जुड़े SD-JWT क्रेडेंशियल जारी किए जाएंगे और वे सत्यापन डेस्क के लिए पात्र हो जाएंगे।"
+  "Once committed, students will be issued SD-JWT credentials keyed to their 12-digit APAAR ID and become eligible for verification desks.": "एक बार कमिट होने के बाद, छात्रों को उनके 12-अंकीय अपार आईडी से जुड़े SD-JWT क्रेडेंशियल जारी किए जाएंगे और वे सत्यापन डेस्क के लिए पात्र हो जाएंगे।",
+
+  // Settings Tab (Image 1)
+  "Institution Administration & Settings": "संस्थान प्रशासन एवं सेटिंग्स",
+  "Institution Administration": "संस्थान प्रशासन",
+  "Self-service institutional API keys, team role assignments, webhooks, and security compliance": "स्वयं-सेवा संस्थागत एपीआई कुंजियां, टीम भूमिका आवंटन, वेबहुक, और सुरक्षा अनुपालन",
+  "Self-service institutional": "स्वयं-सेवा संस्थागत",
+  "Institutional API Keys": "संस्थागत एपीआई कुंजियां",
+  "Institutional": "संस्थागत",
+  "Provision high-throughput API credentials for programmatic CSV/JSON ingestion from your campus ERP": "अपने कैंपस ERP से प्रोग्रामेटिक CSV/JSON अंतर्ग्रहण हेतु उच्च-थ्रूपुट एपीआई क्रेडेंशियल्स प्राप्त करें",
+  "+ Generate New Key": "+ नई कुंजी बनाएं",
+  "Generate New Key": "नई कुंजी बनाएं",
+  "Generate New": "नया बनाएं",
+  "Key Name": "कुंजी का नाम",
+  "KEY NAME": "कुंजी का नाम",
+  "Prefix": "उपसर्ग (Prefix)",
+  "PREFIX": "उपसर्ग (Prefix)",
+  "Scopes": "अनुमतियां (Scopes)",
+  "SCOPES": "अनुमतियां (Scopes)",
+  "Created": "सृजन तिथि",
+  "CREATED": "सृजन तिथि",
+  "Last Used": "अंतिम उपयोग",
+  "LAST USED": "अंतिम उपयोग",
+  "Revoke": "रद्द करें",
+  "Never": "कभी नहीं",
+  "REVOKED": "रद्द किया गया",
+  "Authorized Institution Users": "अधिकृत संस्थान उपयोगकर्ता",
+  "Manage roles and access permissions for academic registrars and data entry staff": "शैक्षणिक कुलसचिवों और डेटा प्रविष्टि कर्मचारियों के लिए भूमिकाएं और पहुंच अनुमतियां प्रबंधित करें",
+  "Invite Staff Member": "कर्मचारी को आमंत्रित करें",
+  "Invite User": "उपयोगकर्ता को आमंत्रित करें",
+  "Staff Name": "कर्मचारी का नाम",
+  "Official Email": "आधिकारिक ईमेल",
+  "Assigned Role": "सौंपी गई भूमिका",
+  "Last Sign-In": "अंतिम साइन-इन",
+  "Pending Activation": "सक्रियण लंबित",
+  "Audit Trail Cryptographic Integrity": "ऑडिट ट्रेल क्रिप्टोग्राफ़िक सत्यनिष्ठा",
+  "Verify the SHA-256 hash-chain of all institutional batch actions, reviews, and overrides": "सभी संस्थागत बैच कार्रवाइयों, समीक्षाओं और ओवरराइड्स की SHA-256 हैश-चेन सत्यापित करें",
+  "Hash-Chain Status: VERIFIED": "हैश-चेन स्थिति: सत्यापित",
+  "All 142 audit entries are linked by immutable previous-hash pointers. Zero tampering detected.": "सभी 142 ऑडिट प्रविष्टियां अपरिवर्तनीय पूर्व-हैश पॉइंटर्स द्वारा जुड़ी हैं। कोई छेड़छाड़ नहीं मिली।",
+  "Current Anchor Hash:": "वर्तमान एंकर हैश:",
+  "Webhook Notification Hub": "वेबहुक अधिसूचना केंद्र",
+  "Real-time HMAC-signed webhooks for batch validation completion and inter-institution duplicate alerts": "बैच सत्यापन पूर्ण होने और अंतर-संस्थान डुप्लिकेट अलर्ट के लिए वास्तविक समय HMAC-हस्ताक्षरित वेबहुक",
+  "Endpoint:": "समापन बिंदु (Endpoint):",
+  "Algorithm:": "एल्गोरिदम:",
+  "Test Webhook Delivery": "वेबहुक वितरण परीक्षण करें",
+  "Configured Webhook Endpoints": "कॉन्फ़िगर किए गए वेबहुक एंडपॉइंट्स",
+  "Real-time HMAC-signed HTTP notifications dispatched on batch ingestion, student lifecycle, and transfer events": "बैच अंतर्ग्रहण, छात्र जीवनचक्र और स्थानांतरण घटनाओं पर प्रेषित रीयल-टाइम HMAC-हस्ताक्षरित HTTP सूचनाएं",
+  "Register Webhook": "वेबहुक पंजीकृत करें",
+  "Target URL": "लक्षित URL",
+  "Subscribed Events": "सदस्यता प्राप्त घटनाएं",
+  "No webhooks registered. Click \"Register Webhook\" to integrate campus ERP.": "कोई वेबहुक पंजीकृत नहीं है। कैंपस ERP को एकीकृत करने के लिए \"वेबहुक पंजीकृत करें\" पर क्लिक करें।",
+  "Send Test": "परीक्षण भेजें",
+  "Webhook Delivery Log & Telemetry": "वेबहुक वितरण लॉग एवं टेलीमेट्री",
+  "Last 10 Dispatches": "अंतिम 10 प्रेषण",
+  "Inspection log with HTTP status codes, latency, and automatic exponential backoff retry counts": "HTTP स्थिति कोड, विलंबता और स्वचालित घातीय बैकऑफ़ पुनः प्रयास गणना के साथ निरीक्षण लॉग",
+  "Event Type": "इवेंट का प्रकार",
+  "Payload Summary": "पेलोड सारांश",
+  "Latency": "विलंबता",
+  "Retry Count": "पुनः प्रयास संख्या",
+  "No delivery events recorded yet. Send a test ping to verify endpoint connectivity.": "अभी तक कोई वितरण घटना दर्ज नहीं की गई है। एंडपॉइंट कनेक्टिविटी सत्यापित करने के लिए परीक्षण पिंग भेजें।",
+  "HMAC-SHA256 Signature Verification Snippet": "HMAC-SHA256 हस्ताक्षर सत्यापन स्निपेट",
+  "Copy and paste into your server backend to authenticate the X-EduVerify-Signature request header": "X-EduVerify-Signature अनुरोध शीर्षलेख को प्रमाणित करने के लिए अपने सर्वर बैकएंड में कॉपी और पेस्ट करें",
+  "Copy Snippet": "स्निपेट कॉपी करें",
+  "Copied": "कॉपी किया गया",
+  "API Key Generated": "एपीआई कुंजी उत्पन्न की गई",
+  "Generate Institutional API Key": "संस्थागत एपीआई कुंजी बनाएं",
+  "Key Identifier / Friendly Name": "कुंजी पहचानकर्ता / नाम",
+  "Allowed Scopes": "अनुमत कार्यक्षेत्र (Scopes)",
+  "upload:batches — Upload CSV/XLSX spreadsheets & confirm mappings": "upload:batches — CSV/XLSX स्प्रेडशीट अपलोड करें एवं मैपिंग की पुष्टि करें",
+  "read:reports — Fetch batch validation reports & anomaly metrics": "read:reports — बैच सत्यापन रिपोर्ट एवं विसंगति मेट्रिक्स प्राप्त करें",
+  "Create Key": "कुंजी बनाएं",
+  "Important: Copy your secret key now!": "महत्वपूर्ण: अपनी गुप्त कुंजी अभी कॉपी करें!",
+  "This secret token will never be shown again. If you lose this key, you will need to revoke it and generate a new one.": "यह गुप्त टोकन फिर कभी नहीं दिखाया जाएगा। यदि आप यह कुंजी खो देते हैं, तो आपको इसे रद्द करके एक नई कुंजी उत्पन्न करनी होगी।",
+  "Generated API Key Secret": "उत्पन्न एपीआई कुंजी सीक्रेट",
+  "I Have Safely Saved This Key": "मैंने इस कुंजी को सुरक्षित रूप से सहेज लिया है",
+  "Invite Institution Staff": "संस्थान कर्मचारियों को आमंत्रित करें",
+  "Institutional Email Address": "संस्थागत ईमेल पता",
+  "Institutional Role": "संस्थागत भूमिका",
+  "Institution Staff (Upload & Edit Drafts)": "संस्थान कर्मचारी (ड्राफ्ट अपलोड एवं संपादित करें)",
+  "Institution Admin (Sign-off & Commit to Central Repo)": "संस्थान व्यवस्थापक (हस्ताक्षर करें एवं केंद्रीय भंडार में कमिट करें)",
+  "Send Invitation": "निमंत्रण भेजें",
+  "Register New Webhook": "नया वेबहुक पंजीकृत करें",
+  "Endpoint Destination URL": "एंडपॉइंट गंतव्य URL",
+  "Must be an accessible HTTPS endpoint capable of receiving JSON POST payloads.": "JSON POST पेलोड प्राप्त करने में सक्षम एक सुलभ HTTPS एंडपॉइंट होना चाहिए।",
+  "Subscribed Event Topics": "सदस्यता प्राप्त घटना विषय",
+  "Register Endpoint": "एंडपॉइंट पंजीकृत करें",
+  "Webhook Signing Secret Generated": "वेबहुक हस्ताक्षर सीक्रेट उत्पन्न हुआ",
+  "Notice: Secret Displayed Only Once": "सूचना: सीक्रेट केवल एक बार प्रदर्शित किया जाता है",
+  "For security reasons, this HMAC shared secret will never be displayed again. Store it in your server's secure vault or environment variables to verify incoming event signatures.": "सुरक्षा कारणों से, यह HMAC साझा रहस्य फिर कभी प्रदर्शित नहीं किया जाएगा। आने वाले इवेंट हस्ताक्षरों को सत्यापित करने के लिए इसे अपने सर्वर के सुरक्षित वॉल्ट या पर्यावरण चर में संग्रहीत करें।",
+  "HMAC Signing Secret Key": "HMAC हस्ताक्षर सीक्रेट कुंजी",
+  "I Have Safely Saved This Secret": "मैंने इस सीक्रेट को सुरक्षित रूप से सहेज लिया है",
+
+  // Statutory Reports & Quality Audits (Image 2)
+  "Statutory Reports & Quality Audits": "सांविधिक रिपोर्ट एवं गुणवत्ता ऑडिट",
+  "Generate AICTE policy reports, NBA/NAAC accreditation summaries, intake monitoring, and reservation compliance packages.": "एआईसीटीई नीति रिपोर्ट, NBA/NAAC प्रत्यायन सारांश, प्रवेश निगरानी और आरक्षण अनुपालन पैकेज तैयार करें।",
+  "प्रतिवेदन एवं सांविधिक लेखापरीक्षा · Generate AICTE policy reports, NBA/NAAC accreditation summaries, intake monitoring, and reservation compliance packages.": "प्रतिवेदन एवं सांविधिक लेखापरीक्षा · एआईसीटीई नीति रिपोर्ट, NBA/NAAC प्रत्यायन सारांश, प्रवेश निगरानी और आरक्षण अनुपालन पैकेज तैयार करें।",
+  "Generate Authority Access Link": "प्राधिकरण एक्सेस लिंक उत्पन्न करें",
+  "Annual Policy Report": "वार्षिक नीति रिपोर्ट",
+  "National intake ceilings, excess enrollments, and state seat utilization.": "राष्ट्रीय प्रवेश सीमाएं, अतिरिक्त नामांकन, और राज्य सीट उपयोग।",
+  "Accreditation Audit": "प्रत्यायन ऑडिट",
+  "NBA/NAAC multi-tab student intake, faculty ratios, and referential integrity.": "NBA/NAAC बहु-टैब छात्र प्रवेश, संकाय अनुपात, और संदर्भात्मक सत्यनिष्ठा।",
+  "Seat Monitoring": "सीट निगरानी",
+  "Supernumerary schemes (TFW/PMSSS/JK), NRI/OCI/FN shares by state.": "अतिरिक्त सीटें (सुपरन्यूमरेरी योजनाएं - TFW/PMSSS/JK), राज्यवार NRI/OCI/FN हिस्सेदारी।",
+  "Reservation Compliance": "आरक्षण अनुपालन",
+  "Statutory GEN/OBC/SC/ST/EWS breakdown and quota audit certificate.": "सांविधिक GEN/अन्य पिछड़ा वर्ग (OBC)/SC/ST/आर्थिक रूप से कमजोर वर्ग (EWS) विवरण और कोटा ऑडिट प्रमाणपत्र।",
+  "Custom Report Builder": "कस्टम रिपोर्ट बिल्डर",
+  "Configure report scope, institutional filters, target demographic dimensions, and output format.": "रिपोर्ट दायरा, संस्थागत फ़िल्टर, लक्षित जनसांख्यिकीय आयाम और आउटपुट प्रारूप कॉन्फ़िगर करें।",
+  "1. Report Type": "1. रिपोर्ट का प्रकार",
+  "1. REPORT TYPE": "1. रिपोर्ट का प्रकार",
+  "POLICY — National & State Intake Policy Report": "नीति — राष्ट्रीय एवं राज्य प्रवेश नीति रिपोर्ट",
+  "ACCREDITATION — NBA/NAAC Institutional Audit": "प्रत्यायन — NBA/NAAC संस्थागत ऑडिट",
+  "ACCREDITATION — NBA/NAAC Multi-Program Accreditation Reconciliation": "प्रत्यायन — NBA/NAAC बहु-कार्यक्रम प्रत्यायन समाधान",
+  "MONITORING — Seat Utilization & Supernumerary Quotas": "निगरानी — सीट उपयोग एवं अतिरिक्त कोटा",
+  "MONITORING — Supernumerary Quota & Seat Utilization Ledger": "निगरानी — अतिरिक्त कोटा एवं सीट उपयोग लेज़र",
+  "REGULATORY — Statutory Reservation & Quota Compliance": "विनियामक — सांविधिक आरक्षण एवं कोटा अनुपालन",
+  "REGULATORY — Statutory Reservation (SC/ST/OBC/EWS) Audit": "विनियामक — सांविधिक आरक्षण (SC/ST/OBC/EWS) ऑडिट",
+  "2. Academic Year": "2. शैक्षणिक वर्ष",
+  "2. ACADEMIC YEAR": "2. शैक्षणिक वर्ष",
+  "2026-27 (Current Active Batch)": "2026-27 (वर्तमान सक्रिय बैच)",
+  "2025-26 (Previous Audited Year)": "2025-26 (पिछला ऑडिट किया गया वर्ष)",
+  "2024-25 (Archived Census)": "2024-25 (अभिलेखागार जनगणना)",
+  "3. State Scope": "3. राज्य दायरा (Scope)",
+  "3. STATE SCOPE": "3. राज्य दायरा (Scope)",
+  "All India (National Aggregation)": "अखिल भारतीय (राष्ट्रीय संकलन)",
+  "Maharashtra (27)": "महाराष्ट्र (27)",
+  "Delhi NCT (07)": "दिल्ली एनसीटी (07)",
+  "Karnataka (29)": "कर्नाटक (29)",
+  "Tamil Nadu (33)": "तमिलनाडु (33)",
+  "Uttar Pradesh (09)": "उत्तर प्रदेश (09)",
+  "Gujarat (24)": "गुजरात (24)",
+  "Haryana (06)": "हरियाणा (06)",
+  "4. Program Discipline": "4. कार्यक्रम अनुशासन (Discipline)",
+  "4. PROGRAM DISCIPLINE": "4. कार्यक्रम अनुशासन (Discipline)",
+  "All Disciplines & Programs": "सभी विषय एवं कार्यक्रम",
+  "B.Tech Computer Science & Engineering": "बी.टेक कंप्यूटर साइंस एवं इंजीनियरिंग",
+  "B.Tech Electronics & Communication": "बी.टेक इलेक्ट्रॉनिक्स एवं संचार",
+  "B.Tech Mechanical Engineering": "बी.टेक मैकेनिकल इंजीनियरिंग",
+  "Master of Business Administration (MBA)": "मास्टर ऑफ बिजनेस एडमिनिस्ट्रेशन (MBA)",
+  "Master of Computer Applications (MCA)": "मास्टर ऑफ कंप्यूटर एप्लीकेशन (MCA)",
+  "5. Reservation Category": "5. आरक्षण श्रेणी",
+  "5. RESERVATION CATEGORY": "5. आरक्षण श्रेणी",
+  "5. RESERVATION श्रेणी": "5. आरक्षण श्रेणी",
+  "All Social Categories": "सभी सामाजिक श्रेणियां",
+  "General (Unreserved)": "सामान्य (अनारक्षित)",
+  "General (Open Merit)": "सामान्य (ओपन मेरिट)",
+  "Other Backward Classes (OBC-NCL)": "अन्य पिछड़ा वर्ग (OBC-NCL)",
+  "Scheduled Castes (SC)": "अनुसूचित जाति (SC)",
+  "Scheduled Tribes (ST)": "अनुसूचित जनजाति (ST)",
+  "Economically Weaker Section (EWS)": "आर्थिक रूप से कमजोर वर्ग (EWS)",
+  "Economically Weaker Sections (EWS)": "आर्थिक रूप से कमजोर वर्ग (EWS)",
+  "Persons with Disabilities (PwD)": "दिव्यांगजन (PwD)",
+  "6. Output Format": "6. आउटपुट प्रारूप",
+  "6. OUTPUT FORMAT": "6. आउटपुट प्रारूप",
+  "PDF (Print A4)": "PDF (प्रिंट A4)",
+  "XLSX (Excel)": "XLSX (एक्सेल)",
+  "* Reports are compiled live from the central verified repository and rendered using WeasyPrint print styles.": "* रिपोर्ट केंद्रीय सत्यापित भंडार से लाइव संकलित की जाती हैं और WeasyPrint प्रिंट शैलियों का उपयोग करके प्रस्तुत की जाती हैं।",
+  "Generate PDF Report": "पीडीएफ रिपोर्ट तैयार करें",
+  "Generate XLSX Report": "एक्सेल रिपोर्ट तैयार करें",
+  "Compiling & Rendering Report...": "रिपोर्ट संकलित एवं प्रस्तुत की जा रही है...",
+  "Report Job Complete": "रिपोर्ट कार्य पूर्ण हुआ",
+  "Compiled across": "के पार संकलित",
+  "Generated Reports History": "तैयार की गई रिपोर्ट का इतिहास",
+  "Audit trail of compiled policy documents, accreditation tables, and statutory downloads.": "संकलित नीति दस्तावेजों, प्रत्यायन तालिकाओं और सांविधिक डाउनलोड का ऑडिट ट्रेल।",
+  "Search reports...": "रिपोर्ट खोजें...",
+  "All Types": "सभी प्रकार",
+  "All Formats": "सभी प्रारूप",
+  "Policy": "नीति (Policy)",
+  "Accreditation": "प्रत्यायन (Accreditation)",
+  "Monitoring": "निगरानी (Monitoring)",
+  "Regulatory": "विनियामक (Regulatory)",
+  "Report ID": "रिपोर्ट आईडी",
+  "REPORT ID": "रिपोर्ट आईडी",
+  "Title & Scope": "शीर्षक एवं दायरा",
+  "TITLE & SCOPE": "शीर्षक एवं दायरा",
+  "TYPE": "प्रकार",
+  "FORMAT": "प्रारूप",
+  "GENERATED AT": "तैयार करने का समय",
+  "Year:": "वर्ष:",
+  "State:": "राज्य:",
+  "Program:": "कार्यक्रम:",
+  "Size": "आकार",
+  "SIZE": "आकार",
+  "No reports match the selected filters.": "चयनित फ़िल्टर से मेल खाने वाली कोई रिपोर्ट नहीं मिली।",
+  "PDF PREVIEW": "PDF पूर्वावलोकन",
+  "XLSX PREVIEW": "XLSX पूर्वावलोकन",
+  "All India Council for Technical Education": "अखिल भारतीय तकनीकी शिक्षा परिषद",
+  "अखिल भारतीय तकनीकी शिक्षा परिषद · Statutory Body under Ministry of Education, Govt. of India": "अखिल भारतीय तकनीकी शिक्षा परिषद · शिक्षा मंत्रालय, भारत सरकार के अधीन सांविधिक निकाय",
+  "Ref:": "संदर्भ:",
+  "Date:": "दिनांक:",
+  "Executive Summary & Key Indicators": "कार्यकारी सारांश एवं मुख्य संकेतक",
+  "Institutions Covered": "शामिल संस्थान",
+  "Total Students": "कुल छात्र",
+  "Compliance Score": "अनुपालन स्कोर",
+  "Scope & Regulatory Parameters": "दायरा एवं विनियामक पैरामीटर",
+  "State Jurisdiction:": "राज्य क्षेत्राधिकार:",
+  "Program Specialization:": "कार्यक्रम विशेषज्ञता:",
+  "Category Filter:": "श्रेणी फ़िल्टर:",
+  "Cryptographic Audit Chain:": "क्रिप्टोग्राफ़िक ऑडिट श्रृंखला:",
+  "Generated & Authenticated by:": "द्वारा तैयार एवं प्रमाणित:",
+  "Digital Seal:": "डिजिटल मुहर:",
+  "Generate Authority-Restricted Link": "प्राधिकरण-प्रतिबंधित लिंक उत्पन्न करें",
+  "Grant role-scoped, cryptographic file access exclusively to verified authorities": "सत्यापित प्राधिकरणों को विशेष रूप से भूमिका-दायरे, क्रिप्टोग्राफ़िक फ़ाइल पहुंच प्रदान करें",
+  "Zero-Trust Access Control: Only users possessing active credentials for the selected authority role will be permitted to open and download the file. Unauthorized users will receive a 403 Forbidden security block.": "ज़ीरो-ट्रस्ट एक्सेस नियंत्रण: केवल चयनित प्राधिकरण भूमिका के लिए सक्रिय क्रेडेंशियल रखने वाले उपयोगकर्ताओं को फ़ाइल खोलने और डाउनलोड करने की अनुमति होगी। अनधिकृत उपयोगकर्ताओं को 403 निषिद्ध सुरक्षा ब्लॉक प्राप्त होगा।",
+  "Authorized Authority Role": "अधिकृत प्राधिकरण भूमिका",
+  "Restricted Resource / File": "प्रतिबंधित संसाधन / फ़ाइल",
+
+  // Verifier Tab (Image 3)
+  "PUBLIC VERIFIER": "सार्वजनिक सत्यापनकर्ता",
+  "Authorized Credential Verification Portal": "अधिकृत प्रमाणपत्र सत्यापन पोर्टल",
+  "Real-time verification of SD-JWT credentials against AICTE trust roots and national status lists": "एआईसीटीई ट्रस्ट रूट्स और राष्ट्रीय स्थिति सूचियों के विरुद्ध SD-JWT क्रेडेंशियल्स का रीयल-टाइम सत्यापन",
+  "AICTE Trust Root Connected": "एआईसीटीई ट्रस्ट रूट कनेक्टेड",
+  "Verify Student Presentation": "विद्यार्थी प्रस्तुति सत्यापित करें",
+  "Accepts raw SD-JWT presentation strings or full verification URLs generated from the Student Wallet": "छात्र वॉलेट से उत्पन्न रॉ SD-JWT प्रस्तुति स्ट्रिंग्स या पूर्ण सत्यापन URL स्वीकार करता है",
+  "Presentation Token / Share Link:": "प्रस्तुति टोकन / साझाकरण लिंक:",
+  "PRESENTATION TOKEN / SHARE LINK:": "प्रस्तुति टोकन / साझाकरण लिंक:",
+  "Presentation Token / Share Link": "प्रस्तुति टोकन / साझाकरण लिंक",
+  "PRESENTATION TOKEN / SHARE LINK": "प्रस्तुति टोकन / साझाकरण लिंक",
+  "Paste presentation string (eyJh...~WyJz...~eyJ0...) or http://localhost:5173/verify?presentation=...": "प्रस्तुति स्ट्रिंग पेस्ट करें (eyJh...~WyJz...~eyJ0...) या http://localhost:5173/verify?presentation=...",
+  "Verify Credential Presentation": "प्रमाणपत्र प्रस्तुति सत्यापित करें",
+  "Verifying Cryptographic Proofs...": "क्रिप्टोग्राफ़िक प्रमाण सत्यापित किए जा रहे हैं...",
+  "VALID CREDENTIAL": "मान्य प्रमाणपत्र",
+  "TRUSTED ISSUER": "विश्वसनीय जारीकर्ता",
+  "Cryptographic proofs validated: Ed25519 issuer signature intact • Hardware key binding verified": "क्रिप्टोग्राफ़िक प्रमाण मान्य: Ed25519 जारीकर्ता हस्ताक्षर बरकरार • हार्डवेयर कुंजी बाइंडिंग सत्यापित",
+  "Verified:": "सत्यापित:",
+  "INVALID CREDENTIAL": "अमान्य प्रमाणपत्र",
+  "TAMPER DETECTED": "छेड़छाड़ का पता चला",
+  "Checked:": "जांचा गया:",
+  "SUPERSEDED CREDENTIAL": "प्रतिस्थापित प्रमाणपत्र",
+  "NEW VERSION EXISTS": "नया संस्करण उपलब्ध है",
+  "A newer student record version exists; ask the holder for an updated verifiable credential.": "एक नया छात्र रिकॉर्ड संस्करण मौजूद है; धारक से एक अद्यतन सत्यापन योग्य प्रमाणपत्र मांगें।",
+  "SUSPENDED CREDENTIAL": "निलंबित प्रमाणपत्र",
+  "CONSENT WITHDRAWN": "सहमति वापस ली गई",
+  "Holder has withdrawn VERIFICATION_SHARE consent under Section 8.4. No student data is revealed.": "धारक ने धारा 8.4 के तहत VERIFICATION_SHARE सहमति वापस ले ली है। कोई छात्र डेटा प्रकट नहीं किया गया है।",
+  "Cryptographic Audit Proofs": "क्रिप्टोग्राफ़िक ऑडिट प्रमाण",
+  "Issuing Authority:": "जारीकर्ता प्राधिकरण:",
+  "Trust Registry Status:": "ट्रस्ट रजिस्ट्री स्थिति:",
+  "Verified AICTE Trust List": "सत्यापित एआईसीटीई ट्रस्ट सूची",
+  "Untrusted Authority": "अविश्वसनीय प्राधिकरण",
+  "Checked Timestamp:": "सत्यापन समय:",
+  "Hardware Key Binding:": "हार्डवेयर कुंजी बाइंडिंग:",
+  "✓ ECDSA P-256 Validated": "✓ ECDSA P-256 मान्य",
+  "Unbound": "अबाध्य (Unbound)",
+  "Verification Reasons & Statutory Checks:": "सत्यापन कारण एवं सांविधिक जांच:",
+  "Disclosed Student Attributes": "प्रकट की गई छात्र विशेषताएं (Claims)",
+  "Fields Revealed": "फ़ील्ड प्रकट किए गए",
+  "Selective disclosure zero-knowledge guarantee: non-disclosed claims were never transmitted to verifier": "चयनात्मक प्रकटीकरण ज़ीरो-नॉलेज गारंटी: अप्रकट दावे कभी भी सत्यापनकर्ता को प्रेषित नहीं किए गए",
+  "Claim Key": "दावा कुंजी (Claim Key)",
+  "Attribute Value": "विशेषता मान (Attribute Value)",
+  "Cryptographically Disclosed": "क्रिप्टोग्राफ़िक रूप से प्रकट",
+  "No claims disclosed because the holder has suspended verification consent under Section 8.4.": "कोई दावा प्रकट नहीं किया गया क्योंकि धारक ने धारा 8.4 के तहत सत्यापन सहमति को निलंबित कर दिया है।",
+  "No selective claims were disclosed in this presentation.": "इस प्रस्तुति में कोई चयनात्मक दावा प्रकट नहीं किया गया था।"
 };
 
 // Sorted keys by length descending to match longest phrases first
@@ -958,6 +1212,141 @@ export function translateText(text: string): string {
   // Pattern: "Streaming live telemetry from AICTE Verification Engine"
   if (/Streaming\s+live\s+telemetry\s+from\s+AICTE\s+Verification\s+Engine/i.test(result)) {
     result = result.replace(/Streaming\s+live\s+telemetry\s+from\s+AICTE\s+Verification\s+Engine/gi, 'एआईसीटीई सत्यापन इंजन से लाइव टेलीमेट्री स्ट्रीमिंग जारी');
+    hasMatch = true;
+  }
+
+  // --- Settings Tab Regex Patterns (Image 1) ---
+  // Pattern: "Institution Administration & सेटिंग्स" or "Institution Administration & Settings"
+  if (/Institution\s+Administration\s*&\s*(?:Settings|सेटिंग्स)/i.test(result)) {
+    result = result.replace(/Institution\s+Administration\s*&\s*(?:Settings|सेटिंग्स)/gi, 'संस्थान प्रशासन एवं सेटिंग्स');
+    hasMatch = true;
+  }
+
+  // Pattern: "Self-service institutional API keys..." or with "एपीआई कुंजियां"
+  if (/Self-service\s+institutional\s+(?:API\s+keys|एपीआई\s+कुंजियां)/i.test(result)) {
+    result = result.replace(/Self-service\s+institutional\s+(?:API\s+keys|एपीआई\s+कुंजियां)[^.]*/gi, 'स्वयं-सेवा संस्थागत एपीआई कुंजियां, टीम भूमिका आवंटन, वेबहुक, और सुरक्षा अनुपालन');
+    hasMatch = true;
+  }
+
+  // Pattern: "Institutional API Keys" or "Institutional एपीआई कुंजियां"
+  if (/Institutional\s+(?:API\s+Keys|एपीआई\s+कुंजियां)/i.test(result)) {
+    result = result.replace(/Institutional\s+(?:API\s+Keys|एपीआई\s+कुंजियां)/gi, 'संस्थागत एपीआई कुंजियां');
+    hasMatch = true;
+  }
+
+  // Pattern: "Provision high-throughput API credentials..." or with "उच्च-throughput"
+  if (/Provision\s+(?:high-throughput|उच्च-throughput)\s+API\s+credentials/i.test(result)) {
+    result = result.replace(/Provision\s+(?:high-throughput|उच्च-throughput)\s+API\s+credentials\s+for\s+programmatic\s+CSV\/JSON\s+ingestion\s+from\s+your\s+campus\s+ERP/gi, 'अपने कैंपस ERP से प्रोग्रामेटिक CSV/JSON अंतर्ग्रहण हेतु उच्च-थ्रूपुट एपीआई क्रेडेंशियल्स प्राप्त करें');
+    hasMatch = true;
+  }
+
+  // Pattern: "+ Generate New Key" or "+ Generate नई Key" or "Generate New Key" or "Generate नई Key"
+  if (/(\+?\s*)Generate\s+(?:New|नई)\s+Key/i.test(result)) {
+    result = result.replace(/(\+?\s*)Generate\s+(?:New|नई)\s+Key/gi, '$1नई कुंजी बनाएं');
+    hasMatch = true;
+  }
+
+  // --- Reports Tab Regex Patterns (Image 2) ---
+  // Pattern: "প্রতিवेदन एवं सांविधिक लेखापरीक्षा · Generate AICTE policy reports..." or "Generate AICTE policy reports..."
+  if (/Generate\s+AICTE\s+policy\s+reports,\s*NBA\/NAAC\s+accreditation\s+summaries/i.test(result)) {
+    result = result.replace(/(?:प्रतिवेदन\s+एवं\s+सांविधिक\s+लेखापरीक्षा\s*·\s*)?Generate\s+AICTE\s+policy\s+reports,\s*NBA\/NAAC\s+accreditation\s+summaries,\s*intake\s+monitoring,\s*and\s*reservation\s+compliance\s+packages\.?/gi, 'प्रतिवेदन एवं सांविधिक लेखापरीक्षा · एआईसीटीई नीति रिपोर्ट, NBA/NAAC प्रत्यायन सारांश, प्रवेश निगरानी और आरक्षण अनुपालन पैकेज तैयार करें।');
+    hasMatch = true;
+  }
+
+  // Pattern: "National intake ceilings, excess enrollments..." or with "अतिरिक्त enrollments"
+  if (/National\s+intake\s+ceilings,\s*(?:excess|अतिरिक्त)\s+enrollments/i.test(result)) {
+    result = result.replace(/National\s+intake\s+ceilings,\s*(?:excess|अतिरिक्त)\s+enrollments,\s*and\s*state\s+seat\s+utilization\.?/gi, 'राष्ट्रीय प्रवेश सीमाएं, अतिरिक्त नामांकन, और राज्य सीट उपयोग।');
+    hasMatch = true;
+  }
+
+  // Pattern: "NBA/NAAC multi-tab student intake..." or with "विद्यार्थी intake"
+  if (/NBA\/NAAC\s+multi-tab\s+(?:student|विद्यार्थी)\s+intake/i.test(result)) {
+    result = result.replace(/NBA\/NAAC\s+multi-tab\s+(?:student|विद्यार्थी)\s+intake,\s*faculty\s+ratios,\s*and\s*referential\s+integrity\.?/gi, 'NBA/NAAC बहु-टैब छात्र प्रवेश, संकाय अनुपात, और संदर्भात्मक सत्यनिष्ठा।');
+    hasMatch = true;
+  }
+
+  // Pattern: "Supernumerary schemes..." or "अतिरिक्त सीटें (Supernumerary) schemes..."
+  if (/(?:Supernumerary|अतिरिक्त\s+सीटें\s*\(Supernumerary\))\s+schemes/i.test(result)) {
+    result = result.replace(/(?:Supernumerary|अतिरिक्त\s+सीटें\s*\(Supernumerary\))\s+schemes\s*\(TFW\/PMSSS\/JK\),\s*NRI\/OCI\/FN\s+shares\s+by\s+state\.?/gi, 'अतिरिक्त सीटें (सुपरन्यूमरेरी योजनाएं - TFW/PMSSS/JK), राज्यवार NRI/OCI/FN हिस्सेदारी।');
+    hasMatch = true;
+  }
+
+  // Pattern: "Statutory GEN/OBC..." or with "अन्य पिछड़ा वर्ग" and "कोटा audit"
+  if (/Statutory\s+GEN\/(?:OBC|अन्य\s+पिछड़ा\s+वर्ग\s*\(OBC\))/i.test(result)) {
+    result = result.replace(/Statutory\s+GEN\/(?:OBC|अन्य\s+पिछड़ा\s+वर्ग\s*\(OBC\))\/SC\/ST\/(?:EWS|आर्थिक\s+रूप\s+से\s+कमजोर\s+वर्ग\s*\(EWS\))\s+breakdown\s+and\s+(?:quota|कोटा)\s+audit\s+certificate\.?/gi, 'सांविधिक GEN/OBC/SC/ST/EWS विवरण और कोटा ऑडिट प्रमाणपत्र।');
+    hasMatch = true;
+  }
+
+  // Pattern: "2026-27 (Current Active Batch)" or "(Current सत्रिम Batch)"
+  if (/(\d{4}-\d{2})\s*\((?:Current\s+Active\s+Batch|Current\s+सत्र(?:िम)?\s+Batch)\)/i.test(result)) {
+    result = result.replace(/(\d{4}-\d{2})\s*\((?:Current\s+Active\s+Batch|Current\s+सत्र(?:िम)?\s+Batch)\)/gi, '$1 (वर्तमान सक्रिय बैच)');
+    hasMatch = true;
+  }
+
+  // Pattern: "All India (National Aggregation)" or "सभी India (National Aggregation)"
+  if (/(?:All|सभी)\s+India\s*\(National\s+Aggregation\)/i.test(result)) {
+    result = result.replace(/(?:All|सभी)\s+India\s*\(National\s+Aggregation\)/gi, 'अखिल भारतीय (राष्ट्रीय संकलन)');
+    hasMatch = true;
+  }
+
+  // Pattern: "All Disciplines & Programs" or "सभी Disciplines & Programs"
+  if (/(?:All|सभी)\s+Disciplines\s*&\s*Programs/i.test(result)) {
+    result = result.replace(/(?:All|सभी)\s+Disciplines\s*&\s*Programs/gi, 'सभी विषय एवं कार्यक्रम');
+    hasMatch = true;
+  }
+
+  // Pattern: "5. RESERVATION Category" or "5. RESERVATION श्रेणी"
+  if (/5\.\s*RESERVATION\s*(?:Category|श्रेणी)/i.test(result)) {
+    result = result.replace(/5\.\s*RESERVATION\s*(?:Category|श्रेणी)/gi, '5. आरक्षण श्रेणी');
+    hasMatch = true;
+  }
+
+  // Pattern: "All Social Categories" or "सभी Social Categories"
+  if (/(?:All|सभी)\s+Social\s+Categories/i.test(result)) {
+    result = result.replace(/(?:All|सभी)\s+Social\s+Categories/gi, 'सभी सामाजिक श्रेणियां');
+    hasMatch = true;
+  }
+
+  // Pattern: "Search reports..." or "खोजें reports..."
+  if (/(?:Search|खोजें)\s+reports\.\.\./i.test(result)) {
+    result = result.replace(/(?:Search|खोजें)\s+reports\.\.\./gi, 'रिपोर्ट खोजें...');
+    hasMatch = true;
+  }
+
+  // Pattern: "All Types" or "सभी Types"
+  if (/(?:All|सभी)\s+Types/i.test(result)) {
+    result = result.replace(/(?:All|सभी)\s+Types/gi, 'सभी प्रकार');
+    hasMatch = true;
+  }
+
+  // Pattern: "All Formats" or "सभी Formats"
+  if (/(?:All|सभी)\s+Formats/i.test(result)) {
+    result = result.replace(/(?:All|सभी)\s+Formats/gi, 'सभी प्रारूप');
+    hasMatch = true;
+  }
+
+  // --- Verifier Tab Regex Patterns (Image 3) ---
+  // Pattern: "Real-time verification of SD-JWT credentials against AICTE trust roots and national status lists" or "...national स्थिति lists"
+  if (/Real-time\s+verification\s+of\s+SD-JWT\s+credentials\s+against\s+AICTE\s+trust\s+roots\s+and\s+national\s+(?:status|स्थिति)\s+lists/i.test(result)) {
+    result = result.replace(/Real-time\s+verification\s+of\s+SD-JWT\s+credentials\s+against\s+AICTE\s+trust\s+roots\s+and\s+national\s+(?:status|स्थिति)\s+lists/gi, 'एआईसीटीई ट्रस्ट रूट्स और राष्ट्रीय स्थिति सूचियों के विरुद्ध SD-JWT क्रेडेंशियल्स का रीयल-टाइम सत्यापन');
+    hasMatch = true;
+  }
+
+  // Pattern: "Verify Student Presentation" or "Verify विद्यार्थी Presentation"
+  if (/Verify\s+(?:Student|विद्यार्थी)\s+Presentation/i.test(result)) {
+    result = result.replace(/Verify\s+(?:Student|विद्यार्थी)\s+Presentation/gi, 'विद्यार्थी प्रस्तुति सत्यापित करें');
+    hasMatch = true;
+  }
+
+  // Pattern: "Accepts raw SD-JWT presentation strings or full verification URLs generated from the Student Wallet" or "...from the छात्र वॉलेट"
+  if (/Accepts\s+raw\s+SD-JWT\s+presentation\s+strings\s+or\s+full\s+verification\s+URLs\s+generated\s+from\s+the\s+(?:Student\s+Wallet|छात्र\s+वॉलेट)/i.test(result)) {
+    result = result.replace(/Accepts\s+raw\s+SD-JWT\s+presentation\s+strings\s+or\s+full\s+verification\s+URLs\s+generated\s+from\s+the\s+(?:Student\s+Wallet|छात्र\s+वॉलेट)/gi, 'छात्र वॉलेट से उत्पन्न रॉ SD-JWT प्रस्तुति स्ट्रिंग्स या पूर्ण सत्यापन URL स्वीकार करता है');
+    hasMatch = true;
+  }
+
+  // Pattern: "Verify Credential Presentation" or "प्रमाणपत्र सत्यापित करें Presentation"
+  if (/(?:Verify\s+Credential|प्रमाणपत्र\s+सत्यापित\s+करें)\s+Presentation/i.test(result)) {
+    result = result.replace(/(?:Verify\s+Credential|प्रमाणपत्र\s+सत्यापित\s+करें)\s+Presentation/gi, 'प्रमाणपत्र प्रस्तुति सत्यापित करें');
     hasMatch = true;
   }
 
