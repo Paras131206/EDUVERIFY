@@ -8,7 +8,6 @@ import {
   Layers,
   CheckSquare,
   ArrowLeftRight,
-  ShieldCheck,
   Wallet,
   FileBarChart2,
   Settings,

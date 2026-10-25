@@ -36,8 +36,6 @@ export const StudentWalletPage: React.FC = () => {
 
   // WebCrypto Holder Key State
   const [holderPrivateKey, setHolderPrivateKey] = useState<CryptoKey | null>(null);
-  const [publicJwk, setPublicJwk] = useState<JsonWebKey | null>(null);
-  const [isKeyRegistered, setIsKeyRegistered] = useState<boolean>(false);
 
   // Modals
   const [selectedCredForShare, setSelectedCredForShare] = useState<StudentCredentialItem | null>(null);
@@ -60,8 +58,6 @@ export const StudentWalletPage: React.FC = () => {
     try {
       const keyResult = await getOrInitHolderKey(true);
       setHolderPrivateKey(keyResult.privateKey);
-      setPublicJwk(keyResult.publicJwk);
-      setIsKeyRegistered(true);
     } catch (err) {
       console.warn('Holder key initialization notice:', err);
     }

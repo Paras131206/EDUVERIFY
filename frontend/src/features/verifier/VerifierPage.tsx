@@ -11,7 +11,6 @@ import {
   AlertTriangle,
   Clock,
   Ban,
-  Users,
 } from 'lucide-react';
 
 export const VerifierPage: React.FC = () => {

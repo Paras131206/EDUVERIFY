@@ -15,7 +15,6 @@ import {
   X,
   ExternalLink,
   Building,
-  Users,
 } from 'lucide-react';
 
 interface SharePresentationModalProps {
@@ -28,7 +27,6 @@ interface SharePresentationModalProps {
 
 export const SharePresentationModal: React.FC<SharePresentationModalProps> = ({
   credential,
-  userConsents = [],
   isOpen,
   onClose,
   holderPrivateKey,
