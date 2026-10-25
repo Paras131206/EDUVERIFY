@@ -110,7 +110,7 @@ export const Step4Summary: React.FC<Step4SummaryProps> = ({ batchId, onReset }) 
           </div>
           <h3 className="text-xl font-bold text-gov-navy mt-1">Ingestion & Quality Summary</h3>
           <p className="text-xs text-slate-500 mt-0.5">
-            AICTE Demographics and Rule Catalog v0.1.0 executed across {rows_total} candidate records.
+            {`AICTE Demographics and Rule Catalog v0.1.0 executed across ${rows_total} candidate records.`}
           </p>
         </div>
 
@@ -171,9 +171,7 @@ export const Step4Summary: React.FC<Step4SummaryProps> = ({ batchId, onReset }) 
             <div className="text-xs text-amber-800 space-y-1">
               {schema_drift.map((drift, idx) => (
                 <p key={idx}>
-                  Header &apos;<strong>{drift.column}</strong>&apos; has shifted from canonical &apos;
-                  <strong>{drift.previous}</strong>&apos; ({drift.kind}). Column mapping profile updated
-                  to maintain backward compatibility.
+                  {`Header '${drift.column}' has shifted from canonical '${drift.previous}' (${drift.kind}). Column mapping profile updated to maintain backward compatibility.`}
                 </p>
               ))}
             </div>
@@ -405,8 +403,7 @@ export const Step4Summary: React.FC<Step4SummaryProps> = ({ batchId, onReset }) 
             Next Step: Human-in-the-Loop Issue Resolution
           </h4>
           <p className="text-xs text-slate-600">
-            {rows_error} error(s) and {rows_warning} warning(s) require review. You can accept automated
-            suggestions, edit cells with inline rationale, or dismiss items.
+            {`${rows_error} error(s) and ${rows_warning} warning(s) require review. You can accept automated suggestions, edit cells with inline rationale, or dismiss items.`}
           </p>
         </div>
 

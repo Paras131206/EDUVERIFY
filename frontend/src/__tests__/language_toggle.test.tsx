@@ -171,5 +171,83 @@ describe('Site-Wide Language Translation System', () => {
     expect(translateText('Streaming live telemetry from AICTE Verification Engine'))
       .toBe('एआईसीटीई सत्यापन इंजन से लाइव टेलीमेट्री स्ट्रीमिंग जारी');
   });
+
+  it('translates all elements from Institution Dashboard screenshots (Screenshots 1, 2, 3)', () => {
+    // Toolbar buttons
+    expect(translateText('Reset Stats to Zero')).toBe('आंकड़े शून्य पर रीसेट करें');
+    expect(translateText('Reset stats to zero to simulate fresh state'))
+      .toBe('ताज़ा स्थिति का अनुकरण करने के लिए आंकड़े शून्य पर रीसेट करें');
+    expect(translateText('Authority File Link')).toBe('प्राधिकरण फ़ाइल लिंक');
+    expect(translateText('Authority फ़ाइल Link')).toBe('प्राधिकरण फ़ाइल लिंक');
+    expect(translateText('Load Demo Document')).toBe('डेमो दस्तावेज़ लोड करें');
+
+    // Deduplication Engine Banner (Screenshot 1)
+    expect(translateText('Institution-Wide & Cross-Institution Deduplication Engine'))
+      .toBe('संस्थान-व्यापी एवं अंतर-संस्थान डुप्लिकेट पहचान इंजन');
+    expect(translateText('Rules V007 · V008 · V010 · V011')).toBe('नियम V007 · V008 · V010 · V011');
+    expect(translateText('Rules V001 · V002')).toBe('नियम V001 · V002');
+    expect(translateText('Biometric Soundex & Jaro-Winkler phonetic algorithms continuously check duplicates across all batches in this institution as well as cross-institutional dual-enrolments in the National AICTE Central Repository.'))
+      .toBe('बायोमेट्रिक साउंडेक्स और जेरो-विंकलर ध्वन्यात्मक एल्गोरिदम इस संस्थान के सभी बैचों के साथ-साथ राष्ट्रीय एआईसीटीई केंद्रीय भंडार में अंतर-संस्थागत दोहरे नामांकनों की निरंतर जांच करते हैं।');
+    expect(translateText('Biometric Soundex & Jaro-Winkler phonetic algorithms continuously check duplicates across सभी batches in this institution as well as cross-institutional dual-enrolments in the National AICTE Central Repository.'))
+      .toBe('बायोमेट्रिक साउंडेक्स और जेरो-विंकलर ध्वन्यात्मक एल्गोरिदम इस संस्थान के सभी बैचों के साथ-साथ राष्ट्रीय एआईसीटीई केंद्रीय भंडार में अंतर-संस्थागत दोहरे नामांकनों की निरंतर जांच करते हैं।');
+    expect(translateText('Intra-Batch Duplicates: None')).toBe('अंतः-बैच डुप्लिकेट: कोई नहीं');
+    expect(translateText('Intra-Batch Duplicates: None Detected')).toBe('अंतः-बैच डुप्लिकेट: कोई नहीं मिला');
+    expect(translateText('Cross-Institution Matches: 1 Flagged')).toBe('अंतर-संस्थान मिलान: 1 ध्वजांकित');
+    expect(translateText('Inspect Deduplication Resolution Desk')).toBe('डुप्लिकेट समाधान डेस्क का निरीक्षण करें');
+    expect(translateText('निरीक्षण करें Deduplication Resolution Desk')).toBe('डुप्लिकेट समाधान डेस्क का निरीक्षण करें');
+
+    // Empty / Reset State Banner & Cards (Screenshot 2)
+    expect(translateText('No Student Data Uploaded Yet')).toBe('अभी तक कोई छात्र डेटा अपलोड नहीं हुआ');
+    expect(translateText('No विद्यार्थी Data Uploaded Yet')).toBe('अभी तक कोई छात्र डेटा अपलोड नहीं हुआ');
+    expect(translateText("No student admission batches have been ingested yet. All enrolment statistics, data quality scores, and statutory validation checks are currently set to zero. Upload your institution's batch file or load the demo document to populate real-time analytics."))
+      .toBe('अभी तक कोई छात्र प्रवेश बैच अंतर्ग्रहीत नहीं किया गया है। सभी नामांकन आंकड़े, डेटा गुणवत्ता स्कोर और वैधानिक सत्यापन वर्तमान में शून्य पर सेट हैं। वास्तविक समय के विश्लेषण देखने के लिए अपने संस्थान की बैच फ़ाइल अपलोड करें या डेमो दस्तावेज़ लोड करें।');
+    expect(translateText('Awaiting batch data upload')).toBe('बैच डेटा अपलोड की प्रतीक्षा है');
+    expect(translateText('No student records uploaded')).toBe('कोई छात्र रिकॉर्ड अपलोड नहीं हुआ');
+    expect(translateText('No विद्यार्थी रिकॉर्ड uploaded')).toBe('कोई छात्र रिकॉर्ड अपलोड नहीं हुआ');
+    expect(translateText('No Issues Pending')).toBe('कोई मुद्दा लंबित नहीं');
+    expect(translateText('No Issues लंबित')).toBe('कोई मुद्दा लंबित नहीं');
+
+    // Empty Chart & Card Placeholders (Screenshot 3)
+    expect(translateText('No Historical Batch Data')).toBe('कोई ऐतिहासिक बैच डेटा नहीं');
+    expect(translateText('Batch-by-batch data quality progression will plot here automatically once batches are uploaded and validated.'))
+      .toBe('बैच अपलोड और सत्यापित होने के बाद बैच-वार डेटा गुणवत्ता प्रगति यहाँ स्वतः प्रदर्शित होगी।');
+    expect(translateText('No Enrolment Records')).toBe('कोई नामांकन रिकॉर्ड नहीं');
+    expect(translateText('No Enrolment रिकॉर्ड')).toBe('कोई नामांकन रिकॉर्ड नहीं');
+    expect(translateText('Intake ceiling comparisons per program will populate once student admission batches are uploaded.'))
+      .toBe('छात्र प्रवेश बैच अपलोड होने के बाद कार्यक्रम-वार प्रवेश सीमा तुलना यहाँ प्रदर्शित होगी।');
+    expect(translateText('No Open Issues')).toBe('कोई सक्रिय मुद्दा नहीं');
+    expect(translateText('No सक्रिय मुद्दे')).toBe('कोई सक्रिय मुद्दा नहीं');
+    expect(translateText('No data uploaded yet. Ingest student admission records to run statutory validation checks.'))
+      .toBe('अभी तक कोई डेटा अपलोड नहीं हुआ। वैधानिक सत्यापन जांच चलाने के लिए छात्र प्रवेश रिकॉर्ड अंतर्ग्रहीत करें।');
+    expect(translateText('No Notifications')).toBe('कोई सूचना नहीं');
+    expect(translateText('Regulatory alerts, deadline notices, and ingestion events will appear here once active.'))
+      .toBe('सक्रिय होने पर नियामक अलर्ट, अंतिम तिथि नोटिस और अंतर्ग्रहण घटनाएं यहाँ दिखाई देंगी।');
+  });
+
+  it('translates Step 4 Validation Summary screenshot elements (Screenshots 4, 5)', () => {
+    // Subtitle dynamic sentence
+    expect(translateText('AICTE Demographics and Rule Catalog v0.1.0 executed across 65 candidate records.'))
+      .toBe('एआईसीटीई जनसांख्यिकी एवं नियम कैटलॉग v0.1.0 को 65 उम्मीदवार रिकॉर्ड पर निष्पादित किया गया।');
+    expect(translateText('AICTE Demographics and Rule Catalog v0.1.0 executed across 65 candidate रिकॉर्ड.'))
+      .toBe('एआईसीटीई जनसांख्यिकी एवं नियम कैटलॉग v0.1.0 को 65 उम्मीदवार रिकॉर्ड पर निष्पादित किया गया।');
+
+    // Schema Drift alert banner
+    expect(translateText("Header 'PRN' has shifted from canonical 'institution_student_id' (COLUMN_RENAMED). Column mapping profile updated to maintain backward compatibility."))
+      .toBe("शीर्षक 'PRN' प्रामाणिक 'institution_student_id' (COLUMN_RENAMED) से परिवर्तित हुआ है। पश्चगामी संगतता बनाए रखने के लिए कॉलम मैपिंग प्रोफ़ाइल अद्यतन की गई।");
+    expect(translateText("' (COLUMN_RENAMED). Column mapping profile updated to maintain backward compatibility."))
+      .toBe("' (COLUMN_RENAMED) से बदला है। पश्चगामी संगतता बनाए रखने के लिए कॉलम मैपिंग प्रोफ़ाइल अद्यतन की गई।");
+
+    // Review Bucket Queue
+    expect(translateText('Auto Flag')).toBe('स्वतः चिह्नित');
+
+    // Next Step issue resolution callout
+    expect(translateText('12 error(s) and 5 warning(s) require review. You can accept automated suggestions, edit cells with inline rationale, or dismiss items.'))
+      .toBe('12 त्रुटि(यां) और 5 चेतावनी(यां) समीक्षा योग्य हैं। आप स्वचालित सुझाव स्वीकार कर सकते हैं, इनलाइन औचित्य के साथ सेल संपादित कर सकते हैं, या खारिज कर सकते हैं।');
+    expect(translateText('12 त्रुटि(s) and 5 चेतावनी(s) require review. You can accept automated suggestions, संपादित करें cells with inline rationale, or dismiss items.'))
+      .toBe('12 त्रुटि(यां) और 5 चेतावनी(यां) समीक्षा योग्य हैं। आप स्वचालित सुझाव स्वीकार कर सकते हैं, इनलाइन औचित्य के साथ सेल संपादित कर सकते हैं, या खारिज कर सकते हैं।');
+    expect(translateText(' error(s) and ')).toBe(' त्रुटि(यां) और ');
+    expect(translateText(' warning(s) require review. You can accept automated suggestions, edit cells with inline rationale, or dismiss items.'))
+      .toBe(' चेतावनी(यां) समीक्षा योग्य हैं। आप स्वचालित सुझाव स्वीकार कर सकते हैं, इनलाइन औचित्य के साथ सेल संपादित कर सकते हैं, या खारिज कर सकते हैं।');
+  });
 });
 
