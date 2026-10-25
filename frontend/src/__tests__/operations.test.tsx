@@ -277,6 +277,35 @@ describe('Task A4: Institution Operations & Lifecycle Management', () => {
       });
     });
 
+    it('source institution can reject incoming transfer with structured reason and preset', async () => {
+      renderComponent(<TransfersPage />, '/institution/transfers');
+
+      await waitFor(() => {
+        expect(screen.getByText('TR-2026-0881')).toBeInTheDocument();
+      });
+
+      const rejectBtn = screen.getByTestId('reject-transfer-TR-2026-0881');
+      fireEvent.click(rejectBtn);
+
+      await waitFor(() => {
+        expect(screen.getByText(/reject transfer request/i)).toBeInTheDocument();
+        expect(screen.getByText(/notice: rejecting will deny this transfer request/i)).toBeInTheDocument();
+      });
+
+      // Select preset chip
+      fireEvent.click(screen.getByRole('button', { name: /intake exceeded/i }));
+
+      // Confirm REJECTED
+      fireEvent.click(screen.getByRole('button', { name: /confirm REJECTED/i }));
+
+      await waitFor(() => {
+        expect(screen.getAllByText('REJECTED').length).toBeGreaterThanOrEqual(2);
+        expect(
+          screen.getByText('Sanctioned intake capacity exceeded in target academic program')
+        ).toBeInTheDocument();
+      });
+    });
+
     it('creates outgoing transfer request with APAAR ID and source institution search', async () => {
       renderComponent(<TransfersPage />, '/institution/transfers');
 
@@ -433,20 +462,12 @@ describe('Task A4: Institution Operations & Lifecycle Management', () => {
   });
 
   describe('5. Institution Portal (/institution)', () => {
-    it('renders zero stats initially, shows no data uploaded message, and loads demo document stats on demand', async () => {
-      localStorage.removeItem('eduverify_data_uploaded');
+    it('renders institution portal overview metrics and ensures load demo doc button and banner are absent', async () => {
       renderComponent(<InstitutionDashboardPage />, '/institution');
 
       expect(screen.getByText(/institution (portal|dashboard)/i)).toBeInTheDocument();
-      expect(screen.getByText(/no student data uploaded/i)).toBeInTheDocument();
-
-      // Initially zero stats
-      expect(screen.getByText('0')).toBeInTheDocument();
-      expect(screen.getByText(/0\.0%/)).toBeInTheDocument();
-
-      // Click "Load Demo Document"
-      const loadDemoBtns = screen.getAllByRole('button', { name: /load demo document/i });
-      fireEvent.click(loadDemoBtns[0]);
+      expect(screen.queryByText(/load demo document/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/no student data uploaded/i)).not.toBeInTheDocument();
 
       await waitFor(() => {
         expect(screen.getByTestId('kpi-dq-score')).toBeInTheDocument();
@@ -455,7 +476,7 @@ describe('Task A4: Institution Operations & Lifecycle Management', () => {
         expect(screen.getByTestId('kpi-open-issues')).toBeInTheDocument();
       });
 
-      // Check populated stats after demo document loaded
+      // Check populated stats
       expect(screen.getByText('480')).toBeInTheDocument();
       expect(screen.getByText(/92\.3%/)).toBeInTheDocument();
 
