@@ -32,7 +32,7 @@ interface Step2MappingProps {
   autoMapCanonicalFields?: boolean;
 }
 
-export const autoMapRemainingFields = (
+const autoMapRemainingFields = (
   currentMappings: ColumnMappingItem[],
   academicYearStr: string
 ): ColumnMappingItem[] => {
