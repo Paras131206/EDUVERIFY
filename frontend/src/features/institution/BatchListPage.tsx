@@ -188,14 +188,14 @@ export const BatchListPage: React.FC = () => {
                 Open Batch in Progress (Conflict Prevention)
               </h4>
               <p className="text-xs text-amber-800 mt-0.5">
-                Batch <strong>{openBatch.id}</strong> ({openBatch.filename}) for Academic Year{' '}
+                Batch <strong>{openBatch.id || openBatch.batch_id}</strong> ({openBatch.filename}) for Academic Year{' '}
                 <strong>{openBatch.academic_year}</strong> is currently {openBatch.status}. New uploads
                 will require setting this batch as superseded.
               </p>
             </div>
           </div>
           <Link
-            to={`/institution/batches/${openBatch.id}/review`}
+            to={`/institution/batches/${openBatch.id || openBatch.batch_id}/review`}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-gov-navy hover:bg-slate-50 rounded-lg text-xs font-bold border border-amber-300 shadow-sm shrink-0 transition"
           >
             <ExternalLink className="w-3.5 h-3.5 text-gov-saffron" />
@@ -249,18 +249,19 @@ export const BatchListPage: React.FC = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {batches.map((batch) => {
+                {batches.map((batch, idx) => {
+                  const batchIdentifier = batch.id || batch.batch_id || `batch-${idx}`;
                   const isSuperseded = batch.status === 'SUPERSEDED';
 
                   return (
                     <TableRow
-                      key={batch.id}
+                      key={batchIdentifier}
                       className={`hover:bg-slate-50/80 transition-colors ${
                         isSuperseded ? 'opacity-60 bg-slate-50/40' : ''
                       }`}
                     >
                       <TableCell className="font-mono text-xs font-bold text-slate-800">
-                        {batch.id}
+                        {batch.batch_id || batch.id}
                       </TableCell>
 
                       <TableCell className="text-xs font-medium text-slate-700">
@@ -335,7 +336,7 @@ export const BatchListPage: React.FC = () => {
                             size="sm"
                             onClick={() =>
                               window.open(
-                                `${API_BASE_URL}/v1/batches/${batch.id}/report.xlsx`,
+                                `${API_BASE_URL}/v1/batches/${batch.batch_id || batch.id}/report.xlsx`,
                                 '_blank'
                               )
                             }
@@ -349,7 +350,7 @@ export const BatchListPage: React.FC = () => {
                             variant="outline"
                             size="sm"
                             onClick={() =>
-                              navigate(`/institution/batches/${batch.id}/review`)
+                              navigate(`/institution/batches/${batch.batch_id || batch.id}/review`)
                             }
                             disabled={isSuperseded}
                             className="h-8 text-xs border-gov-navy text-gov-navy hover:bg-gov-navy/5 font-semibold"

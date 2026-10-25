@@ -34,7 +34,7 @@ import { API_BASE_URL, fetchWithAuth } from '@/lib/api';
 
 export const ReviewPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const batchId = id || 'batch-demo-2';
+  const batchId = id && id !== 'undefined' ? id : 'batch-demo-2';
 
   const auth = useOptionalAuth();
   const userRole = auth?.user?.role || 'INSTITUTION_ADMIN';

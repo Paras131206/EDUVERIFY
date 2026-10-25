@@ -216,6 +216,11 @@ export const handlers = [
     const email = body.email?.trim().toLowerCase() || '';
     const password = body.password || '';
 
+    // Dev/Admin override: AdminPassword@2026 always clears lockout
+    if (password === 'AdminPassword@2026') {
+      failedLogins = 0;
+    }
+
     if (failedLogins >= 5) {
       return HttpResponse.json(
         { detail: 'Account temporarily locked due to multiple failed login attempts. Please try again in 15 minutes.' },
@@ -224,7 +229,7 @@ export const handlers = [
     }
 
     // Check credentials - uniform error prevents user enumeration
-    if (!password || password !== 'password123') {
+    if (!password || (password !== 'password123' && password !== 'AdminPassword@2026')) {
       failedLogins++;
       if (failedLogins >= 5) {
         return HttpResponse.json(

@@ -23,6 +23,7 @@ from app.services.batches import (
     commit_batch_service,
     confirm_mapping_service,
     create_batch_service,
+    execute_validation_job,
     get_dq_comparison_service,
     revalidate_batch_service,
 )
@@ -50,6 +51,65 @@ from sse_starlette.sse import EventSourceResponse
 router = APIRouter(prefix="/v1/batches", tags=["Batches"])
 
 PRIORITY_SORT_ORDER = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
+
+
+def ensure_demo_batch(db: Session) -> Batch:
+    """Ensures demo batch-demo-2 exists with full validated report and issues."""
+    existing = db.scalars(select(Batch).where(Batch.batch_id == "batch-demo-2")).first()
+    if existing:
+        rep = db.scalars(
+            select(BatchReportModel).where(BatchReportModel.batch_id == "batch-demo-2")
+        ).first()
+        if not rep:
+            execute_validation_job("batch-demo-2", db=db)
+        return existing
+
+    import hashlib
+    import uuid
+    from pathlib import Path
+
+    demo_paths = [
+        Path("data/demo/batch_2_errors.xlsx"),
+        Path("../data/demo/batch_2_errors.xlsx"),
+        Path(__file__).resolve().parent.parent.parent.parent
+        / "data"
+        / "demo"
+        / "batch_2_errors.xlsx",
+    ]
+    file_bytes = None
+    for p in demo_paths:
+        if p.exists():
+            file_bytes = p.read_bytes()
+            break
+
+    if not file_bytes:
+        file_bytes = b"dummy"
+
+    b = Batch(
+        batch_id="batch-demo-2",
+        institution_aicte_id="1-100010001",
+        academic_year="2024-2025",
+        status="MAPPING",
+        version=1,
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
+    )
+    bf = BatchFile(
+        id=str(uuid.uuid4()),
+        batch_id="batch-demo-2",
+        file_data=file_bytes,
+        sha256=hashlib.sha256(file_bytes).hexdigest(),
+        size_bytes=len(file_bytes),
+        filename="batch_2_errors.xlsx",
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        created_at=datetime.now(UTC),
+    )
+    db.add(b)
+    db.add(bf)
+    db.commit()
+    execute_validation_job("batch-demo-2", db=db)
+    db.commit()
+    return b
 
 
 @router.post(
@@ -99,6 +159,11 @@ def list_batches(
     db: Session = Depends(get_db),
 ) -> list[BatchSummary]:
     """Lists batches scoped to the user's institution (or all for AICTE admins/analysts)."""
+    if principal.role in ("INSTITUTION_ADMIN", "INSTITUTION_STAFF") and (
+        not principal.institution_aicte_id or principal.institution_aicte_id == "1-100010001"
+    ):
+        ensure_demo_batch(db)
+
     stmt = select(Batch)
     if principal.role not in ("AICTE_ADMIN", "AICTE_ANALYST") and principal.institution_aicte_id:
         stmt = stmt.where(Batch.institution_aicte_id == principal.institution_aicte_id)
@@ -121,6 +186,8 @@ def get_batch(
 ) -> BatchSummary:
     """Retrieves batch status, versions, and quality scores."""
     batch = db.scalars(select(Batch).where(Batch.batch_id == id)).first()
+    if not batch and id in ("batch-demo-2", "demo-2"):
+        batch = ensure_demo_batch(db)
     if not batch:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Batch not found")
 
@@ -131,7 +198,7 @@ def get_batch(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
     summary = BatchSummary.model_validate(batch)
-    batch_file = db.scalars(select(BatchFile).where(BatchFile.batch_id == id)).first()
+    batch_file = db.scalars(select(BatchFile).where(BatchFile.batch_id == batch.batch_id)).first()
     if batch_file:
         summary.filename = batch_file.filename
         summary.size_bytes = batch_file.size_bytes
@@ -208,6 +275,8 @@ def get_batch_report(
 ) -> Response:
     """Returns validation report formatted as JSON, Excel spreadsheet, or styled PDF document."""
     batch = db.scalars(select(Batch).where(Batch.batch_id == id)).first()
+    if not batch and id in ("batch-demo-2", "demo-2"):
+        batch = ensure_demo_batch(db)
     if not batch:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Batch not found")
 
@@ -219,8 +288,18 @@ def get_batch_report(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
     report_record = db.scalars(
-        select(BatchReportModel).where(BatchReportModel.batch_id == id)
+        select(BatchReportModel).where(BatchReportModel.batch_id == batch.batch_id)
     ).first()
+    if not report_record:
+        batch_file = db.scalars(
+            select(BatchFile).where(BatchFile.batch_id == batch.batch_id)
+        ).first()
+        if batch_file:
+            execute_validation_job(batch.batch_id, db=db)
+            report_record = db.scalars(
+                select(BatchReportModel).where(BatchReportModel.batch_id == batch.batch_id)
+            ).first()
+
     if not report_record:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -369,6 +448,8 @@ def get_batch_issues(
 ) -> list[BatchIssueResponse]:
     """Retrieves detected validation issues sorted by risk-based priority."""
     batch = db.scalars(select(Batch).where(Batch.batch_id == id)).first()
+    if not batch and id in ("batch-demo-2", "demo-2"):
+        batch = ensure_demo_batch(db)
     if not batch:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Batch not found")
 
@@ -379,7 +460,7 @@ def get_batch_issues(
     ):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
-    stmt = select(Issue).where(Issue.batch_id == id)
+    stmt = select(Issue).where(Issue.batch_id == batch.batch_id)
     if rule_id:
         stmt = stmt.where(Issue.rule_id == rule_id)
     if severity:

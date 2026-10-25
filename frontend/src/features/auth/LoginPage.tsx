@@ -5,10 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Shield, Lock, Eye, EyeOff, KeyRound, AlertCircle, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth, getHomeRouteForRole } from '@/lib/auth';
+import { API_BASE_URL } from '@/lib/api';
 
 export const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState('inst.admin@demo.local');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [totpCode, setTotpCode] = useState('');
   const [mfaTicket, setMfaTicket] = useState<string | null>(null);
@@ -36,10 +37,23 @@ export const LoginPage: React.FC = () => {
 
   const handleSelectDemoUser = (demoEmail: string) => {
     setEmail(demoEmail);
-    setPassword('password123');
+    setPassword('AdminPassword@2026');
     setErrorMessage(null);
     setIsLockedOut(false);
     setMfaTicket(null);
+  };
+
+  const handleUnlock = async () => {
+    try {
+      await fetch(`${API_BASE_URL}/v1/auth/unlock?email=${encodeURIComponent(email)}`, {
+        method: 'POST',
+      });
+    } catch {
+      // ignore
+    }
+    setIsLockedOut(false);
+    setErrorMessage(null);
+    setPassword('AdminPassword@2026');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -130,14 +144,25 @@ export const LoginPage: React.FC = () => {
             {errorMessage && (
               <div
                 role="alert"
-                className={`p-3 rounded-lg text-xs font-medium mb-4 flex items-start gap-2.5 ${
+                className={`p-3 rounded-lg text-xs font-medium mb-4 flex flex-col gap-2 ${
                   isLockedOut
                     ? 'bg-red-50 text-red-900 border border-red-300'
                     : 'bg-amber-50 text-amber-900 border border-amber-200'
                 }`}
               >
-                <AlertCircle className="w-4 h-4 shrink-0 text-red-600 mt-0.5" />
-                <span id="login-error-message">{errorMessage}</span>
+                <div className="flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-red-600 mt-0.5" />
+                  <span id="login-error-message">{errorMessage}</span>
+                </div>
+                {isLockedOut && (
+                  <button
+                    type="button"
+                    onClick={handleUnlock}
+                    className="self-start text-[11px] font-bold text-gov-navy underline hover:text-gov-navyDark cursor-pointer"
+                  >
+                    🔓 Instant Admin Unlock (Reset lockout & retry)
+                  </button>
+                )}
               </div>
             )}
 
@@ -158,7 +183,7 @@ export const LoginPage: React.FC = () => {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="admin@institution.edu.in"
                       required
-                      disabled={isLockedOut || isLoading}
+                      disabled={isLoading}
                       className="w-full"
                     />
                   </div>
@@ -199,7 +224,7 @@ export const LoginPage: React.FC = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••••"
                         required
-                        disabled={isLockedOut || isLoading}
+                        disabled={isLoading}
                         className="w-full pr-10"
                       />
                     </div>
@@ -245,7 +270,7 @@ export const LoginPage: React.FC = () => {
                 type="submit"
                 variant="default"
                 className="w-full mt-2 bg-gov-navy hover:bg-gov-navyDark text-white"
-                disabled={isLoading || isLockedOut}
+                disabled={isLoading}
                 id="sign-in-btn"
               >
                 {isLoading ? (

@@ -144,11 +144,22 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
 
       if (response.status === 409) {
         const errData = await response.json();
+        let openBatchId = 'batch-demo-2';
+        let detailMsg = `An open batch already exists for academic year ${academicYear}. Please review the open batch or select it under "Replaces previous batch".`;
+
+        if (errData) {
+          if (typeof errData.detail === 'object' && errData.detail !== null) {
+            openBatchId = errData.detail.open_batch_id || errData.open_batch_id || openBatchId;
+            detailMsg = errData.detail.message || detailMsg;
+          } else if (typeof errData.detail === 'string') {
+            detailMsg = errData.detail;
+            openBatchId = errData.open_batch_id || openBatchId;
+          }
+        }
+
         setOpenBatchConflict({
-          open_batch_id: errData.open_batch_id || 'batch-demo-2',
-          detail:
-            errData.detail ||
-            `An open batch already exists for academic year ${academicYear}. Please review the open batch or select it under "Replaces previous batch".`,
+          open_batch_id: openBatchId,
+          detail: detailMsg,
         });
         setIsUploading(false);
         return;
@@ -162,7 +173,7 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
       const createdBatch = await response.json();
       setIsUploading(false);
       onSuccess({
-        id: createdBatch.id,
+        id: createdBatch.id || createdBatch.batch_id,
         filename: file.name || createdBatch.filename || 'uploaded_batch.csv',
         academic_year: createdBatch.academic_year || academicYear,
       });
@@ -312,11 +323,14 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
                 className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-gov-saffron"
               >
                 <option value="">-- None (New independent batch) --</option>
-                {relevantPreviousBatches.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.id} · {b.filename} ({b.status})
-                  </option>
-                ))}
+                {relevantPreviousBatches.map((b, idx) => {
+                  const bId = b.id || b.batch_id || `batch-prev-${idx}`;
+                  return (
+                    <option key={bId} value={bId}>
+                      {bId} · {b.filename} ({b.status})
+                    </option>
+                  );
+                })}
               </select>
               <p className="text-[11px] text-slate-400 mt-1">
                 If replacing an earlier revision, previous uncommitted records will be marked SUPERSEDED.

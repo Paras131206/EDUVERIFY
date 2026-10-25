@@ -24,6 +24,10 @@ export const RowInspectorModal: React.FC<RowInspectorModalProps> = ({
 
   useEffect(() => {
     let isMounted = true;
+    if (!batchId || row === undefined || row === null || isNaN(Number(row))) {
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
     fetchWithAuth(`/v1/batches/${batchId}/records/${row}`)
       .then((res) => {

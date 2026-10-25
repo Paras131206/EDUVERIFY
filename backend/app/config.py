@@ -96,6 +96,11 @@ class Settings(BaseSettings):
                 return v.replace("postgres://", "postgresql+psycopg://", 1)
             if v.startswith("postgresql://") and "+psycopg" not in v:
                 return v.replace("postgresql://", "postgresql+psycopg://", 1)
+            if v == "sqlite:///./eduverify.sqlite3" or v.startswith("sqlite:///./"):
+                from pathlib import Path
+
+                root_db = Path(__file__).resolve().parent.parent.parent / "eduverify.sqlite3"
+                return f"sqlite:///{root_db.as_posix()}"
         return v
 
     @field_validator("CORS_ORIGINS", mode="before")

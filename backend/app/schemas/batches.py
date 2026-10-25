@@ -6,7 +6,7 @@ Complies with contracts/openapi.yaml and prompt B3.
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class ColumnMappingModel(BaseModel):
@@ -31,6 +31,7 @@ class ConfirmMappingRequest(BaseModel):
 class BatchSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     batch_id: str
+    id: str | None = None
     institution_aicte_id: str
     academic_year: str
     status: str
@@ -46,6 +47,12 @@ class BatchSummary(BaseModel):
     updated_at: datetime | None = None
     filename: str | None = None
     size_bytes: int | None = None
+
+    @model_validator(mode="after")
+    def sync_id(self):
+        if not self.id:
+            self.id = self.batch_id
+        return self
 
 
 class BatchIssueResponse(BaseModel):
