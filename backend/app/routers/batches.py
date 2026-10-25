@@ -4,6 +4,7 @@ Complies with contracts/openapi.yaml and prompt B3.
 """
 
 import json
+import logging
 from datetime import UTC, datetime
 from typing import Any
 
@@ -49,6 +50,8 @@ from fastapi import (
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sse_starlette.sse import EventSourceResponse
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/v1/batches", tags=["Batches"])
 
@@ -332,7 +335,11 @@ def get_batch_report(
         )
 
 
-@router.get("/{id}/report.xlsx", include_in_schema=False, summary="Download validation report spreadsheet (XLSX)")
+@router.get(
+    "/{id}/report.xlsx",
+    include_in_schema=False,
+    summary="Download validation report spreadsheet (XLSX)",
+)
 def get_batch_report_xlsx(
     id: str,
     principal: Principal = Depends(get_current_principal),
@@ -341,7 +348,11 @@ def get_batch_report_xlsx(
     return get_batch_report(id=id, format="xlsx", principal=principal, db=db)
 
 
-@router.get("/{id}/report.pdf", include_in_schema=False, summary="Download validation report document (PDF)")
+@router.get(
+    "/{id}/report.pdf",
+    include_in_schema=False,
+    summary="Download validation report document (PDF)",
+)
 def get_batch_report_pdf(
     id: str,
     principal: Principal = Depends(get_current_principal),
@@ -664,8 +675,8 @@ def get_batch_record_by_row(
                     result_record[target] = str(val).strip()
             result_record["row"] = row
             return result_record
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug("Failed to resolve raw record preview: %s", exc)
 
     return default_record
 

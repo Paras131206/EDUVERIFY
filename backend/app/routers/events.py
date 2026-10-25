@@ -73,7 +73,9 @@ def get_ticker_events() -> list[dict[str, str]]:
             "event": "ANOMALY_RESOLVED",
             "institution_id": "1-100010002",
             "institution_name": "Mumbai Technical Institute",
-            "message": "Quota drift anomaly reviewed and justified with state admission council approval.",
+            "message": (
+                "Quota drift anomaly reviewed and justified with state admission council approval."
+            ),
             "timestamp": "5 mins ago",
         },
         {
@@ -81,7 +83,9 @@ def get_ticker_events() -> list[dict[str, str]]:
             "event": "AUDIT_CHAIN_VERIFIED",
             "institution_id": "AICTE-CENTRAL",
             "institution_name": "AICTE Apex Console",
-            "message": "Tamper-evident SHA-256 audit chain verified. Unbroken cryptographic lineage.",
+            "message": (
+                "Tamper-evident SHA-256 audit chain verified. Unbroken cryptographic lineage."
+            ),
             "timestamp": "12 mins ago",
         },
     ]

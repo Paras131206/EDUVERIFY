@@ -173,7 +173,11 @@ def get_institution_by_id_alias(
     return get_institution_summary_service(db, principal=principal, institution_id=institution_id)
 
 
-@router.get("/aicte/quotas", include_in_schema=False, summary="Get supernumerary scheme and quota share stats")
+@router.get(
+    "/aicte/quotas",
+    include_in_schema=False,
+    summary="Get supernumerary scheme and quota share stats",
+)
 def get_aicte_quotas(
     principal: Principal = Depends(get_current_principal),
     db: Session = Depends(get_db),
@@ -234,16 +238,55 @@ def get_aicte_quotas(
     ]
 
     shares = [
-        {"label": "Maharashtra", "regular": 82.4, "supernumerary": 12.1, "nri": 3.2, "oci": 1.1, "fn": 1.2},
-        {"label": "Karnataka", "regular": 80.1, "supernumerary": 14.5, "nri": 2.8, "oci": 1.4, "fn": 1.2},
-        {"label": "Tamil Nadu", "regular": 85.0, "supernumerary": 10.2, "nri": 2.5, "oci": 1.0, "fn": 1.3},
-        {"label": "Delhi", "regular": 78.6, "supernumerary": 13.8, "nri": 4.1, "oci": 2.0, "fn": 1.5},
-        {"label": "Uttar Pradesh", "regular": 87.2, "supernumerary": 9.8, "nri": 1.8, "oci": 0.6, "fn": 0.6},
+        {
+            "label": "Maharashtra",
+            "regular": 82.4,
+            "supernumerary": 12.1,
+            "nri": 3.2,
+            "oci": 1.1,
+            "fn": 1.2,
+        },
+        {
+            "label": "Karnataka",
+            "regular": 80.1,
+            "supernumerary": 14.5,
+            "nri": 2.8,
+            "oci": 1.4,
+            "fn": 1.2,
+        },
+        {
+            "label": "Tamil Nadu",
+            "regular": 85.0,
+            "supernumerary": 10.2,
+            "nri": 2.5,
+            "oci": 1.0,
+            "fn": 1.3,
+        },
+        {
+            "label": "Delhi",
+            "regular": 78.6,
+            "supernumerary": 13.8,
+            "nri": 4.1,
+            "oci": 2.0,
+            "fn": 1.5,
+        },
+        {
+            "label": "Uttar Pradesh",
+            "regular": 87.2,
+            "supernumerary": 9.8,
+            "nri": 1.8,
+            "oci": 0.6,
+            "fn": 0.6,
+        },
     ]
     return {"schemes": schemes, "shares": shares}
 
 
-@router.get("/aicte/duplicates", include_in_schema=False, summary="Get cross-institution duplicate clusters for AICTE console")
+@router.get(
+    "/aicte/duplicates",
+    include_in_schema=False,
+    summary="Get cross-institution duplicate clusters for AICTE console",
+)
 def get_aicte_duplicates(
     principal: Principal = Depends(get_current_principal),
     db: Session = Depends(get_db),
@@ -260,7 +303,11 @@ def get_aicte_duplicates(
     )
 
 
-@router.post("/aicte/duplicates/{id}/resolve", include_in_schema=False, summary="Resolve duplicate cluster from AICTE console")
+@router.post(
+    "/aicte/duplicates/{id}/resolve",
+    include_in_schema=False,
+    summary="Resolve duplicate cluster from AICTE console",
+)
 def resolve_aicte_duplicate(
     id: str,
     body: dict[str, Any],
@@ -280,7 +327,11 @@ def resolve_aicte_duplicate(
     )
 
 
-@router.get("/aicte/reconciliation", include_in_schema=False, summary="Get national reconciliation items for AICTE console")
+@router.get(
+    "/aicte/reconciliation",
+    include_in_schema=False,
+    summary="Get national reconciliation items for AICTE console",
+)
 def get_aicte_reconciliation(
     year: str | None = Query(None),
     state: str | None = Query(None),

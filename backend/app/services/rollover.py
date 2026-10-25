@@ -33,7 +33,9 @@ def execute_rollover_service(
             status_code=status.HTTP_403_FORBIDDEN,
             detail={
                 "code": "FORBIDDEN",
-                "message": "Only AICTE_ADMIN or AICTE_ANALYST can preview/execute academic year rollover",
+                "message": (
+                    "Only AICTE_ADMIN or AICTE_ANALYST can preview/execute academic year rollover"
+                ),
             },
         )
 

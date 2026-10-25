@@ -87,8 +87,11 @@ def login(
     # Check account lockout
     locked_until_utc = ensure_utc(user.locked_until)
     if locked_until_utc and locked_until_utc > now:
-        # Dev / Admin override: AdminPassword@2026 always bypasses lockout and unlocks
-        if body.password == "AdminPassword@2026" and verify_password(body.password, user.password_hash):
+        # Dev / Admin override: seed admin password always bypasses lockout and unlocks
+        if (
+            body.password == settings.SEED_PASSWORD
+            and verify_password(body.password, user.password_hash)
+        ):
             user.locked_until = None
             user.failed_logins = 0
             db.commit()
