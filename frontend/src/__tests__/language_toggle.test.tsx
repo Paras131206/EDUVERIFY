@@ -551,5 +551,145 @@ describe('Site-Wide Language Translation System', () => {
     expect(translateText('Switch Branch')).toBe('शाखा बदलें');
     expect(translateText('Details')).toBe('विवरण');
   });
+
+  it('translates Aggregates & Intake Reconciliation tab elements from user screenshot to Hindi', () => {
+    // Header & Summary Cards (Image 1)
+    expect(translateText('Aggregate Enrolment Reporting')).toBe('कुल नामांकन रिपोर्टिंग');
+    expect(translateText('Dedicated submission workspace for institutions in AGGREGATE_ONLY mode and statutory AICTE intake reconciliation'))
+      .toBe('AGGREGATE_ONLY मोड में संस्थानों के लिए समर्पित सबमिशन कार्यक्षेत्र और वैधानिक एआईसीटीई प्रवेश समाधान');
+    expect(translateText('Academic Year 2026-27')).toBe('शैक्षणिक वर्ष 2026-27');
+    expect(translateText('Approved Declared Seats')).toBe('स्वीकृत घोषित सीटें');
+    expect(translateText('Sanctioned intake across all active programs')).toBe('सभी सक्रिय कार्यक्रमों में स्वीकृत प्रवेश');
+    expect(translateText('Total Submitted Enrolment')).toBe('कुल प्रस्तुत नामांकन');
+    expect(translateText('Sum of aggregate submissions for 2026-27')).toBe('2026-27 के लिए कुल सबमिशन का योग');
+    expect(translateText('Reconciliation Variance')).toBe('सुलह भिन्नता');
+    expect(translateText('Fully Reconciled')).toBe('पूर्णतः सुलह पूर्ण');
+    expect(translateText('Evaluated under AICTE Rule V022')).toBe('एआईसीटीई नियम V022 के तहत मूल्यांकित');
+
+    // Section 1: Form Table
+    expect(translateText('Program Enrolment Breakdown Form')).toBe('कार्यक्रम नामांकन विवरण प्रपत्र');
+    expect(translateText('Enter total enrolled heads along with supernumerary and foreign quota sub-counts for each program'))
+      .toBe('प्रत्येक कार्यक्रम के लिए अतिरिक्त और विदेशी कोटा उप-गणना के साथ कुल नामांकित छात्र दर्ज करें');
+    expect(translateText('Save & Reconcile')).toBe('सहेजें एवं सुलह करें');
+    expect(translateText('सहजें & Reconcile')).toBe('सहेजें एवं सुलह करें');
+    expect(translateText('सहेजें & Reconcile')).toBe('सहेजें एवं सुलह करें');
+    expect(translateText('Program Code & Title')).toBe('कार्यक्रम कोड एवं शीर्षक');
+    expect(translateText('PROGRAM CODE & TITLE')).toBe('कार्यक्रम कोड एवं शीर्षक');
+    expect(translateText('कार्यक्रम कोड & TITLE')).toBe('कार्यक्रम कोड एवं शीर्षक');
+    expect(translateText('Declared Intake')).toBe('घोषित इंटेक');
+    expect(translateText('Total Enrolled *')).toBe('कुल नामांकित *');
+    expect(translateText('Supernumerary')).toBe('अतिरिक्त सीटें (सुपरन्यूमरेरी)');
+    expect(translateText('अतिरिक्त सीटें (SUPERNUMERARY)')).toBe('अतिरिक्त सीटें (सुपरन्यूमरेरी)');
+    expect(translateText('FN (Foreign)')).toBe('विदेशी (FN)');
+    expect(translateText('FN (FOREIGN)')).toBe('विदेशी (FN)');
+    expect(translateText('B.Tech in Computer Science & Engineering')).toBe('बी.टेक कंप्यूटर साइंस एवं इंजीनियरिंग');
+    expect(translateText('B.Tech in Electronics & Communication Engineering')).toBe('बी.टेक इलेक्ट्रॉनिक्स एवं संचार इंजीनियरिंग');
+    expect(translateText('B.Tech in Mechanical Engineering')).toBe('बी.टेक मैकेनिकल इंजीनियरिंग');
+    expect(translateText('Master of Business Administration')).toBe('मास्टर ऑफ बिजनेस एडमिनिस्ट्रेशन (MBA)');
+
+    // Section 2: Intake Reconciliation (Image 1 & 2)
+    expect(translateText('Intake Reconciliation: Declared Quota vs. Submitted Enrolment'))
+      .toBe('प्रवेश समाधान: घोषित कोटा बनाम प्रस्तुत नामांकन');
+    expect(translateText('प्रवेश समाधान: Declared कोटा vs. Submitted Enrolment'))
+      .toBe('प्रवेश समाधान: घोषित कोटा बनाम प्रस्तुत नामांकन');
+    expect(translateText('Automated Audit per Rule V022')).toBe('नियम V022 के अनुसार स्वचालित ऑडिट');
+    expect(translateText('Automated Audit per नियम V022')).toBe('नियम V022 के अनुसार स्वचालित ऑडिट');
+    expect(translateText('Comparison between approved sanction from AICTE Approval Portal and actual enrolments reported by institution'))
+      .toBe('एआईसीटीई अनुमोदन पोर्टल से स्वीकृत सीटों और संस्थान द्वारा रिपोर्ट किए गए वास्तविक नामांकन के बीच तुलना');
+    expect(translateText('Comparison between स्वीकृत sanction from AICTE Approval Portal and वास्तविक enrolments reported by institution'))
+      .toBe('एआईसीटीई अनुमोदन पोर्टल से स्वीकृत सीटों और संस्थान द्वारा रिपोर्ट किए गए वास्तविक नामांकन के बीच तुलना');
+
+    // Section 2: Table Columns & Rows (Image 2)
+    expect(translateText('Declared (Approved Intake)')).toBe('घोषित (स्वीकृत प्रवेश)');
+    expect(translateText('DECLARED (स्वीकृत प्रवेश)')).toBe('घोषित (स्वीकृत प्रवेश)');
+    expect(translateText('Submitted Enrolment')).toBe('प्रस्तुत नामांकन');
+    expect(translateText('SUBMITTED ENROLMENT')).toBe('प्रस्तुत नामांकन');
+    expect(translateText('Variance (Delta)')).toBe('भिन्नता (अंतर (डेल्टा))');
+    expect(translateText('VARIANCE (अंतर (डेल्टा))')).toBe('भिन्नता (अंतर (डेल्टा))');
+    expect(translateText('Reconciliation Status')).toBe('सुलह स्थिति');
+    expect(translateText('60 students')).toBe('60 छात्र');
+    expect(translateText('58 students')).toBe('58 छात्र');
+    expect(translateText('65 students')).toBe('65 छात्र');
+    expect(translateText('40 students')).toBe('40 छात्र');
+    expect(translateText('MATCH')).toBe('सटीक मिलान');
+    expect(translateText('EXCESS (OVER-ENROLLED)')).toBe('अतिरिक्त (ओवर-नामांकित)');
+    expect(translateText('अतिरिक्त (OVER-नामांकित)')).toBe('अतिरिक्त (ओवर-नामांकित)');
+    expect(translateText('MISMATCH (UNDER-FILLED)')).toBe('बेमेल (अंडर-फिल्ड)');
+    expect(translateText('बेमेल (UNDER-FILLED)')).toBe('बेमेल (अंडर-फिल्ड)');
+  });
+
+  it('translates Category Quotas & Seat Allocation Engine elements from user screenshot to Hindi', () => {
+    // Top Bar & Controls (Image 3)
+    expect(translateText('ANALYTICAL ENGINE')).toBe('विश्लेषणात्मक इंजन');
+    expect(translateText('Statutory Category Quotas & Seat Allocation Engine'))
+      .toBe('सांविधिक श्रेणी कोटा एवं सीट आवंटन इंजन');
+    expect(translateText('Statutory श्रेणी Quotas & Seat Allocation Engine'))
+      .toBe('सांविधिक श्रेणी कोटा एवं सीट आवंटन इंजन');
+    expect(translateText('Real-time compliance monitoring for SC, ST, OBC-NCL, EWS, and General category intake limits under central/state statutory reservation mandates.'))
+      .toBe('केंद्रीय/राज्य सांविधिक आरक्षण शासनादेशों के तहत SC, ST, OBC-NCL, EWS और सामान्य श्रेणी की प्रवेश सीमाओं की वास्तविक समय अनुपालन निगरानी।');
+    expect(translateText('Real-time compliance निगरानी (Monitoring) for SC, ST, अन्य पिछड़ा वर्ग (OBC)-NCL, आर्थिक रूप से कमजोर वर्ग (EWS), and सामान्य (General) श्रेणी intake limits under central/state statutory reservation mandates.'))
+      .toBe('केंद्रीय/राज्य सांविधिक आरक्षण शासनादेशों के तहत SC, ST, OBC-NCL, EWS और सामान्य श्रेणी की प्रवेश सीमाओं की वास्तविक समय अनुपालन निगरानी।');
+    expect(translateText('All Programs (520 Seats)')).toBe('सभी कार्यक्रम (520 सीटें)');
+    expect(translateText('सभी Programs (520 सीटें)')).toBe('सभी कार्यक्रम (520 सीटें)');
+    expect(translateText('Adjust Category Quotas')).toBe('श्रेणी कोटा समायोजित करें');
+    expect(translateText('Adjust श्रेणी Quotas')).toBe('श्रेणी कोटा समायोजित करें');
+
+    // Breach Alert Banner
+    expect(translateText('Statutory Reservation Quota Breach Detected (1 Category Alert)'))
+      .toBe('सांविधिक आरक्षण कोटा उल्लंघन का पता चला (1 श्रेणी अलर्ट)');
+    expect(translateText('STATUTORY RESERVATION कोटा BREACH DETECTED (1 श्रेणी ALERT)'))
+      .toBe('सांविधिक आरक्षण कोटा उल्लंघन का पता चला (1 श्रेणी अलर्ट)');
+    expect(translateText('• Scheduled Castes (SC): Enrolled count (81 seats) exceeds approved statutory quota (78 seats) by +3 excess students. AICTE Rule V012/V015 alert triggered.'))
+      .toBe('• अनुसूचित जाति (SC): नामांकित संख्या (81 सीटें) स्वीकृत सांविधिक कोटा (78 सीटें) से +3 अतिरिक्त छात्र अधिक है। एआईसीटीई नियम V012/V015 अलर्ट ट्रिगर हुआ।');
+    expect(translateText('• Scheduled Castes (अनुसूचित जाति (SC)): नामांकित count (81 सीटें) exceeds स्वीकृत statutory कोटा (78 सीटें) by +3 अतिरिक्त students. AICTE नियम V012/V015 alert triggered.'))
+      .toBe('• अनुसूचित जाति (SC): नामांकित संख्या (81 सीटें) स्वीकृत सांविधिक कोटा (78 सीटें) से +3 अतिरिक्त छात्र अधिक है। एआईसीटीई नियम V012/V015 अलर्ट ट्रिगर हुआ।');
+    expect(translateText('Reallocate Seats')).toBe('सीटें पुन: आवंटित करें');
+    expect(translateText('Reallocate सीटें')).toBe('सीटें पुन: आवंटित करें');
+
+    // Quotas Table
+    expect(translateText('Category Code')).toBe('श्रेणी कोड');
+    expect(translateText('श्रेणी CODE')).toBe('श्रेणी कोड');
+    expect(translateText('Statutory Category Name')).toBe('सांविधिक श्रेणी का नाम');
+    expect(translateText('STATUTORY श्रेणी NAME')).toBe('सांविधिक श्रेणी का नाम');
+    expect(translateText('Statutory %')).toBe('सांविधिक %');
+    expect(translateText('STATUTORY %')).toBe('सांविधिक %');
+    expect(translateText('Allocated Quota')).toBe('आवंटित कोटा');
+    expect(translateText('ALLOCATED कोटा')).toBe('आवंटित कोटा');
+    expect(translateText('Compliance Status')).toBe('अनुपालन स्थिति');
+    expect(translateText('COMPLIANCE स्थिति')).toBe('अनुपालन स्थिति');
+
+    // Table Rows
+    expect(translateText('General / Open Merit')).toBe('सामान्य / ओपन मेरिट');
+    expect(translateText('सामान्य (General) / सक्रिय Merit')).toBe('सामान्य / ओपन मेरिट');
+    expect(translateText('Other Backward Classes (NCL)')).toBe('अन्य पिछड़ा वर्ग (OBC-NCL)');
+    expect(translateText('Scheduled Castes')).toBe('अनुसूचित जाति');
+    expect(translateText('Scheduled Castes (SC)')).toBe('अनुसूचित जाति (SC)');
+    expect(translateText('Scheduled Tribes')).toBe('अनुसूचित जनजाति');
+    expect(translateText('Scheduled Tribes (ST)')).toBe('अनुसूचित जनजाति (ST)');
+    expect(translateText('Economically Weaker Section')).toBe('आर्थिक रूप से कमजोर वर्ग');
+    expect(translateText('Economically Weaker Section (EWS)')).toBe('आर्थिक रूप से कमजोर वर्ग (EWS)');
+    expect(translateText('Persons with Disabilities (Horizontal 5%)')).toBe('दिव्यांगजन (क्षैतिज 5%)');
+    expect(translateText('Horizontal')).toBe('क्षैतिज');
+    expect(translateText('6 vacant')).toBe('6 रिक्त');
+    expect(translateText('2 vacant')).toBe('2 रिक्त');
+    expect(translateText('3 vacant')).toBe('3 रिक्त');
+    expect(translateText('4 vacant')).toBe('4 रिक्त');
+    expect(translateText('NEAR LIMIT')).toBe('सीमा के निकट');
+    expect(translateText('QUOTA BREACH')).toBe('कोटा उल्लंघन');
+    expect(translateText('कोटा BREACH')).toBe('कोटा उल्लंघन');
+    expect(translateText('COMPLIANT')).toBe('अनुपालित');
+
+    // Summary Footer
+    expect(translateText('Total Approved Ceiling: 520 seats')).toBe('कुल स्वीकृत सीमा: 520 सीटें');
+    expect(translateText('Total स्वीकृत सीमा: 520 सीटें')).toBe('कुल स्वीकृत सीमा: 520 सीटें');
+    expect(translateText('Total Quota Allocated: 520 seats')).toBe('कुल आवंटित कोटा: 520 सीटें');
+    expect(translateText('Total कोटा Allocated: 520 सीटें')).toBe('कुल आवंटित कोटा: 520 सीटें');
+    expect(translateText('Total Category Enrolled: 508 students')).toBe('कुल श्रेणी नामांकित: 508 छात्र');
+    expect(translateText('Total श्रेणी नामांकित: 508 students')).toBe('कुल श्रेणी नामांकित: 508 छात्र');
+    expect(translateText('Automated AICTE Reservation Balancing Active'))
+      .toBe('स्वचालित एआईसीटीई आरक्षण संतुलन सक्रिय');
+    expect(translateText('Automated AICTE Reservation Balancing सक्रिय'))
+      .toBe('स्वचालित एआईसीटीई आरक्षण संतुलन सक्रिय');
+  });
 });
 
