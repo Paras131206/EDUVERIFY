@@ -160,3 +160,45 @@ export interface TrustListItem {
   status: 'ACTIVE' | 'REVOKED' | 'EXPIRED';
   expires_at: string;
 }
+
+export interface InstitutionMasterRecord {
+  institution_aicte_id: string;
+  name: string;
+  state_code: string | number;
+  state_name?: string;
+  district_code: string | number;
+  district_name?: string;
+  type: string;
+  affiliated_dab_id: string;
+  onboarding_level: 'FULL' | 'AGGREGATE_ONLY' | string;
+  did: string;
+  aishe_code?: string;
+  approval_order_ref?: string;
+  source_authority?: string;
+  source_file_name?: string;
+  source_file_hash?: string;
+  verified_by?: string;
+  verified_at?: string;
+}
+
+export interface IngestInstitutionsPayload {
+  source_authority: string;
+  approval_order_ref: string;
+  aishe_cycle_code?: string;
+  authorizing_officer: string;
+  source_file_name?: string;
+  institutions: Partial<InstitutionMasterRecord>[];
+}
+
+export interface IngestInstitutionsResult {
+  success: boolean;
+  ingested_count: number;
+  updated_count: number;
+  total_records: number;
+  source_authority: string;
+  approval_order_ref: string;
+  batch_hash: string;
+  ingested_at: string;
+  institutions: InstitutionMasterRecord[];
+}
+

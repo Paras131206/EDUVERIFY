@@ -480,6 +480,68 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
       expect(within(admin).getByText(/AICTE National Apex Credential Authority/i)).toBeInTheDocument();
       expect(within(admin).getByText(/did:web:dcet.eduverify.ac.in/i)).toBeInTheDocument();
     });
+
+    it('uploads institution master data with verified provenance and inspects certificate', async () => {
+      renderAictePage();
+
+      await waitFor(() => {
+        expect(screen.getByTestId('admin-section')).toBeInTheDocument();
+      });
+
+      const admin = screen.getByTestId('admin-section');
+
+      // Click "Ingest Official Institutions"
+      const uploadBtn = within(admin).getByTestId('upload-institutions-btn');
+      fireEvent.click(uploadBtn);
+
+      // Verify modal opened
+      await waitFor(() => {
+        expect(screen.getByTestId('institution-upload-modal')).toBeInTheDocument();
+      });
+
+      const modal = screen.getByTestId('institution-upload-modal');
+      expect(within(modal).getByText(/Ingest Official Institution Master Data/i)).toBeInTheDocument();
+      expect(within(modal).getByText(/Statutory Provenance Tracking/i)).toBeInTheDocument();
+
+      // Click "Load Official APH 2026-27 Dataset"
+      const loadAphBtn = within(modal).getByTestId('load-aph-sample-btn');
+      fireEvent.click(loadAphBtn);
+
+      await waitFor(() => {
+        expect(within(modal).getByText(/College of Engineering Pune/i)).toBeInTheDocument();
+        expect(within(modal).getByText(/U-0892/i)).toBeInTheDocument();
+      });
+
+      // Confirm ingestion
+      const confirmBtn = within(modal).getByTestId('confirm-ingest-btn');
+      fireEvent.click(confirmBtn);
+
+      await waitFor(() => {
+        expect(within(modal).getByText(/Statutory Master Ingestion Complete!/i)).toBeInTheDocument();
+      });
+
+      // Close modal
+      const closeBtn = within(modal).getByTestId('modal-close-btn');
+      fireEvent.click(closeBtn);
+
+      // In the admin institutions table, inspect provenance certificate
+      await waitFor(() => {
+        expect(within(admin).getAllByText(/College of Engineering Pune/i).length).toBeGreaterThan(0);
+      });
+
+      const inspectBtn = within(admin).getByTestId('inspect-provenance-1-100010041');
+      fireEvent.click(inspectBtn);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('provenance-certificate-modal')).toBeInTheDocument();
+      });
+
+      const certModal = screen.getByTestId('provenance-certificate-modal');
+      expect(within(certModal).getByText(/Statutory Data Provenance Certificate/i)).toBeInTheDocument();
+      expect(within(certModal).getByText(/AISHE Code/i)).toBeInTheDocument();
+      expect(within(certModal).getByText(/U-0892/i)).toBeInTheDocument();
+      expect(within(certModal).getByText(/F.No. AICTE\/WR\/2026\/APH-COEP-01/i)).toBeInTheDocument();
+    });
   });
 
   describe('11. Empty, Error, and Offline States', () => {

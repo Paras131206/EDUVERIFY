@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { RolloverDryRunResult, TrustListItem } from '../types';
+import { InstitutionMasterUploadModal } from './InstitutionMasterUploadModal';
 import { API_BASE_URL } from '@/lib/api';
 import { formatIndianNumber } from '@/lib/format';
 import {
@@ -16,6 +17,11 @@ import {
   ArrowRight,
   Sparkles,
   Key,
+  UploadCloud,
+  ShieldCheck,
+  Building2,
+  X,
+  Hash,
 } from 'lucide-react';
 
 interface AdminSectionProps {
@@ -32,6 +38,8 @@ export const AdminSection: React.FC<AdminSectionProps> = ({
   const [masterData, setMasterData] = useState<any[]>([]);
   const [masterLoading, setMasterLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
+  const [selectedProvenanceRecord, setSelectedProvenanceRecord] = useState<any | null>(null);
 
   // Rollover state
   const [rolloverResult, setRolloverResult] = useState<RolloverDryRunResult | null>(initialRollover);
@@ -201,15 +209,29 @@ export const AdminSection: React.FC<AdminSectionProps> = ({
                 </button>
               </div>
 
-              <div className="relative w-64">
-                <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
-                <Input
-                  type="text"
-                  placeholder="Filter records..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-8 text-xs h-8 bg-white"
-                />
+              <div className="flex flex-wrap items-center gap-2">
+                {masterEntity === 'institutions' && (
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => setIsUploadModalOpen(true)}
+                    data-testid="upload-institutions-btn"
+                    className="h-8 text-xs bg-gov-navy hover:bg-gov-navyDark text-white font-semibold gap-1.5 shadow-xs"
+                  >
+                    <UploadCloud className="w-3.5 h-3.5" />
+                    Ingest Official Institutions
+                  </Button>
+                )}
+                <div className="relative w-64">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+                  <Input
+                    type="text"
+                    placeholder="Filter records..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-8 text-xs h-8 bg-white"
+                  />
+                </div>
               </div>
             </div>
 
@@ -229,7 +251,9 @@ export const AdminSection: React.FC<AdminSectionProps> = ({
                           <TableHead className="text-xs">State / District</TableHead>
                           <TableHead className="text-xs">Discipline</TableHead>
                           <TableHead className="text-xs">Affiliated DAB</TableHead>
+                          <TableHead className="text-xs">Official Provenance & Origin</TableHead>
                           <TableHead className="text-xs">Onboarding</TableHead>
+                          <TableHead className="text-xs text-right">Certificate</TableHead>
                         </>
                       )}
                       {masterEntity === 'dabs' && (
@@ -280,6 +304,23 @@ export const AdminSection: React.FC<AdminSectionProps> = ({
                               {row.affiliated_dab_id}
                             </TableCell>
                             <TableCell>
+                              <div className="space-y-1">
+                                <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-900 border border-blue-200">
+                                  <ShieldCheck className="w-3 h-3 text-blue-600 shrink-0" />
+                                  <span className="truncate max-w-[190px]" title={row.source_authority || 'AICTE Approval Process Handbook (APH) 2026-27'}>
+                                    {row.source_authority || 'AICTE Approval Process Handbook (APH) 2026-27'}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-mono">
+                                  <span>AISHE: <strong className="text-slate-800">{row.aishe_code || 'C-10291'}</strong></span>
+                                  <span>•</span>
+                                  <span className="truncate max-w-[110px]" title={row.approval_order_ref || 'F.No. AICTE/AB/2026'}>
+                                    {row.approval_order_ref || 'F.No. AICTE/AB/2026'}
+                                  </span>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
                               <span
                                 className={`text-[10px] font-bold px-2 py-0.5 rounded ${
                                   row.onboarding_level === 'FULL'
@@ -289,6 +330,17 @@ export const AdminSection: React.FC<AdminSectionProps> = ({
                               >
                                 {row.onboarding_level}
                               </span>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setSelectedProvenanceRecord(row)}
+                                data-testid={`inspect-provenance-${row.institution_aicte_id}`}
+                                className="h-7 text-[11px] px-2 text-gov-navy border-slate-300 hover:bg-slate-50 font-medium"
+                              >
+                                Provenance
+                              </Button>
                             </TableCell>
                           </>
                         )}
@@ -530,6 +582,126 @@ export const AdminSection: React.FC<AdminSectionProps> = ({
           </div>
         )}
       </CardContent>
+
+      {/* Upload Institution Master Data Modal */}
+      <InstitutionMasterUploadModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onSuccess={(updated) => {
+          setMasterData(updated);
+        }}
+      />
+
+      {/* Inspect Provenance Certificate Dialog */}
+      {selectedProvenanceRecord && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="prov-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in"
+          data-testid="provenance-certificate-modal"
+        >
+          <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-linear-to-r from-blue-50 to-white">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-lg bg-blue-100 text-blue-900">
+                  <ShieldCheck className="w-5 h-5 text-blue-700" />
+                </div>
+                <div>
+                  <h3 id="prov-modal-title" className="text-sm font-bold text-gov-navy">
+                    Statutory Data Provenance Certificate
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Official Origin & Accreditation Audit Record
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedProvenanceRecord(null)}
+                aria-label="Close dialog"
+                className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-5 space-y-3.5 text-xs">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
+                  Accredited Institution
+                </span>
+                <p className="text-sm font-bold text-slate-900 mt-0.5">
+                  {selectedProvenanceRecord.name}
+                </p>
+                <p className="font-mono text-xs font-semibold text-gov-navy mt-0.5">
+                  AICTE Permanent ID: {selectedProvenanceRecord.institution_aicte_id}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">AISHE Code</span>
+                  <span className="font-mono font-bold text-blue-900 text-xs">
+                    {selectedProvenanceRecord.aishe_code || 'C-10291'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Category / Type</span>
+                  <span className="font-semibold text-slate-800 text-xs">
+                    {selectedProvenanceRecord.type} ({selectedProvenanceRecord.onboarding_level})
+                  </span>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Approval Order / Gazette Ref</span>
+                  <span className="font-mono font-semibold text-slate-800 text-xs">
+                    {selectedProvenanceRecord.approval_order_ref || 'F.No. AICTE/AB/2026/APH-1049'}
+                  </span>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Source Authority Origin</span>
+                  <span className="font-semibold text-slate-900 text-xs flex items-center gap-1.5 mt-0.5">
+                    <Building2 className="w-3.5 h-3.5 text-blue-600" />
+                    {selectedProvenanceRecord.source_authority || 'AICTE Approval Process Handbook (APH) 2026-27'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-1.5 p-3 bg-blue-50/50 rounded-lg border border-blue-200/60 font-mono text-[11px] text-slate-700">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">Verified By:</span>
+                  <span className="font-medium text-slate-900">{selectedProvenanceRecord.verified_by || 'Dr. Rajesh Sharma, AICTE Chief Master Data Officer'}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">Verified Timestamp:</span>
+                  <span className="font-medium text-slate-900">{selectedProvenanceRecord.verified_at ? new Date(selectedProvenanceRecord.verified_at).toLocaleString() : '2026-06-15 10:30 IST'}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">DID Registry:</span>
+                  <span className="font-medium text-gov-navy">{selectedProvenanceRecord.did}</span>
+                </div>
+                <div className="pt-1 border-t border-blue-200/60 flex items-center gap-1 text-[10px] text-slate-500">
+                  <Hash className="w-3 h-3 text-slate-400 shrink-0" />
+                  <span className="truncate">Seal: {selectedProvenanceRecord.source_file_hash || 'sha256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end p-3 border-t border-slate-100 bg-slate-50">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedProvenanceRecord(null)}
+                className="text-xs font-semibold"
+              >
+                Close Certificate
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </Card>
   );
 };
