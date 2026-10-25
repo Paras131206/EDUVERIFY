@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="400" viewBox="0 0 1080 400" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5b2bb5"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e39a32"/></marker>
+    <g id="person"><circle cx="0" cy="-6" r="6" fill="#fff"/><path d="M-11,12 a11,10 0 0,1 22,0 z" fill="#fff"/></g>
+  </defs>
+
+  <rect x="1.5" y="1.5" width="1077" height="397" fill="#fff" stroke="#7b3fe4" stroke-width="3"/>
+  <text x="16" y="31" font-size="21" font-weight="bold" fill="#3c7a7f">SYSTEM ARCHITECTURE</text>
+  <text x="1064" y="28" font-size="14" font-weight="bold" fill="#222" text-anchor="end" font-family="Georgia, 'Times New Roman', serif">FIGURE NO: 02</text>
+
+  <!-- who connects -->
+  <text x="16" y="64" font-size="10.5" font-weight="bold" fill="#6b7280" letter-spacing="1">WHO CONNECTS</text>
+  <circle cx="40" cy="104" r="21" fill="#3a7d7e"/><use href="#person" x="40" y="104"/>
+  <circle cx="40" cy="168" r="21" fill="#3a7d7e"/><use href="#person" x="40" y="168"/>
+  <circle cx="40" cy="232" r="21" fill="#3a7d7e"/><use href="#person" x="40" y="232"/>
+  <circle cx="40" cy="300" r="21" fill="#fff" stroke="#8a8f98" stroke-width="1.6" stroke-dasharray="4 3"/>
+  <rect x="31" y="291" width="18" height="18" rx="3" fill="none" stroke="#6b7280" stroke-width="2"/>
+  <g font-size="13" fill="#1f2d4f">
+    <text x="70" y="109" font-weight="bold">Institutions</text>
+    <text font-weight="bold"><tspan x="70" y="165">AICTE &amp;</tspan><tspan x="70" y="181">reviewers</tspan></text>
+    <text font-weight="bold"><tspan x="70" y="229">Students &amp;</tspan><tspan x="70" y="245">verifiers</tspan></text>
+    <text fill="#374151"><tspan x="70" y="297">External</tspan><tspan x="70" y="313">systems</tspan></text>
+  </g>
+  <g stroke="#5b2bb5" stroke-width="1.4" marker-end="url(#a)">
+    <line x1="172" y1="104" x2="198" y2="104"/><line x1="172" y1="168" x2="198" y2="168"/><line x1="172" y1="236" x2="198" y2="236"/><line x1="172" y1="304" x2="198" y2="304"/>
+  </g>
+
+  <!-- secure zone -->
+  <rect x="200" y="48" width="620" height="304" rx="22" fill="#f7f4ff" stroke="#7b3fe4" stroke-width="1.8" stroke-dasharray="8 5"/>
+  <text x="222" y="72" font-size="12" font-weight="bold" fill="#5b2bb5" letter-spacing="1">SECURE ZONE</text>
+  <text x="330" y="72" font-size="11.5" fill="#6b7280">sign-in · roles · consent · audit</text>
+
+  <!-- spokes -->
+  <g stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="3 3">
+    <line x1="466" y1="176" x2="400" y2="148"/><line x1="534" y1="176" x2="600" y2="148"/>
+    <line x1="466" y1="244" x2="400" y2="272"/><line x1="534" y1="244" x2="600" y2="272"/>
+  </g>
+
+  <!-- hub -->
+  <circle cx="500" cy="210" r="50" fill="#3c7a7f"/>
+  <circle cx="500" cy="210" r="56" fill="none" stroke="#3c7a7f" stroke-width="1.2" opacity="0.4"/>
+  <text x="500" y="206" font-size="12.5" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">PLATFORM</text>
+  <text x="500" y="223" font-size="12.5" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">CORE</text>
+
+  <!-- modules -->
+  <g text-anchor="middle">
+    <rect x="226" y="92" width="200" height="56" rx="28" fill="#e6f2f2" stroke="#3a7d7e" stroke-width="1.6"/>
+    <text x="326" y="116" font-size="13.5" font-weight="bold" fill="#1f2d4f">Ingest &amp; standardise</text>
+    <text x="326" y="134" font-size="11.5" fill="#4b5563">files, APIs, one format</text>
+
+    <rect x="536" y="92" width="200" height="56" rx="28" fill="#e8eef5" stroke="#1f2d4f" stroke-width="1.6"/>
+    <text x="636" y="116" font-size="13.5" font-weight="bold" fill="#1f2d4f">Validate &amp; match</text>
+    <text x="636" y="134" font-size="11.5" fill="#4b5563">rules, limits, duplicates</text>
+
+    <rect x="226" y="272" width="200" height="56" rx="28" fill="#f1f2f4" stroke="#6b7280" stroke-width="1.6"/>
+    <text x="326" y="296" font-size="13.5" font-weight="bold" fill="#1f2d4f">Alerts &amp; integration</text>
+    <text x="326" y="314" font-size="11.5" fill="#4b5563">notifications, live updates</text>
+
+    <rect x="536" y="272" width="200" height="56" rx="28" fill="#f1ecff" stroke="#7b3fe4" stroke-width="1.6"/>
+    <text x="636" y="296" font-size="13.5" font-weight="bold" fill="#1f2d4f">Reports &amp; verification</text>
+    <text x="636" y="314" font-size="11.5" fill="#4b5563">dashboards, consent-based proofs</text>
+
+    <!-- correction workflow (unchanged) -->
+    <rect x="684" y="180" width="120" height="58" rx="5" fill="#fff8ee" stroke="#e39a32" stroke-width="1.8"/>
+    <text x="744" y="204" font-size="13.5" font-weight="bold" fill="#1f2d4f">Human review</text>
+    <text x="744" y="222" font-size="11.5" fill="#4b5563">approve / correct</text>
+  </g>
+  <line x1="426" y1="120" x2="534" y2="120" stroke="#5b2bb5" stroke-width="1.6" marker-end="url(#a)"/>
+  <line x1="716" y1="148" x2="716" y2="177" stroke="#e39a32" stroke-width="1.5" marker-end="url(#o)"/>
+  <path d="M694,180 Q682,166 674,151" fill="none" stroke="#e39a32" stroke-width="1.5" marker-end="url(#o)"/>
+  <text x="744" y="256" font-size="10.5" font-style="italic" font-weight="bold" fill="#b3741d" text-anchor="middle">fixes re-validated</text>
+
+  <!-- data store -->
+  <text x="862" y="64" font-size="10.5" font-weight="bold" fill="#6b7280" letter-spacing="1">DATA STORE</text>
+  <line x1="822" y1="200" x2="858" y2="200" stroke="#5b2bb5" stroke-width="2.2" marker-start="url(#a)" marker-end="url(#a)"/>
+  <path d="M862,92 v210 a101,10 0 0,0 202,0 v-210" fill="#e8eef5" stroke="#1f2d4f" stroke-width="1.6"/>
+  <path d="M862,162 a101,10 0 0,0 202,0 v70 a101,10 0 0,1 -202,0 z" fill="#dde6f1" stroke="none"/>
+  <g fill="none" stroke="#1f2d4f" stroke-width="1.4">
+    <path d="M862,162 a101,10 0 0,0 202,0"/><path d="M862,232 a101,10 0 0,0 202,0"/>
+  </g>
+  <ellipse cx="963" cy="92" rx="101" ry="10" fill="#f3f6fa" stroke="#1f2d4f" stroke-width="1.6"/>
+  <g font-size="14" font-weight="bold" fill="#1f2d4f" text-anchor="middle">
+    <text x="963" y="137">Student records</text><text x="963" y="207">Audit trail</text><text x="963" y="277">Reference data</text>
+  </g>
+
+  <text x="16" y="386" font-size="11.5" fill="#6b7280">Users and systems enter only through the secure zone. The platform core links every module and writes all actions to one audit trail.</text>
+</svg>

@@ -215,6 +215,11 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
 
       const createdBatch = await response.json();
       const resolvedBatchId = createdBatch.batch_id || createdBatch.id || '';
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.setItem('eduverify_data_uploaded', 'true');
+        }
+      } catch {}
       setIsUploading(false);
       onSuccess({
         id: resolvedBatchId,
@@ -379,11 +384,14 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
                 className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-gov-saffron"
               >
                 <option value="">-- None (New independent batch) --</option>
-                {relevantPreviousBatches.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.id} · {b.filename} ({b.status})
-                  </option>
-                ))}
+                {relevantPreviousBatches.map((b, idx) => {
+                  const bId = b.id || b.batch_id || `batch-prev-${idx}`;
+                  return (
+                    <option key={bId} value={bId}>
+                      {bId} · {b.filename} ({b.status})
+                    </option>
+                  );
+                })}
               </select>
               <p className="text-[11px] text-slate-400 mt-1">
                 If replacing an earlier revision, previous uncommitted records will be marked SUPERSEDED.

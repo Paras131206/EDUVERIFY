@@ -84,6 +84,7 @@ export interface SchemaDriftData {
 
 export interface BatchItem {
   id: string;
+  batch_id?: string;
   institution_aicte_id: string;
   academic_year: string;
   filename: string;
@@ -266,7 +267,7 @@ export interface StudentVersionRecord {
 
 export interface StudentTimelineEvent {
   id: string;
-  event_type: 'ADMISSION' | 'STATUS_CHANGE' | 'TRANSFER_REQUEST' | 'CREDENTIAL_ISSUED' | 'CONSENT_GRANTED';
+  event_type: 'ADMISSION' | 'STATUS_CHANGE' | 'TRANSFER_REQUEST' | 'CREDENTIAL_ISSUED' | 'CONSENT_GRANTED' | 'BRANCH_SWITCH';
   from_status?: EnrolmentStatus;
   to_status: EnrolmentStatus | string;
   effective_date: string;

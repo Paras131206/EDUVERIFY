@@ -17,7 +17,7 @@ from app.services.audit import append_audit_log
 from app.services.batches import update_student_service
 from app.services.students import transition_student_service
 from eduverify_engine.masking import mask_apaar, mask_email, mask_mobile
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -72,6 +72,42 @@ def serialize_student_record(
         resp.mobile = mask_mobile(raw_mobile) if raw_mobile else None
 
     return resp
+
+
+@router.get(
+    "",
+    include_in_schema=False,
+    response_model=list[StudentRecordResponse],
+    summary="List students in Central Repository",
+)
+def list_students(
+    q: str | None = Query(None, description="Search by name, APAAR ID, or roll number"),
+    status: str | None = Query(None, description="Filter by enrolment status"),
+    program: str | None = Query(None, description="Filter by program code"),
+    principal: Principal = Depends(get_current_principal),
+    db: Session = Depends(get_db),
+) -> list[StudentRecordResponse]:
+    """Lists students filtered by institution, status, program, or search query."""
+    stmt = select(StudentRecord)
+    if principal.role not in ("AICTE_ADMIN", "AICTE_ANALYST") and principal.institution_aicte_id:
+        stmt = stmt.where(StudentRecord.institution_aicte_id == principal.institution_aicte_id)
+    if status and status != "ALL":
+        stmt = stmt.where(StudentRecord.enrolment_status == status)
+    if program and program != "ALL":
+        stmt = stmt.where(StudentRecord.program_code == program)
+    if q:
+        search = f"%{q.strip()}%"
+        stmt = stmt.where(
+            (StudentRecord.full_name.ilike(search))
+            | (StudentRecord.apaar_id.ilike(search))
+            | (StudentRecord.institution_student_id.ilike(search))
+        )
+    stmt = stmt.order_by(StudentRecord.full_name.asc())
+    students = db.scalars(stmt).all()
+    return [
+        serialize_student_record(s, principal=principal, db=db, purpose="STUDENT_ROSTER_LIST")
+        for s in students
+    ]
 
 
 @router.get(

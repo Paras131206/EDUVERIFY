@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, fetchWithAuth } from '@/lib/api';
 import {
   ReportType,
   ReportFormat,
@@ -25,7 +25,9 @@ import {
   Eye,
   AlertCircle,
   X,
+  Link2,
 } from 'lucide-react';
+import { AuthorityLinkModal } from './AuthorityLinkModal';
 
 export const ReportsPage: React.FC = () => {
   // Builder form state
@@ -50,13 +52,14 @@ export const ReportsPage: React.FC = () => {
 
   // Preview modal state
   const [previewReport, setPreviewReport] = useState<ReportItem | null>(null);
+  const [authorityModalOpen, setAuthorityModalOpen] = useState<boolean>(false);
 
   // Fetch report history
   const fetchReports = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE_URL}/v1/reports`);
+      const res = await fetchWithAuth(`${API_BASE_URL}/v1/reports`);
       if (!res.ok) {
         throw new Error(`Failed to load reports history (${res.status})`);
       }
@@ -89,7 +92,7 @@ export const ReportsPage: React.FC = () => {
     };
 
     try {
-      const res = await fetch(`${API_BASE_URL}/v1/reports/jobs`, {
+      const res = await fetchWithAuth(`${API_BASE_URL}/v1/reports/jobs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -172,6 +175,16 @@ export const ReportsPage: React.FC = () => {
             >
               <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh
+            </Button>
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => setAuthorityModalOpen(true)}
+              className="bg-gov-navy hover:bg-slate-800 text-white text-xs gap-1.5"
+              data-testid="generate-authority-link-btn"
+            >
+              <Link2 className="w-3.5 h-3.5" />
+              Generate Authority Access Link
             </Button>
           </div>
         </div>
@@ -831,6 +844,12 @@ export const ReportsPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Authority-Restricted Link Modal */}
+      <AuthorityLinkModal
+        isOpen={authorityModalOpen}
+        onClose={() => setAuthorityModalOpen(false)}
+      />
     </div>
   );
 };

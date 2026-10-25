@@ -15,6 +15,7 @@ import { DabDashboardPage } from '@/features/dab/DabDashboardPage';
 import { StudentWalletPage } from '@/features/student/StudentWalletPage';
 import { VerifierPage } from '@/features/verifier/VerifierPage';
 import { ReportsPage } from '@/features/reports/ReportsPage';
+import { AuthorityAccessPage } from '@/features/reports/AuthorityAccessPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 
 const RootLayout: React.FC = () => (
@@ -30,6 +31,10 @@ export const router = createBrowserRouter([
       {
         path: '/login',
         element: <LoginPage />,
+      },
+      {
+        path: '/auth-access',
+        element: <AuthorityAccessPage />,
       },
       {
         path: '/',
@@ -59,7 +64,15 @@ export const router = createBrowserRouter([
           {
             path: 'institution/batches',
             element: (
-              <RequireRole roles={['INSTITUTION_ADMIN', 'INSTITUTION_STAFF']}>
+              <RequireRole
+                roles={[
+                  'INSTITUTION_ADMIN',
+                  'INSTITUTION_STAFF',
+                  'AICTE_ADMIN',
+                  'AICTE_ANALYST',
+                  'AICTE_VIEWER',
+                ]}
+              >
                 <BatchListPage />
               </RequireRole>
             ),
@@ -67,7 +80,15 @@ export const router = createBrowserRouter([
           {
             path: 'institution/batches/:id/review',
             element: (
-              <RequireRole roles={['INSTITUTION_ADMIN', 'INSTITUTION_STAFF']}>
+              <RequireRole
+                roles={[
+                  'INSTITUTION_ADMIN',
+                  'INSTITUTION_STAFF',
+                  'AICTE_ADMIN',
+                  'AICTE_ANALYST',
+                  'AICTE_VIEWER',
+                ]}
+              >
                 <ReviewPage />
               </RequireRole>
             ),
@@ -137,8 +158,11 @@ export const router = createBrowserRouter([
                   'INSTITUTION_ADMIN',
                   'INSTITUTION_STAFF',
                   'AICTE_ADMIN',
+                  'AICTE_ANALYST',
                   'AICTE_VIEWER',
+                  'DAB_ADMIN',
                   'DAB_MEMBER',
+                  'VERIFIER',
                 ]}
               >
                 <ReportsPage />

@@ -87,42 +87,69 @@ apiClient.use({
 });
 
 export async function authFetch(
-  input: RequestInfo | URL,
+  input: RequestInfo | URL | string,
   init?: RequestInit
 ): Promise<Response> {
-  const token = getAuthToken();
-  const headers = new Headers(init?.headers);
+  const token = getAuthToken() || authToken;
+  const reqInit: RequestInit = { ...init };
+  const headers = new Headers(
+    reqInit.headers ||
+      (typeof input === 'object' && 'headers' in input ? (input as Request).headers : undefined)
+  );
 
   if (token && !headers.has('Authorization')) {
     headers.set('Authorization', `Bearer ${token}`);
   }
 
-  let url = input;
+  let url: string | URL | Request;
   if (typeof input === 'string') {
-    if (input.startsWith('/v1/')) {
+    if (input.startsWith('/')) {
       url = `${API_BASE_URL}${input}`;
-    } else if (!input.startsWith('http://') && !input.startsWith('https://') && !input.startsWith('/')) {
+    } else if (!input.startsWith('http://') && !input.startsWith('https://')) {
       url = `${API_BASE_URL}/${input}`;
+    } else {
+      url = input;
     }
+  } else if (input instanceof URL) {
+    if (
+      typeof window !== 'undefined' &&
+      input.origin === window.location.origin &&
+      input.pathname.startsWith('/v1')
+    ) {
+      url = `${API_BASE_URL}${input.pathname}${input.search}`;
+    } else {
+      url = input;
+    }
+  } else {
+    url = input;
   }
 
-  const response = await fetch(url, {
-    ...init,
-    headers,
-    credentials: init?.credentials || 'include',
-  });
+  if (reqInit.credentials === undefined) {
+    reqInit.credentials = 'include';
+  }
+  reqInit.headers = headers;
 
-  const urlStr = typeof url === 'string' ? url : url.toString();
-  if (response.status === 401 && !urlStr.includes('/auth/login') && !urlStr.includes('/auth/refresh')) {
+  const response = await fetch(url, reqInit);
+
+  const urlStr =
+    typeof url === 'string'
+      ? url
+      : url instanceof URL
+        ? url.toString()
+        : (url as Request).url;
+
+  if (
+    response.status === 401 &&
+    !urlStr.includes('/auth/login') &&
+    !urlStr.includes('/auth/refresh')
+  ) {
     if (!isRefreshing) {
       isRefreshing = true;
       try {
         const res = await fetch(`${API_BASE_URL}/v1/auth/refresh`, {
           method: 'POST',
           credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
         });
         if (res.ok) {
           const data = await res.json();
@@ -131,13 +158,9 @@ export async function authFetch(
           isRefreshing = false;
           onRefreshed(newToken);
 
-          const retryHeaders = new Headers(init?.headers);
-          retryHeaders.set('Authorization', `Bearer ${newToken}`);
-          return fetch(url, {
-            ...init,
-            headers: retryHeaders,
-            credentials: init?.credentials || 'include',
-          });
+          headers.set('Authorization', `Bearer ${newToken}`);
+          reqInit.headers = headers;
+          return fetch(url, reqInit);
         } else {
           setAuthToken(null);
           isRefreshing = false;
@@ -148,16 +171,10 @@ export async function authFetch(
       }
     } else {
       return new Promise<Response>((resolve) => {
-        subscribeTokenRefresh((newToken: string) => {
-          const retryHeaders = new Headers(init?.headers);
-          retryHeaders.set('Authorization', `Bearer ${newToken}`);
-          resolve(
-            fetch(url, {
-              ...init,
-              headers: retryHeaders,
-              credentials: init?.credentials || 'include',
-            })
-          );
+        subscribeTokenRefresh(async (newToken: string) => {
+          headers.set('Authorization', `Bearer ${newToken}`);
+          reqInit.headers = headers;
+          resolve(fetch(url, reqInit));
         });
       });
     }
@@ -165,4 +182,7 @@ export async function authFetch(
 
   return response;
 }
+
+export const fetchWithAuth = authFetch;
+
 

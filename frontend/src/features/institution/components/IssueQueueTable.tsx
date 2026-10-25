@@ -51,7 +51,7 @@ export const IssueQueueTable: React.FC<IssueQueueTableProps> = ({
   const [filterSeverity, setFilterSeverity] = useState<string>('ALL');
   const [filterPriority, setFilterPriority] = useState<string>('ALL');
   const [filterBucket, setFilterBucket] = useState<string>('ALL');
-  const [filterStatus, setFilterStatus] = useState<string>('ALL');
+  const [filterStatus, setFilterStatus] = useState<string>('OPEN');
 
   // Sorting: default is priority ASC (CRITICAL -> LOW), then row ASC
   const [sortField, setSortField] = useState<'priority' | 'row' | 'field' | 'status'>('priority');
@@ -84,13 +84,20 @@ export const IssueQueueTable: React.FC<IssueQueueTableProps> = ({
     return Array.from(set).sort();
   }, [issues]);
 
-  // Tab counts
+  // Tab counts reflect active/unresolved issues under current status filter
   const tabCounts = useMemo(() => {
+    const list =
+      filterStatus === 'ALL'
+        ? issues
+        : filterStatus === 'OPEN'
+        ? issues.filter((i) => i.status === 'OPEN' || i.status === 'PROPOSED')
+        : issues.filter((i) => i.status === filterStatus);
+
     return {
-      ALL: issues.length,
-      AUTO_FLAG: issues.filter((i) => i.bucket === 'AUTO_FLAG').length,
-      HUMAN_REVIEW: issues.filter((i) => i.bucket === 'HUMAN_REVIEW').length,
-      INFO: issues.filter(
+      ALL: list.length,
+      AUTO_FLAG: list.filter((i) => i.bucket === 'AUTO_FLAG').length,
+      HUMAN_REVIEW: list.filter((i) => i.bucket === 'HUMAN_REVIEW').length,
+      INFO: list.filter(
         (i) =>
           i.bucket === 'INFO' ||
           i.severity === 'INFO' ||
@@ -98,6 +105,11 @@ export const IssueQueueTable: React.FC<IssueQueueTableProps> = ({
           i.rule_id === 'V030'
       ).length,
     };
+  }, [issues, filterStatus]);
+
+  // Overall open/pending issues count
+  const openIssuesCount = useMemo(() => {
+    return issues.filter((i) => i.status === 'OPEN' || i.status === 'PROPOSED').length;
   }, [issues]);
 
   // Open INFO normalisations count
@@ -135,7 +147,13 @@ export const IssueQueueTable: React.FC<IssueQueueTableProps> = ({
       if (filterSeverity !== 'ALL' && iss.severity !== filterSeverity) return false;
       if (filterPriority !== 'ALL' && iss.priority !== filterPriority) return false;
       if (filterBucket !== 'ALL' && iss.bucket !== filterBucket) return false;
-      if (filterStatus !== 'ALL' && iss.status !== filterStatus) return false;
+      if (filterStatus !== 'ALL') {
+        if (filterStatus === 'OPEN') {
+          if (iss.status !== 'OPEN' && iss.status !== 'PROPOSED') return false;
+        } else if (iss.status !== filterStatus) {
+          return false;
+        }
+      }
 
       return true;
     });
@@ -185,17 +203,24 @@ export const IssueQueueTable: React.FC<IssueQueueTableProps> = ({
   );
   const visibleIssues = sortedIssues.slice(startIndex, endIndex);
 
-  // Checkbox handlers
+  // Checkbox handlers - only allow selecting actionable (non-fixed, non-dismissed) issues
   const handleToggleSelectAll = () => {
-    if (selectedIds.size === sortedIssues.length) {
+    const selectable = sortedIssues.filter(
+      (i) => i.status !== 'FIXED' && i.status !== 'DISMISSED'
+    );
+    if (selectable.length > 0 && selectedIds.size === selectable.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(sortedIssues.map((i) => i.issue_id)));
+      setSelectedIds(new Set(selectable.map((i) => i.issue_id)));
     }
   };
 
   const handleToggleSelectOne = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    const target = issues.find((i) => i.issue_id === id);
+    if (target && (target.status === 'FIXED' || target.status === 'DISMISSED')) {
+      return;
+    }
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -244,7 +269,7 @@ export const IssueQueueTable: React.FC<IssueQueueTableProps> = ({
     setFilterSeverity('ALL');
     setFilterPriority('ALL');
     setFilterBucket('ALL');
-    setFilterStatus('ALL');
+    setFilterStatus('OPEN');
     setSortField('priority');
     setSortDirection('asc');
   };
@@ -256,8 +281,16 @@ export const IssueQueueTable: React.FC<IssueQueueTableProps> = ({
           <div>
             <CardTitle className="text-base text-gov-navy font-bold flex items-center gap-2">
               <span>Explainable Issue Queue</span>
-              <span className="text-xs font-mono font-bold bg-gov-navy/10 text-gov-navy px-2 py-0.5 rounded-full">
-                {issues.length} Total
+              <span
+                className={`text-xs font-mono font-bold px-2 py-0.5 rounded-full ${
+                  openIssuesCount === 0
+                    ? 'bg-emerald-100 text-emerald-800'
+                    : 'bg-gov-navy/10 text-gov-navy'
+                }`}
+              >
+                {openIssuesCount === 0
+                  ? `All Resolved (${issues.length})`
+                  : `${openIssuesCount} Pending (${issues.length} Total)`}
               </span>
             </CardTitle>
             <CardDescription className="text-xs text-slate-500 mt-0.5">
@@ -492,8 +525,8 @@ export const IssueQueueTable: React.FC<IssueQueueTableProps> = ({
               onChange={(e) => setFilterStatus(e.target.value)}
               className="w-full h-8 px-2 rounded border border-slate-200 bg-white text-xs text-slate-700"
             >
+              <option value="OPEN">Open (Pending)</option>
               <option value="ALL">All Statuses</option>
-              <option value="OPEN">OPEN</option>
               <option value="FIXED">FIXED</option>
               <option value="DISMISSED">DISMISSED</option>
               <option value="PROPOSED">PROPOSED</option>
@@ -525,7 +558,11 @@ export const IssueQueueTable: React.FC<IssueQueueTableProps> = ({
             <input
               type="checkbox"
               aria-label="Select all issues"
-              checked={sortedIssues.length > 0 && selectedIds.size === sortedIssues.length}
+              checked={
+                sortedIssues.some((i) => i.status !== 'FIXED' && i.status !== 'DISMISSED') &&
+                selectedIds.size ===
+                  sortedIssues.filter((i) => i.status !== 'FIXED' && i.status !== 'DISMISSED').length
+              }
               onChange={handleToggleSelectAll}
               className="rounded border-slate-300 text-gov-navy focus:ring-gov-navy"
             />
@@ -585,7 +622,19 @@ export const IssueQueueTable: React.FC<IssueQueueTableProps> = ({
         {/* Scrollable Virtual Container */}
         {sortedIssues.length === 0 ? (
           <div className="py-12 text-center text-slate-500 text-xs">
-            No validation issues match the selected filters.
+            {issues.length > 0 && issues.every((i) => i.status === 'FIXED' || i.status === 'DISMISSED') ? (
+              <div className="flex flex-col items-center justify-center gap-2 max-w-sm mx-auto">
+                <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+                </div>
+                <span className="font-bold text-slate-900 text-sm">All Validation Issues Resolved!</span>
+                <p className="text-slate-500 text-xs leading-relaxed">
+                  All issues in this batch have been fixed or dismissed. Switch Status to &ldquo;All Statuses&rdquo; or &ldquo;FIXED&rdquo; if you wish to review resolved items.
+                </p>
+              </div>
+            ) : (
+              'No validation issues match the selected filters.'
+            )}
           </div>
         ) : (
           <div
@@ -625,9 +674,10 @@ export const IssueQueueTable: React.FC<IssueQueueTableProps> = ({
                         <input
                           type="checkbox"
                           checked={isChecked}
+                          disabled={iss.status === 'FIXED' || iss.status === 'DISMISSED'}
                           onClick={(e) => e.stopPropagation()}
                           onChange={(e) => handleToggleSelectOne(iss.issue_id, e as unknown as React.MouseEvent)}
-                          className="rounded border-slate-300 text-gov-navy focus:ring-gov-navy"
+                          className="rounded border-slate-300 text-gov-navy focus:ring-gov-navy disabled:opacity-30 disabled:cursor-not-allowed"
                         />
                         <span className="font-mono text-slate-600 font-semibold">#{iss.row}</span>
                       </div>
