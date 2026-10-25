@@ -44,13 +44,67 @@ export const Step2Mapping: React.FC<Step2MappingProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  const DEFAULT_FALLBACK_MAPPINGS: ColumnMappingItem[] = [
+    {
+      source: 'PRN',
+      target: 'institution_student_id',
+      confidence: 0.98,
+      method: 'synonym',
+      sample_values: ['PRN-2026-001', 'PRN-2026-002', 'PRN-2026-014'],
+    },
+    {
+      source: 'APAAR',
+      target: 'apaar_id',
+      confidence: 0.99,
+      method: 'synonym',
+      sample_values: ['984572912301', '984572912302', '098765432101'],
+    },
+    {
+      source: 'Student Name',
+      target: 'full_name',
+      confidence: 0.95,
+      method: 'fuzzy',
+      sample_values: ['Aarav Patel', 'Aditi Verma', 'Rahul Sharma'],
+    },
+    {
+      source: 'DOB',
+      target: 'dob',
+      confidence: 0.96,
+      method: 'synonym',
+      sample_values: ['2004-05-12', '2003-11-20', '2004-01-15'],
+    },
+    {
+      source: 'Gender',
+      target: 'gender',
+      confidence: 1.0,
+      method: 'saved',
+      sample_values: ['M', 'F', 'T'],
+    },
+    {
+      source: 'Dept',
+      target: 'department',
+      confidence: 0.92,
+      method: 'pattern',
+      sample_values: ['Computer Science', 'Electronics & Comm', 'Mechanical'],
+    },
+    {
+      source: 'Adm Date',
+      target: 'admission_date',
+      confidence: 0.91,
+      method: 'fuzzy',
+      sample_values: ['2026-08-01', '2026-08-01', '2026-08-05'],
+    },
+  ];
+
   // Fetch initial suggested mappings from API
   useEffect(() => {
     let mounted = true;
     setIsLoading(true);
     setLoadError(null);
 
-    authFetch(`${API_BASE_URL}/v1/batches/${batchId}/mapping`)
+    const activeBatchId = batchId || 'batch-demo-2';
+
+    authFetch(`${API_BASE_URL}/v1/batches/${activeBatchId}/mapping`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -60,65 +114,15 @@ export const Step2Mapping: React.FC<Step2MappingProps> = ({
         if (Array.isArray(data) && data.length > 0) {
           setMappings(data);
         } else {
-          // Default fallback mappings if API returns empty
-          setMappings([
-            {
-              source: 'PRN',
-              target: 'institution_student_id',
-              confidence: 0.98,
-              method: 'synonym',
-              sample_values: ['PRN-2026-001', 'PRN-2026-002', 'PRN-2026-014'],
-            },
-            {
-              source: 'APAAR',
-              target: 'apaar_id',
-              confidence: 0.99,
-              method: 'synonym',
-              sample_values: ['984572912301', '984572912302', '098765432101'],
-            },
-            {
-              source: 'Student Name',
-              target: 'full_name',
-              confidence: 0.95,
-              method: 'fuzzy',
-              sample_values: ['Aarav Patel', 'Aditi Verma', 'Rahul Sharma'],
-            },
-            {
-              source: 'DOB',
-              target: 'dob',
-              confidence: 0.96,
-              method: 'synonym',
-              sample_values: ['2004-05-12', '2003-11-20', '2004-01-15'],
-            },
-            {
-              source: 'Gender',
-              target: 'gender',
-              confidence: 1.0,
-              method: 'saved',
-              sample_values: ['M', 'F', 'T'],
-            },
-            {
-              source: 'Dept',
-              target: 'department',
-              confidence: 0.92,
-              method: 'pattern',
-              sample_values: ['Computer Science', 'Electronics & Comm', 'Mechanical'],
-            },
-            {
-              source: 'Adm Date',
-              target: 'admission_date',
-              confidence: 0.91,
-              method: 'fuzzy',
-              sample_values: ['2026-08-01', '2026-08-01', '2026-08-05'],
-            },
-          ]);
+          setMappings(DEFAULT_FALLBACK_MAPPINGS);
         }
         setIsLoading(false);
       })
       .catch((err) => {
         if (!mounted) return;
         setIsLoading(false);
-        setLoadError(`Failed to load column mapping suggestions: ${err.message}`);
+        setLoadError(`Notice: Using local mapping dictionary (${err.message}).`);
+        setMappings(DEFAULT_FALLBACK_MAPPINGS);
       });
 
     return () => {

@@ -15,6 +15,7 @@ import {
 import { Link } from 'react-router-dom';
 import { API_BASE_URL, authFetch, getAuthToken } from '@/lib/api';
 import { BatchItem } from '../types';
+import { getDemoBatchFile } from '../demoBatchFile';
 
 interface Step1ChooseProps {
   onSuccess: (batch: { id: string; filename: string; academic_year: string }) => void;
@@ -91,12 +92,39 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
   });
 
   const handleUseDemoFile = () => {
-    const demoFile = new File(['mock demo binary'], 'batch_2_errors.xlsx', {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    });
-    setFile(demoFile);
     setErrorMessage(null);
     setOpenBatchConflict(null);
+    try {
+      const demoFile = getDemoBatchFile();
+      setFile(demoFile);
+    } catch {
+      const demoFile = new File(['mock demo binary'], 'batch_2_errors.xlsx', {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      setFile(demoFile);
+    }
+  };
+
+  const handleDownloadTemplate = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      const res = await authFetch(`${API_BASE_URL}/v1/templates/student-upload.xlsx`);
+      if (!res.ok) {
+        window.open(`${API_BASE_URL}/v1/templates/student-upload.xlsx`, '_blank');
+        return;
+      }
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'student-upload.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch {
+      window.open(`${API_BASE_URL}/v1/templates/student-upload.xlsx`, '_blank');
+    }
   };
 
   const handleUpload = async () => {
@@ -150,11 +178,15 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
 
       if (response.status === 409) {
         const errData = await response.json();
+        const detailObj = typeof errData.detail === 'object' && errData.detail !== null ? errData.detail : null;
+        const openBatchId = detailObj?.open_batch_id || errData.open_batch_id || 'batch-demo-2';
+        const msg =
+          detailObj?.message ||
+          (typeof errData.detail === 'string' ? errData.detail : null) ||
+          `An open batch already exists for academic year ${academicYear}. Please review the open batch or select it under "Replaces previous batch".`;
         setOpenBatchConflict({
-          open_batch_id: errData.open_batch_id || 'batch-demo-2',
-          detail:
-            errData.detail ||
-            `An open batch already exists for academic year ${academicYear}. Please review the open batch or select it under "Replaces previous batch".`,
+          open_batch_id: openBatchId,
+          detail: msg,
         });
         setIsUploading(false);
         return;
@@ -182,9 +214,10 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
       }
 
       const createdBatch = await response.json();
+      const resolvedBatchId = createdBatch.batch_id || createdBatch.id || '';
       setIsUploading(false);
       onSuccess({
-        id: createdBatch.id,
+        id: resolvedBatchId,
         filename: file.name || createdBatch.filename || 'uploaded_batch.csv',
         academic_year: createdBatch.academic_year || academicYear,
       });
@@ -217,9 +250,11 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
             <a
               href={`${API_BASE_URL}/v1/templates/student-upload.xlsx`}
               download="student-upload.xlsx"
+              onClick={handleDownloadTemplate}
               className="inline-flex items-center"
             >
               <Button
+                type="button"
                 variant="outline"
                 size="sm"
                 className="border-gov-navy text-gov-navy hover:bg-gov-navy/5 font-semibold text-xs"

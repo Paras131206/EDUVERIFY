@@ -47,17 +47,14 @@ def normalize_date(val: Any, cell_type: str | None = None) -> tuple[str | None, 
             return None, [s], False
 
     # 2. Excel numeric serial date (e.g. 45678 or 45678.0)
-    if (cell_type in ("n", "d", "numeric", "date") or s.replace(".", "", 1).isdigit()) and float(
-        s
-    ) > 1000:
-        try:
-            num = float(s)
-            if 10000 <= num <= 70000:  # Covers ~1927 to ~2091
-                excel_epoch = date(1899, 12, 30)
-                parsed = excel_epoch + timedelta(days=int(num))
-                return parsed.isoformat(), [f"Excel serial {num}"], True
-        except (ValueError, OverflowError):
-            pass
+    try:
+        num = float(s)
+        if 10000 <= num <= 70000:  # Covers ~1927 to ~2091
+            excel_epoch = date(1899, 12, 30)
+            parsed = excel_epoch + timedelta(days=int(num))
+            return parsed.isoformat(), [f"Excel serial {num}"], True
+    except (ValueError, OverflowError):
+        pass
 
     # 3. Indian standard date formats: DD-MM-YYYY, DD/MM/YYYY, DD.MM.YYYY
     candidates = []
