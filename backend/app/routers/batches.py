@@ -668,6 +668,8 @@ def get_batch_record_by_row(
         pass
 
     return default_record
+
+
 @router.post(
     "/{id}/commit",
     response_model=CommitResponse,
