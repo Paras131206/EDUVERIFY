@@ -9,7 +9,6 @@ import {
   UserTypeConsentSetting,
 } from './types';
 import { getOrInitHolderKey } from '@/lib/holderKey';
-import { HolderKeyBanner } from './components/HolderKeyBanner';
 import { StudentProfileCard } from './components/StudentProfileCard';
 import { ConsentManagementCard } from './components/ConsentManagementCard';
 import { CredentialsListCard } from './components/CredentialsListCard';
@@ -186,12 +185,6 @@ export const StudentWalletPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 1. Holder Key Custody Banner (Req 2) */}
-      <HolderKeyBanner
-        publicJwk={publicJwk}
-        isRegistered={isKeyRegistered}
-        onKeyRefreshed={initHolderKey}
-      />
 
       {/* 2. Own Record Profile (Unmasked for Self per Req 1) */}
       <StudentProfileCard record={record} versions={versions} />

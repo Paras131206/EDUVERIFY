@@ -103,7 +103,7 @@ describe('Task A6: Trust UIs, Holder Key, Selective Disclosure & Verification', 
   });
 
   describe('3. Student Wallet UI (/student)', () => {
-    it('renders own unmasked record and device holder key notice', async () => {
+    it('renders own unmasked record for self', async () => {
       render(
         <MemoryRouter initialEntries={['/student']}>
           <Routes>
@@ -112,14 +112,8 @@ describe('Task A6: Trust UIs, Holder Key, Selective Disclosure & Verification', 
         </MemoryRouter>
       );
 
-      // Device custody banner
-      expect(
-        await screen.findByText(/This device holds your key; if you clear browser data you must request re-issue/i)
-      ).toBeInTheDocument();
-      expect(screen.getByTestId('holder-key-badge')).toHaveTextContent(/Hardware Key Active/i);
-
       // Unmasked Student Profile for self
-      expect(screen.getByText('Rahul Sharma')).toBeInTheDocument();
+      expect(await screen.findByText('Rahul Sharma')).toBeInTheDocument();
       expect(screen.getByText('984512349012')).toBeInTheDocument(); // Unmasked for self
       expect(screen.getByText('2026/UG/CSE/042')).toBeInTheDocument();
       expect(screen.getByText(/B.Tech Computer Science & Engineering/i)).toBeInTheDocument();

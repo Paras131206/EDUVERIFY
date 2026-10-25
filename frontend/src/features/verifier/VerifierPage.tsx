@@ -135,39 +135,6 @@ export const VerifierPage: React.FC = () => {
         </CardHeader>
 
         <CardContent className="pt-4 space-y-4">
-          {/* Verifier Role / Category Selector */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-1 border-b border-slate-100">
-            <div>
-              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">
-                Verifier Role / Organization Type
-              </label>
-              <select
-                value={verifierType}
-                onChange={(e) => setVerifierType(e.target.value as VerifierUserType)}
-                className="w-full p-2 rounded-lg border border-slate-300 text-xs bg-white font-medium"
-                data-testid="verifier-role-select"
-              >
-                <option value="PUBLIC">🌐 Public / Third-Party Verifier (PUBLIC)</option>
-                <option value="EMPLOYER">🏢 Corporate Employer & Recruiter (EMPLOYER)</option>
-                <option value="HIGHER_ED">🎓 University & Academic Institution (HIGHER_ED)</option>
-                <option value="GOVERNMENT">🏛️ Government & Scholarship Authority (GOVERNMENT)</option>
-                <option value="FINANCIAL">🏦 Bank & Education Loan Lender (FINANCIAL)</option>
-                <option value="REGULATORY">🛡️ AICTE & Apex Regulatory Board (REGULATORY)</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">
-                DPDP Statutory Enforcement
-              </label>
-              <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
-                <span>Section 8.4 User Consent Policy</span>
-                <span className="font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded text-[10px]">
-                  Live Enforced
-                </span>
-              </div>
-            </div>
-          </div>
-
           {/* Paste Presentation or Share URL */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
