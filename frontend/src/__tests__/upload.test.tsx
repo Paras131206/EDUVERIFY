@@ -140,16 +140,16 @@ describe('Upload Wizard & Column Mapping (Task A2)', () => {
       expect(screen.getByText('Pattern / Regex')).toBeInTheDocument();
 
       // Confidence percentages
-      expect(screen.getByText('98%')).toBeInTheDocument();
-      expect(screen.getByText('96%')).toBeInTheDocument();
-      expect(screen.getByText('92%')).toBeInTheDocument();
+      expect(screen.getAllByText('98%').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('96%').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('92%').length).toBeGreaterThan(0);
 
       // Masked APAAR in sample values preview (never unmasked)
       expect(screen.getByText('9845****2301')).toBeInTheDocument();
       expect(screen.queryByText('984572912301')).not.toBeInTheDocument();
     });
 
-    it('displays rule V001 red alert and disables confirm when required canonical fields are unmapped', async () => {
+    it('always auto-maps canonical fields by default so all 21 required fields are mapped', async () => {
       render(
         <MemoryRouter>
           <Step2Mapping
@@ -163,6 +163,30 @@ describe('Upload Wizard & Column Mapping (Task A2)', () => {
       );
 
       await waitFor(() => {
+        expect(screen.getByText(/21 \/ 21 required fields mapped/i)).toBeInTheDocument();
+      });
+
+      // Confirm button is enabled immediately
+      const confirmBtn = screen.getByRole('button', { name: /confirm mapping & start validation/i });
+      expect(confirmBtn).not.toBeDisabled();
+      expect(screen.queryByText(/rule v001: required column missing after column mapping/i)).not.toBeInTheDocument();
+    });
+
+    it('displays rule V001 red alert and disables confirm when required canonical fields are unmapped', async () => {
+      render(
+        <MemoryRouter>
+          <Step2Mapping
+            batchId="batch-demo-2"
+            filename="batch_2_errors.xlsx"
+            academicYear="2026-27"
+            onBack={vi.fn()}
+            onConfirm={vi.fn()}
+            autoMapCanonicalFields={false}
+          />
+        </MemoryRouter>
+      );
+
+      await waitFor(() => {
         expect(screen.getByText(/rule v001: required column missing after column mapping/i)).toBeInTheDocument();
       });
 
@@ -171,7 +195,7 @@ describe('Upload Wizard & Column Mapping (Task A2)', () => {
       expect(confirmBtn).toBeDisabled();
 
       // Auto-map remaining canonical fields button resolves V001
-      const autoMapBtn = screen.getByRole('button', { name: /auto-map remaining canonical fields/i });
+      const autoMapBtn = screen.getAllByRole('button', { name: /auto-map remaining canonical fields/i })[0];
       fireEvent.click(autoMapBtn);
 
       await waitFor(() => {

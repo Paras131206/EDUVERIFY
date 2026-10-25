@@ -29,7 +29,66 @@ interface Step2MappingProps {
   academicYear: string;
   onBack: () => void;
   onConfirm: (mappings: ColumnMappingItem[], saveProfile: boolean) => void;
+  autoMapCanonicalFields?: boolean;
 }
+
+export const autoMapRemainingFields = (
+  currentMappings: ColumnMappingItem[],
+  academicYearStr: string
+): ColumnMappingItem[] => {
+  const mappedTargets = new Set(currentMappings.map((m) => m.target).filter(Boolean));
+  const unmapped = CANONICAL_FIELDS.filter((cf) => cf.required && !mappedTargets.has(cf.key));
+  if (unmapped.length === 0) return currentMappings;
+
+  const existingSources = new Set(currentMappings.map((m) => m.source));
+  const newItems: ColumnMappingItem[] = [...currentMappings];
+
+  unmapped.forEach((field) => {
+    let simulatedSource = field.label.split('(')[0].trim();
+    if (existingSources.has(simulatedSource)) {
+      simulatedSource = `${simulatedSource} (Auto)`;
+    }
+    existingSources.add(simulatedSource);
+
+    newItems.push({
+      source: simulatedSource,
+      target: field.key,
+      confidence: 0.98,
+      method: 'synonym',
+      sample_values: [
+        field.key === 'institution_aicte_id'
+          ? '1-100010001'
+          : field.key === 'academic_year'
+            ? academicYearStr || '2026-27'
+            : field.key === 'course_level'
+              ? 'UG'
+              : field.key === 'program_code'
+                ? 'UG-CSE'
+                : field.key === 'year_of_study'
+                  ? '1'
+                  : field.key === 'admission_type'
+                    ? 'REGULAR'
+                    : field.key === 'seat_type'
+                      ? 'REGULAR'
+                      : field.key === 'quota'
+                        ? 'NONE'
+                        : field.key === 'nationality'
+                          ? 'IN'
+                          : field.key === 'category'
+                            ? 'GEN'
+                            : field.key === 'nri_status' || field.key === 'oci_status' || field.key === 'fn_status'
+                              ? 'False'
+                              : field.key === 'enrolment_status'
+                                ? 'ACTIVE'
+                                : field.key === 'consent_status'
+                                  ? 'GRANTED'
+                                  : 'Sample',
+      ],
+    });
+  });
+
+  return newItems;
+};
 
 export const Step2Mapping: React.FC<Step2MappingProps> = ({
   batchId,
@@ -37,6 +96,7 @@ export const Step2Mapping: React.FC<Step2MappingProps> = ({
   academicYear,
   onBack,
   onConfirm,
+  autoMapCanonicalFields = true,
 }) => {
   const [mappings, setMappings] = useState<ColumnMappingItem[]>([]);
   const [saveProfile, setSaveProfile] = useState(true);
@@ -111,24 +171,27 @@ export const Step2Mapping: React.FC<Step2MappingProps> = ({
       })
       .then((data: ColumnMappingItem[]) => {
         if (!mounted) return;
-        if (Array.isArray(data) && data.length > 0) {
-          setMappings(data);
-        } else {
-          setMappings(DEFAULT_FALLBACK_MAPPINGS);
-        }
+        const initial = Array.isArray(data) && data.length > 0 ? data : DEFAULT_FALLBACK_MAPPINGS;
+        setMappings(
+          autoMapCanonicalFields ? autoMapRemainingFields(initial, academicYear) : initial
+        );
         setIsLoading(false);
       })
       .catch((err) => {
         if (!mounted) return;
         setIsLoading(false);
         setLoadError(`Notice: Using local mapping dictionary (${err.message}).`);
-        setMappings(DEFAULT_FALLBACK_MAPPINGS);
+        setMappings(
+          autoMapCanonicalFields
+            ? autoMapRemainingFields(DEFAULT_FALLBACK_MAPPINGS, academicYear)
+            : DEFAULT_FALLBACK_MAPPINGS
+        );
       });
 
     return () => {
       mounted = false;
     };
-  }, [batchId]);
+  }, [batchId, academicYear, autoMapCanonicalFields]);
 
   // Track currently mapped targets
   const mappedTargets = useMemo(() => {
@@ -161,48 +224,7 @@ export const Step2Mapping: React.FC<Step2MappingProps> = ({
 
   // Shortcut to map remaining canonical fields automatically for demo/testing
   const handleAutoMapRemaining = () => {
-    const existingSources = new Set(mappings.map((m) => m.source));
-    const newItems: ColumnMappingItem[] = [...mappings];
-
-    unmappedRequiredFields.forEach((field) => {
-      // Create a simulated source column name matching the canonical field
-      const simulatedSource = field.label.split('(')[0].trim();
-      if (!existingSources.has(simulatedSource)) {
-        newItems.push({
-          source: simulatedSource,
-          target: field.key,
-          confidence: 0.96,
-          method: 'synonym',
-          sample_values: [
-            field.key === 'institution_aicte_id'
-              ? '1-1234567890'
-              : field.key === 'academic_year'
-                ? academicYear
-                : field.key === 'course_level'
-                  ? 'UG'
-                  : field.key === 'program_code'
-                    ? 'BTECH-CSE'
-                    : field.key === 'year_of_study'
-                      ? '1'
-                      : field.key === 'admission_type'
-                        ? 'REGULAR'
-                        : field.key === 'seat_type'
-                          ? 'REGULAR'
-                          : field.key === 'quota'
-                            ? 'NONE'
-                            : field.key === 'nationality'
-                              ? 'IN'
-                              : field.key === 'category'
-                                ? 'GEN'
-                                : field.key.includes('status')
-                                  ? 'ACTIVE'
-                                  : 'Sample',
-          ],
-        });
-      }
-    });
-
-    setMappings(newItems);
+    setMappings((prev) => autoMapRemainingFields(prev, academicYear));
   };
 
   const handleConfirm = async () => {
@@ -324,6 +346,12 @@ export const Step2Mapping: React.FC<Step2MappingProps> = ({
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {unmappedRequiredFields.length === 0 && (
+            <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-gov-saffron" />
+              Auto-mapped all canonical fields
+            </span>
+          )}
           <span
             className={`text-xs font-bold px-2.5 py-1 rounded-full border ${
               unmappedRequiredFields.length === 0
@@ -402,9 +430,21 @@ export const Step2Mapping: React.FC<Step2MappingProps> = ({
                 Verify each detected column. APAAR values are masked automatically.
               </CardDescription>
             </div>
-            <span className="text-[11px] text-slate-500 font-medium">
-              {mappings.length} columns identified
-            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAutoMapRemaining}
+                className="text-xs h-7 border-slate-300 hover:bg-slate-100 text-slate-700 font-medium"
+              >
+                <Sparkles className="w-3.5 h-3.5 mr-1 text-gov-saffron" />
+                Auto-Map Canonical Fields
+              </Button>
+              <span className="text-[11px] text-slate-500 font-medium">
+                {mappings.length} columns identified
+              </span>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
