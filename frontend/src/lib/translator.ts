@@ -724,8 +724,15 @@ export const HINDI_DICTIONARY: Record<string, string> = {
 
 
   // Step 3: Validate
+  "Step 3: Real-Time Engine Validation": "चरण 3: वास्तविक समय इंजन सत्यापन",
+  "Real-Time Engine Validation": "वास्तविक समय इंजन सत्यापन",
   "Step 3: Validation Engine Progress": "चरण 3: सत्यापन इंजन प्रगति",
+  "Streaming live telemetry from AICTE Verification Engine": "एआईसीटीई सत्यापन इंजन से लाइव टेलीमेट्री स्ट्रीमिंग जारी",
   "Validating student admission records against national AICTE statutory guidelines...": "राष्ट्रीय एआईसीटीई वैधानिक दिशानिर्देशों के अनुसार छात्र प्रवेश रिकॉर्ड का सत्यापन जारी...",
+  "Live SSE EventStream Connected": "लाइव SSE इवेंटस्ट्रीम कनेक्टेड",
+  "Polling Fallback Active (GET /v1/batches/:id)": "पोलिंग फ़ॉलबैक सक्रिय (GET /v1/batches/:id)",
+  "Multi-Stage Ingestion Pipeline": "बहु-चरणीय अंतर्ग्रहण पाइपलाइन",
+  "MULTI-STAGE INGESTION PIPELINE": "बहु-चरणीय अंतर्ग्रहण पाइपलाइन",
   "1. Parsing": "1. पार्सिंग",
   "Checking file structure, header encoding, and row delimiters": "फ़ाइल संरचना, हेडर एन्कोडिंग और पंक्ति विभाजक की जाँच जारी",
   "2. Mapping": "2. मैपिंग",
@@ -738,15 +745,27 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Detecting quota distribution drift and statistical z-score outliers": "कोटा वितरण विचलन और सांख्यिकीय z-स्कोर आउटलेयर की पहचान",
   "6. Report Generation": "6. रिपोर्ट तैयार करना",
   "Computing Quality Score gauge and intake reconciliation metrics": "गुणवत्ता स्कोर गेज और प्रवेश समाधान मेट्रिक्स की गणना",
+  "Validation Complete. Quality score and issues ready for review.": "सत्यापन पूर्ण हुआ। गुणवत्ता स्कोर एवं मुद्दे समीक्षा के लिए तैयार हैं।",
+  "Quality score and issues ready for review.": "गुणवत्ता स्कोर एवं मुद्दे समीक्षा के लिए तैयार हैं।",
+  "Quality score and issues ready for review": "गुणवत्ता स्कोर एवं मुद्दे समीक्षा के लिए तैयार हैं",
+  "Streaming live validation logs...": "लाइव सत्यापन लॉग स्ट्रीमिंग जारी...",
+  "View Result Summary": "परिणाम सारांश देखें",
+  "Result Summary": "परिणाम सारांश",
   "Validation in Progress": "सत्यापन प्रगति पर है",
   "Validation Complete": "सत्यापन पूर्ण हुआ",
   "Proceed to Summary": "सारांश पर आगे बढ़ें",
+  "Passed": "सफल",
+  "PASSED": "सफल",
+  "Running...": "प्रगति पर...",
+  "Queued": "कतारबद्ध",
 
   // Step 4: Summary
   "Step 4: Batch Validation Summary & Health Report": "चरण 4: बैच सत्यापन सारांश एवं स्वास्थ्य रिपोर्ट",
   "Review detailed validation results, error breakdown, and intake ceiling reconciliation before committing records.": "रिकॉर्ड कमिट करने से पहले विस्तृत सत्यापन परिणाम, त्रुटि विवरण और प्रवेश सीमा समाधान की समीक्षा करें।",
-  "Download XLSX": "XLSX डाउनलोड करें",
+  "Ingestion & Quality Summary": "अंतर्ग्रहण एवं गुणवत्ता सारांश",
+  "Download Report (XLSX)": "रिपोर्ट डाउनलोड करें (XLSX)",
   "Download PDF Report": "PDF रिपोर्ट डाउनलोड करें",
+  "Download XLSX": "XLSX डाउनलोड करें",
   "Total Records Processed": "कुल प्रसंस्कृत रिकॉर्ड",
   "Valid Records (Zero Errors)": "मान्य रिकॉर्ड (शून्य त्रुटियां)",
   "Records with Warnings": "चेतावनियों वाले रिकॉर्ड",
@@ -754,6 +773,38 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Intake Ceiling vs Uploaded Headcount": "स्वीकृत प्रवेश सीमा बनाम अपलोड की गई संख्या",
   "Program-wise reconciliation against AICTE approved ceilings": "एआईसीटीई स्वीकृत सीमा के विरुद्ध कार्यक्रम-वार समाधान",
   "Detected Schema Drift": "पहचाना गया स्कीमा विचलन",
+  "Schema Drift Detected": "पहचाना गया स्कीमा विचलन",
+  "Row Validation Status": "पंक्ति सत्यापन स्थिति",
+  "Total Uploaded:": "कुल अपलोड:",
+  "Total Uploaded": "कुल अपलोड",
+  "Valid Clean Rows:": "मान्य स्वच्छ पंक्तियां:",
+  "Valid Clean Rows": "मान्य स्वच्छ पंक्तियां",
+  "Rows with Warnings:": "चेतावनियों वाली पंक्तियां:",
+  "Rows with Warnings": "चेतावनियों वाली पंक्तियां",
+  "Rows with Errors:": "त्रुटियों वाली पंक्तियां:",
+  "Rows with Errors": "त्रुटियों वाली पंक्तियां",
+  "Issues by Priority Risk": "प्राथमिकता जोखिम के अनुसार मुद्दे",
+  "Review Bucket Queue": "समीक्षा बकेट कतार",
+  "Program Intake Capacity & Excess Evaluation": "कार्यक्रम प्रवेश क्षमता एवं अतिरिक्त मूल्यांकन",
+  "Evaluated against AICTE Approved Sanctioned Intake": "एआईसीटीई स्वीकृत स्वीकृत प्रवेश के विरुद्ध मूल्यांकित",
+  "EXCESS DETECTED": "अतिरिक्त प्रवेश पाया गया",
+  "Within Capacity": "क्षमता के भीतर",
+  "AICTE Approved:": "एआईसीटीई स्वीकृत:",
+  "AICTE Approved": "एआईसीटीई स्वीकृत",
+  "Total Enrolled:": "कुल नामांकित:",
+  "Supernumerary:": "अतिरिक्त सीटें:",
+  "Excess / Breach:": "अतिरिक्त / उल्लंघन:",
+  "Excess / Breach": "अतिरिक्त / उल्लंघन",
+  "Reconciliation Strip: Declared Total vs Ingested APAAR Records": "समाधान पट्टी: घोषित कुल बनाम अंतर्ग्रहीत अपार रिकॉर्ड",
+  "Declared Capacity:": "घोषित क्षमता:",
+  "Declared Capacity": "घोषित क्षमता",
+  "Uploaded Records:": "अपलोड किए गए रिकॉर्ड:",
+  "Delta:": "अंतर (डेल्टा):",
+  "Delta": "अंतर (डेल्टा)",
+  "Reconciled (Match)": "समाधानित (सटीक मिलान)",
+  "Mismatch Delta": "बेमेल अंतर (डेल्टा)",
+  "Next Step: Human-in-the-Loop Issue Resolution": "अगला चरण: ह्यूमन-इन-द-लूप मुद्दा समाधान",
+  "Open Review Workspace": "समीक्षा कार्यक्षेत्र खोलें",
 
   // Commit Modal
   "Commit Batch to Central Repository": "बैच को केंद्रीय भंडार में कमिट करें",
@@ -889,6 +940,24 @@ export function translateText(text: string): string {
   // Pattern: "Foreign National स्थिति"
   if (/Foreign\s+National\s+स्थिति/i.test(result)) {
     result = result.replace(/Foreign\s+National\s+स्थिति/gi, 'विदेशी नागरिक स्थिति');
+    hasMatch = true;
+  }
+
+  // Pattern: "सत्यापन पूर्ण हुआ. Quality स्कोर and issues ready for review." or English equivalent
+  if (/(?:Validation\s+Complete|सत्यापन\s+पूर्ण\s+हुआ)[.!]?\s*Quality\s+(?:score|स्कोर)\s+and\s+issues\s+ready\s+for\s+review/i.test(result)) {
+    result = result.replace(/(?:Validation\s+Complete|सत्यापन\s+पूर्ण\s+हुआ)[.!]?\s*Quality\s+(?:score|स्कोर)\s+and\s+issues\s+ready\s+for\s+review\.?/gi, 'सत्यापन पूर्ण हुआ। गुणवत्ता स्कोर एवं मुद्दे समीक्षा के लिए तैयार हैं।');
+    hasMatch = true;
+  }
+
+  // Pattern: "देखें Result Summary" or "View Result Summary"
+  if (/(?:View|देखें)\s+Result\s+Summary/i.test(result)) {
+    result = result.replace(/(?:View|देखें)\s+Result\s+Summary/gi, 'परिणाम सारांश देखें');
+    hasMatch = true;
+  }
+
+  // Pattern: "Streaming live telemetry from AICTE Verification Engine"
+  if (/Streaming\s+live\s+telemetry\s+from\s+AICTE\s+Verification\s+Engine/i.test(result)) {
+    result = result.replace(/Streaming\s+live\s+telemetry\s+from\s+AICTE\s+Verification\s+Engine/gi, 'एआईसीटीई सत्यापन इंजन से लाइव टेलीमेट्री स्ट्रीमिंग जारी');
     hasMatch = true;
   }
 

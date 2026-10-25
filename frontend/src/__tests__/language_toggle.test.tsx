@@ -156,6 +156,20 @@ describe('Site-Wide Language Translation System', () => {
     expect(translateText('22 / 22 Required Fields Mapped')).toBe('22 / 22 आवश्यक फ़ील्ड मैप किए गए');
     expect(translateText('6 columns identified')).toBe('6 कॉलम पहचाने गए');
     expect(translateText('Commit Batch to Central Repository')).toBe('बैच को केंद्रीय भंडार में कमिट करें');
+
+    // Step 3: Real-Time Engine Validation
+    expect(translateText('Step 3: Real-Time Engine Validation')).toBe('चरण 3: वास्तविक समय इंजन सत्यापन');
+    expect(translateText('Live SSE EventStream Connected')).toBe('लाइव SSE इवेंटस्ट्रीम कनेक्टेड');
+    expect(translateText('MULTI-STAGE INGESTION PIPELINE')).toBe('बहु-चरणीय अंतर्ग्रहण पाइपलाइन');
+    expect(translateText('PASSED')).toBe('सफल');
+    expect(translateText('Validation Complete. Quality score and issues ready for review.'))
+      .toBe('सत्यापन पूर्ण हुआ। गुणवत्ता स्कोर एवं मुद्दे समीक्षा के लिए तैयार हैं।');
+    expect(translateText('सत्यापन पूर्ण हुआ. Quality स्कोर and issues ready for review.'))
+      .toBe('सत्यापन पूर्ण हुआ। गुणवत्ता स्कोर एवं मुद्दे समीक्षा के लिए तैयार हैं।');
+    expect(translateText('View Result Summary')).toBe('परिणाम सारांश देखें');
+    expect(translateText('देखें Result Summary')).toBe('परिणाम सारांश देखें');
+    expect(translateText('Streaming live telemetry from AICTE Verification Engine'))
+      .toBe('एआईसीटीई सत्यापन इंजन से लाइव टेलीमेट्री स्ट्रीमिंग जारी');
   });
 });
 
