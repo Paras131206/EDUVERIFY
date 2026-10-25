@@ -196,6 +196,7 @@ export const BatchListPage: React.FC = () => {
           </div>
           <Link
             to={`/institution/batches/${openBatch.id || openBatch.batch_id}/review`}
+            state={{ batch: openBatch }}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-gov-navy hover:bg-slate-50 rounded-lg text-xs font-bold border border-amber-300 shadow-sm shrink-0 transition"
           >
             <ExternalLink className="w-3.5 h-3.5 text-gov-saffron" />
@@ -282,29 +283,33 @@ export const BatchListPage: React.FC = () => {
                       <TableCell>{getStatusBadge(batch.status)}</TableCell>
 
                       <TableCell>
-                        {typeof batch.quality_score === 'number' ? (
-                          <div className="flex items-center gap-1.5">
-                            <span
-                              className={`text-xs font-bold ${
-                                batch.quality_score >= 80
-                                  ? 'text-green-600'
-                                  : batch.quality_score >= 60
-                                    ? 'text-amber-600'
-                                    : 'text-red-600'
-                              }`}
-                            >
-                              {batch.quality_score}%
-                            </span>
-                            {typeof batch.quality_score_after === 'number' &&
-                              batch.quality_score_after > batch.quality_score && (
-                                <span className="text-[10px] text-green-700 font-bold">
-                                  → {batch.quality_score_after}%
-                                </span>
-                              )}
-                          </div>
-                        ) : (
-                          <span className="text-slate-400 text-xs italic">—</span>
-                        )}
+                        {(() => {
+                          const score = batch.quality_score ?? batch.quality_score_after ?? batch.quality_score_before;
+                          return typeof score === 'number' ? (
+                            <div className="flex items-center gap-1.5">
+                              <span
+                                className={`text-xs font-bold ${
+                                  score >= 80
+                                    ? 'text-green-600'
+                                    : score >= 60
+                                      ? 'text-amber-600'
+                                      : 'text-red-600'
+                                }`}
+                              >
+                                {score}%
+                              </span>
+                              {typeof batch.quality_score_after === 'number' &&
+                                typeof batch.quality_score_before === 'number' &&
+                                batch.quality_score_after > batch.quality_score_before && (
+                                  <span className="text-[10px] text-green-700 font-bold">
+                                    → {batch.quality_score_after}%
+                                  </span>
+                                )}
+                            </div>
+                          ) : (
+                            <span className="text-slate-400 text-xs italic">—</span>
+                          );
+                        })()}
                       </TableCell>
 
                       <TableCell>
@@ -350,7 +355,9 @@ export const BatchListPage: React.FC = () => {
                             variant="outline"
                             size="sm"
                             onClick={() =>
-                              navigate(`/institution/batches/${batch.batch_id || batch.id}/review`)
+                              navigate(`/institution/batches/${batch.batch_id || batch.id}/review`, {
+                                state: { batch },
+                              })
                             }
                             disabled={isSuperseded}
                             className="h-8 text-xs border-gov-navy text-gov-navy hover:bg-gov-navy/5 font-semibold"

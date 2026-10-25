@@ -131,11 +131,26 @@ export const InstitutionDashboardPage: React.FC = () => {
         const res = await fetchWithAuth(`${API_BASE_URL}/v1/dashboards/institution/summary`);
         if (res.ok) {
           const data = await res.json();
-          // If server reports batches/students, or local storage has uploaded flag
-          const hasData = (data.total_enrolled && data.total_enrolled > 0) || isUploadedInitial();
+          const qualityScore = data.latest_quality_score ?? data.avg_quality_score;
+          const totalEnrolled = data.total_students ?? data.total_enrolled ?? 0;
+          const approvedIntake = data.sanctioned_intake ?? data.approved_intake ?? 520;
+          const batchesCount = data.active_batches ?? data.batches_count ?? 0;
+          const pendingReviews = data.pending_reviews ?? data.pending_review_count ?? 0;
+
+          const hasData = totalEnrolled > 0 || batchesCount > 0 || isUploadedInitial();
           if (hasData) {
             setHasUploaded(true);
-            setSummary((prev) => ({ ...prev, ...data }));
+            setSummary((prev) => ({
+              ...prev,
+              ...data,
+              institution_name: data.institution_name || prev.institution_name,
+              total_enrolled: totalEnrolled,
+              approved_intake: approvedIntake,
+              batches_count: batchesCount,
+              latest_quality_score:
+                qualityScore !== undefined ? qualityScore : prev.latest_quality_score,
+              pending_review_count: pendingReviews,
+            }));
           } else {
             setHasUploaded(false);
             setSummary(ZERO_SUMMARY);
