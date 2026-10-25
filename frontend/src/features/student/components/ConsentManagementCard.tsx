@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ConsentPurposeSetting, ConsentHistoryRecord, ConsentPurpose } from '../types';
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, authFetch } from '@/lib/api';
 import {
   ShieldCheck,
   AlertTriangle,
@@ -39,7 +39,7 @@ export const ConsentManagementCard: React.FC<ConsentManagementCardProps> = ({
   const executeConsentChange = async (purpose: ConsentPurpose, action: 'GRANTED' | 'WITHDRAWN') => {
     setUpdating(purpose);
     try {
-      const res = await fetch(`${API_BASE_URL}/v1/students/me/consent`, {
+      const res = await authFetch(`${API_BASE_URL}/v1/students/me/consent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

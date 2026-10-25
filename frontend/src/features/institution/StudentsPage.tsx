@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from '@/components/ui/table';
 import { MaskedValue } from '@/components/shared/MaskedValue';
-import { API_BASE_URL, fetchWithAuth } from '@/lib/api';
+import { API_BASE_URL, authFetch } from '@/lib/api';
 import {
   StudentDetailRecord,
   EnrolmentStatus,
@@ -54,7 +54,7 @@ export const StudentsPage: React.FC = () => {
       if (statusFilter !== 'ALL') url.searchParams.set('status', statusFilter);
       if (programFilter !== 'ALL') url.searchParams.set('program', programFilter);
 
-      const res = await fetchWithAuth(url.toString());
+      const res = await authFetch(url.toString());
       if (res.ok) {
         const data = await res.json();
         setStudents(data);
@@ -88,7 +88,7 @@ export const StudentsPage: React.FC = () => {
       setIsSubmitting(true);
       setTransitionError(null);
 
-      const res = await fetchWithAuth(`${API_BASE_URL}/v1/students/${transitioningStudent.apaar_id}/transitions`, {
+      const res = await authFetch(`${API_BASE_URL}/v1/students/${transitioningStudent.apaar_id}/transitions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

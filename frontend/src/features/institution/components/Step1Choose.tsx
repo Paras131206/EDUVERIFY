@@ -12,9 +12,9 @@ import {
   RefreshCw,
   ExternalLink,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { API_BASE_URL, fetchWithAuth } from '@/lib/api';
+import { API_BASE_URL, authFetch, getAuthToken } from '@/lib/api';
 import { BatchItem } from '../types';
+import { getDemoBatchFile } from '../demoBatchFile';
 
 interface Step1ChooseProps {
   onSuccess: (batch: { id: string; filename: string; academic_year: string }) => void;
@@ -35,7 +35,7 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
   // Fetch academic years master and existing batches
   useEffect(() => {
     let mounted = true;
-    fetchWithAuth(`${API_BASE_URL}/v1/master/academic-years`)
+    authFetch(`${API_BASE_URL}/v1/master/academic-years`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data: { academic_year: string; is_current?: boolean }[]) => {
         if (!mounted || !data.length) return;
@@ -46,7 +46,7 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
       })
       .catch(() => {});
 
-    fetchWithAuth(`${API_BASE_URL}/v1/batches`)
+    authFetch(`${API_BASE_URL}/v1/batches`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data: BatchItem[]) => {
         if (mounted && Array.isArray(data)) {
@@ -91,12 +91,39 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
   });
 
   const handleUseDemoFile = () => {
-    const demoFile = new File(['mock demo binary'], 'batch_2_errors.xlsx', {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    });
-    setFile(demoFile);
     setErrorMessage(null);
     setOpenBatchConflict(null);
+    try {
+      const demoFile = getDemoBatchFile();
+      setFile(demoFile);
+    } catch {
+      const demoFile = new File(['mock demo binary'], 'batch_2_errors.xlsx', {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      setFile(demoFile);
+    }
+  };
+
+  const handleDownloadTemplate = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      const res = await authFetch(`${API_BASE_URL}/v1/templates/student-upload.xlsx`);
+      if (!res.ok) {
+        window.open(`${API_BASE_URL}/v1/templates/student-upload.xlsx`, '_blank');
+        return;
+      }
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'student-upload.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch {
+      window.open(`${API_BASE_URL}/v1/templates/student-upload.xlsx`, '_blank');
+    }
   };
 
   const handleUpload = async () => {
@@ -116,23 +143,29 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
       formData.append('supersedes_batch_id', supersedesBatchId);
     }
 
+    const token = getAuthToken();
+    const authHeaders: Record<string, string> = {
+      'Idempotency-Key': idempotencyKey,
+    };
+    if (token) {
+      authHeaders['Authorization'] = `Bearer ${token}`;
+    }
+
     try {
       let response: Response;
       try {
-        response = await fetchWithAuth(`${API_BASE_URL}/v1/batches`, {
+        response = await authFetch(`${API_BASE_URL}/v1/batches`, {
           method: 'POST',
-          headers: {
-            'Idempotency-Key': idempotencyKey,
-          },
+          headers: authHeaders,
           body: formData,
         });
       } catch {
         // Fallback for test / JSDOM environments where FormData file streaming fails
-        response = await fetchWithAuth(`${API_BASE_URL}/v1/batches`, {
+        response = await authFetch(`${API_BASE_URL}/v1/batches`, {
           method: 'POST',
           headers: {
+            ...authHeaders,
             'Content-Type': 'application/json',
-            'Idempotency-Key': idempotencyKey,
           },
           body: JSON.stringify({
             filename: file.name,
@@ -144,36 +177,46 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
 
       if (response.status === 409) {
         const errData = await response.json();
-        let openBatchId = 'batch-demo-2';
-        let detailMsg = `An open batch already exists for academic year ${academicYear}. Please review the open batch or select it under "Replaces previous batch".`;
-
-        if (errData) {
-          if (typeof errData.detail === 'object' && errData.detail !== null) {
-            openBatchId = errData.detail.open_batch_id || errData.open_batch_id || openBatchId;
-            detailMsg = errData.detail.message || detailMsg;
-          } else if (typeof errData.detail === 'string') {
-            detailMsg = errData.detail;
-            openBatchId = errData.open_batch_id || openBatchId;
-          }
-        }
-
+        const detailObj = typeof errData.detail === 'object' && errData.detail !== null ? errData.detail : null;
+        const openBatchId = detailObj?.open_batch_id || errData.open_batch_id || 'batch-demo-2';
+        const msg =
+          detailObj?.message ||
+          (typeof errData.detail === 'string' ? errData.detail : null) ||
+          `An open batch already exists for academic year ${academicYear}. Please review the open batch or select it under "Replaces previous batch".`;
         setOpenBatchConflict({
           open_batch_id: openBatchId,
-          detail: detailMsg,
+          detail: msg,
         });
         setIsUploading(false);
         return;
       }
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Upload failed');
+        let msg = 'Upload failed';
+        try {
+          const errorJson = await response.json();
+          if (response.status === 401) {
+            msg = 'Authentication required. Your session may have expired — please sign in again.';
+          } else if (typeof errorJson.detail === 'string') {
+            msg = errorJson.detail;
+          } else if (errorJson.detail && typeof errorJson.detail.detail === 'string') {
+            msg = errorJson.detail.detail;
+          } else if (errorJson.message) {
+            msg = errorJson.message;
+          } else {
+            msg = typeof errorJson === 'object' ? JSON.stringify(errorJson) : String(errorJson);
+          }
+        } catch {
+          msg = (await response.text()) || 'Upload failed';
+        }
+        throw new Error(msg);
       }
 
       const createdBatch = await response.json();
+      const resolvedBatchId = createdBatch.batch_id || createdBatch.id || '';
       setIsUploading(false);
       onSuccess({
-        id: createdBatch.id || createdBatch.batch_id,
+        id: resolvedBatchId,
         filename: file.name || createdBatch.filename || 'uploaded_batch.csv',
         academic_year: createdBatch.academic_year || academicYear,
       });
@@ -206,9 +249,11 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
             <a
               href={`${API_BASE_URL}/v1/templates/student-upload.xlsx`}
               download="student-upload.xlsx"
+              onClick={handleDownloadTemplate}
               className="inline-flex items-center"
             >
               <Button
+                type="button"
                 variant="outline"
                 size="sm"
                 className="border-gov-navy text-gov-navy hover:bg-gov-navy/5 font-semibold text-xs"
@@ -263,10 +308,20 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
       {errorMessage && (
         <div
           role="alert"
-          className="p-3 bg-red-50 border border-red-200 rounded-md text-xs text-red-700 flex items-center gap-2"
+          className="p-3 bg-red-50 border border-red-200 rounded-md text-xs text-red-700 flex items-center justify-between gap-3 shadow-xs"
         >
-          <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
-          <span>{errorMessage}</span>
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
+            <span>{errorMessage}</span>
+          </div>
+          {errorMessage.toLowerCase().includes('authentication') || errorMessage.toLowerCase().includes('sign in') || errorMessage.toLowerCase().includes('log in') ? (
+            <Link
+              to="/login"
+              className="font-semibold text-gov-navy hover:underline shrink-0 bg-white px-2.5 py-1 rounded border border-red-200 text-xs shadow-xs"
+            >
+              Sign In &rarr;
+            </Link>
+          ) : null}
         </div>
       )}
 

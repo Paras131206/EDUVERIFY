@@ -9,8 +9,10 @@ export const TopBar: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
+  const isHindi = i18n.language?.startsWith('hi');
+
   const toggleLanguage = () => {
-    const nextLang = i18n.language === 'en' ? 'hi' : 'en';
+    const nextLang = isHindi ? 'en' : 'hi';
     i18n.changeLanguage(nextLang);
   };
 
@@ -29,10 +31,10 @@ export const TopBar: React.FC = () => {
           <button
             onClick={toggleLanguage}
             className="inline-flex items-center gap-1.5 hover:text-white px-2 py-0.5 rounded bg-slate-800/80 hover:bg-slate-700 transition focus:outline-none focus:ring-1 focus:ring-gov-saffron text-xs"
-            aria-label={`Switch language to ${i18n.language === 'en' ? 'हिन्दी' : 'English'}`}
+            aria-label={`Switch language to ${isHindi ? 'English' : 'हिन्दी'}`}
           >
             <Languages className="w-3.5 h-3.5 text-gov-saffron" aria-hidden="true" />
-            <span>{i18n.language === 'en' ? 'हिन्दी' : 'English'}</span>
+            <span>{isHindi ? 'English' : 'हिन्दी'}</span>
           </button>
         </div>
       </div>

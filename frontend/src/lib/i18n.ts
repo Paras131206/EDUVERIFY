@@ -3,16 +3,28 @@ import { initReactI18next } from 'react-i18next';
 import en from './locales/en.json';
 import hi from './locales/hi.json';
 
+const savedLang = typeof window !== 'undefined' ? localStorage.getItem('eduverify_lang') || 'en' : 'en';
+
 i18n.use(initReactI18next).init({
   resources: {
     en: { translation: en },
     hi: { translation: hi },
   },
-  lng: 'en',
+  lng: savedLang,
   fallbackLng: 'en',
   interpolation: {
     escapeValue: false,
   },
 });
+
+if (typeof window !== 'undefined') {
+  i18n.on('languageChanged', (lng) => {
+    try {
+      localStorage.setItem('eduverify_lang', lng);
+    } catch {
+      // ignore
+    }
+  });
+}
 
 export default i18n;

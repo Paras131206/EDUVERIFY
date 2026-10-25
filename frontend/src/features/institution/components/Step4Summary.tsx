@@ -16,7 +16,7 @@ import {
 import { QualityScoreGauge } from '@/components/shared/QualityScoreGauge';
 import { PriorityBadge, type Priority } from '@/components/shared/PriorityBadge';
 import { BucketBadge, type Bucket } from '@/components/shared/BucketBadge';
-import { API_BASE_URL, fetchWithAuth } from '@/lib/api';
+import { API_BASE_URL, authFetch } from '@/lib/api';
 import { mockBatchReport } from '@/mocks/data';
 import { IntakeCardData, ReconciliationRowData, SchemaDriftData } from '../types';
 
@@ -34,7 +34,7 @@ export const Step4Summary: React.FC<Step4SummaryProps> = ({ batchId, onReset }) 
     let mounted = true;
     setIsLoading(true);
 
-    fetchWithAuth(`${API_BASE_URL}/v1/batches/${batchId}/report`)
+    authFetch(`${API_BASE_URL}/v1/batches/${batchId}/report`)
       .then((res) => (res.ok ? res.json() : mockBatchReport))
       .then((data) => {
         if (mounted) {

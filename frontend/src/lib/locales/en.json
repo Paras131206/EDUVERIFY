@@ -16,12 +16,18 @@
     "upload": "Upload Batch",
     "batches": "Batch Registry",
     "review": "Review Workspace",
-    "transfers": "Transfers"
+    "transfers": "Transfers",
+    "students": "Student Registry",
+    "aggregates": "Aggregate Intake",
+    "dab": "DAB Portal & Degrees",
+    "portals_modules": "Portals & Modules",
+    "signin_portal": "Sign In to Portal"
   },
   "roles": {
     "AICTE_ADMIN": "AICTE Admin",
     "AICTE_ANALYST": "AICTE Analyst",
     "DAB_ADMIN": "Degree Awarding Body Admin",
+    "DAB_MEMBER": "DAB Member",
     "INSTITUTION_ADMIN": "Institution Admin",
     "INSTITUTION_STAFF": "Institution Staff",
     "VERIFIER": "Authorized Verifier",
@@ -32,7 +38,10 @@
     "accessibility": "Accessibility Statement: WCAG 2.1 AA Compliant",
     "copyright": "© 2026 EduVerify System. All rights reserved.",
     "role": "Role",
-    "offline_warning": "You are currently offline. Actions will be queued."
+    "navigation": "Navigation",
+    "offline_warning": "You are currently offline. Actions will be queued.",
+    "apaar_keyed": "APAAR Keyed",
+    "apaar_secured": "All data secured via 12-digit APAAR format with hash chain audit."
   },
   "badges": {
     "critical": "Critical",

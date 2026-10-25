@@ -178,6 +178,7 @@ export const LoginPage: React.FC = () => {
                     </label>
                     <Input
                       id="email"
+                      data-testid="login-email-input"
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -219,6 +220,7 @@ export const LoginPage: React.FC = () => {
                     <div className="relative">
                       <Input
                         id="password"
+                        data-testid="login-password-input"
                         type={showPassword ? 'text' : 'password'}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
@@ -251,6 +253,7 @@ export const LoginPage: React.FC = () => {
                     </label>
                     <Input
                       id="totp"
+                      data-testid="login-totp-input"
                       type="text"
                       inputMode="numeric"
                       pattern="[0-9]*"
@@ -272,6 +275,7 @@ export const LoginPage: React.FC = () => {
                 className="w-full mt-2 bg-gov-navy hover:bg-gov-navyDark text-white"
                 disabled={isLoading}
                 id="sign-in-btn"
+                data-testid="login-submit-btn"
               >
                 {isLoading ? (
                   <span className="flex items-center gap-2">

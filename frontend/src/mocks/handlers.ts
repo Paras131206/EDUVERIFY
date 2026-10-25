@@ -136,13 +136,25 @@ export const resetReportsMock = () => {
 
 
 let failedLogins = 0;
-let activeSessionUser: typeof mockUser | null = null;
+let activeSessionUser: typeof mockUser | null = (() => {
+  try {
+    const raw = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('mock_active_user') : null;
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+})();
 let apiKeys = [...mockApiKeys];
 let institutionUsers = [...mockInstitutionUsers];
 
 export const resetAuthMock = () => {
   failedLogins = 0;
   activeSessionUser = null;
+  try {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem('mock_active_user');
+    }
+  } catch {}
   apiKeys = [...mockApiKeys];
   institutionUsers = [...mockInstitutionUsers];
 };
@@ -229,7 +241,8 @@ export const handlers = [
     }
 
     // Check credentials - uniform error prevents user enumeration
-    if (!password || (password !== 'password123' && password !== 'AdminPassword@2026')) {
+    const validPasswords = ['password123', 'Demo@EduVerify2026!', 'AdminPassword@2026'];
+    if (!password || !validPasswords.includes(password)) {
       failedLogins++;
       if (failedLogins >= 5) {
         return HttpResponse.json(
@@ -256,6 +269,11 @@ export const handlers = [
       email: email || mockUser.email,
     };
     activeSessionUser = matchedUser;
+    try {
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem('mock_active_user', JSON.stringify(matchedUser));
+      }
+    } catch {}
 
     return HttpResponse.json({
       access_token: `mock-jwt-${matchedUser.role.toLowerCase()}-${Date.now()}`,
@@ -270,6 +288,11 @@ export const handlers = [
     if (body.code === '123456') {
       const aicteUser = mockUsers['aicte.admin@demo.local'];
       activeSessionUser = aicteUser;
+      try {
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.setItem('mock_active_user', JSON.stringify(aicteUser));
+        }
+      } catch {}
       return HttpResponse.json({
         access_token: `mock-jwt-aicte_admin-${Date.now()}`,
         token_type: 'bearer',

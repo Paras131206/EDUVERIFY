@@ -322,7 +322,8 @@ def issue_credential_service(
         .order_by(Credential.status_list_index.desc())
         .first()
     )
-    next_idx = (max_idx[0] + 1) if max_idx and max_idx[0] is not None else 0
+    cur_idx = max_idx[0] if max_idx else None
+    next_idx = (cur_idx + 1) if cur_idx is not None else 0
 
     # 5. Issuer key & DID resolution
     issuer_id = (
