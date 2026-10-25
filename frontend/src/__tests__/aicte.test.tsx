@@ -480,6 +480,68 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
       expect(within(admin).getByText(/AICTE National Apex Credential Authority/i)).toBeInTheDocument();
       expect(within(admin).getByText(/did:web:dcet.eduverify.ac.in/i)).toBeInTheDocument();
     });
+
+    it('uploads institution master data with verified provenance and inspects certificate', async () => {
+      renderAictePage();
+
+      await waitFor(() => {
+        expect(screen.getByTestId('admin-section')).toBeInTheDocument();
+      });
+
+      const admin = screen.getByTestId('admin-section');
+
+      // Click "Ingest Official Institutions"
+      const uploadBtn = within(admin).getByTestId('upload-institutions-btn');
+      fireEvent.click(uploadBtn);
+
+      // Verify modal opened
+      await waitFor(() => {
+        expect(screen.getByTestId('institution-upload-modal')).toBeInTheDocument();
+      });
+
+      const modal = screen.getByTestId('institution-upload-modal');
+      expect(within(modal).getByText(/Ingest Official Institution Master Data/i)).toBeInTheDocument();
+      expect(within(modal).getByText(/Statutory Provenance Tracking/i)).toBeInTheDocument();
+
+      // Click "Load Official APH 2026-27 Dataset"
+      const loadAphBtn = within(modal).getByTestId('load-aph-sample-btn');
+      fireEvent.click(loadAphBtn);
+
+      await waitFor(() => {
+        expect(within(modal).getByText(/College of Engineering Pune/i)).toBeInTheDocument();
+        expect(within(modal).getByText(/U-0892/i)).toBeInTheDocument();
+      });
+
+      // Confirm ingestion
+      const confirmBtn = within(modal).getByTestId('confirm-ingest-btn');
+      fireEvent.click(confirmBtn);
+
+      await waitFor(() => {
+        expect(within(modal).getByText(/Statutory Master Ingestion Complete!/i)).toBeInTheDocument();
+      });
+
+      // Close modal
+      const closeBtn = within(modal).getByTestId('modal-close-btn');
+      fireEvent.click(closeBtn);
+
+      // In the admin institutions table, inspect provenance certificate
+      await waitFor(() => {
+        expect(within(admin).getAllByText(/College of Engineering Pune/i).length).toBeGreaterThan(0);
+      });
+
+      const inspectBtn = within(admin).getByTestId('inspect-provenance-1-100010041');
+      fireEvent.click(inspectBtn);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('provenance-certificate-modal')).toBeInTheDocument();
+      });
+
+      const certModal = screen.getByTestId('provenance-certificate-modal');
+      expect(within(certModal).getByText(/Statutory Data Provenance Certificate/i)).toBeInTheDocument();
+      expect(within(certModal).getByText(/AISHE Code/i)).toBeInTheDocument();
+      expect(within(certModal).getByText(/U-0892/i)).toBeInTheDocument();
+      expect(within(certModal).getByText(/F.No. AICTE\/WR\/2026\/APH-COEP-01/i)).toBeInTheDocument();
+    });
   });
 
   describe('11. Empty, Error, and Offline States', () => {
@@ -517,6 +579,100 @@ describe('Task A5: AICTE Central Repository Console (/aicte)', () => {
 
       await waitFor(() => {
         expect(screen.queryByTestId('aicte-offline-banner')).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('12. Institution Registration & Sanctioned Seat Matrix Tab', () => {
+    it('switches to Seat Matrix tab, registers a new institution with quotas, uploads seat matrix doc, and inspects certificate', async () => {
+      renderAictePage();
+
+      await waitFor(() => {
+        expect(screen.getByTestId('tab-seat-matrix')).toBeInTheDocument();
+      });
+
+      // Switch to the tab
+      const tabBtn = screen.getByTestId('tab-seat-matrix');
+      fireEvent.click(tabBtn);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('institution-seat-matrix-section')).toBeInTheDocument();
+      });
+
+      const section = screen.getByTestId('institution-seat-matrix-section');
+      expect(within(section).getByText(/Institution Registration & Sanctioned Seat Matrix/i)).toBeInTheDocument();
+      expect(within(section).getByText(/Delhi College of Engineering & Technology/i)).toBeInTheDocument();
+
+      // Test 1: Register New Institution
+      const regBtn = within(section).getByTestId('register-institution-btn');
+      fireEvent.click(regBtn);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('register-institution-modal')).toBeInTheDocument();
+      });
+
+      const regModal = screen.getByTestId('register-institution-modal');
+      const quickFillBtn = within(regModal).getByTestId('quick-fill-sample-btn');
+      fireEvent.click(quickFillBtn);
+
+      expect(within(regModal).getByDisplayValue(/Indian Institute of Information Technology Pune/i)).toBeInTheDocument();
+      expect(within(regModal).getByDisplayValue('420')).toBeInTheDocument();
+
+      const submitRegBtn = within(regModal).getByTestId('submit-register-institution-btn');
+      fireEvent.click(submitRegBtn);
+
+      await waitFor(() => {
+        expect(within(regModal).getByText(/Institution Registered Successfully!/i)).toBeInTheDocument();
+      });
+
+      const closeRegBtn = within(regModal).getByTestId('close-reg-modal-btn');
+      fireEvent.click(closeRegBtn);
+
+      // Verify newly registered institution appears in section table
+      await waitFor(() => {
+        expect(within(section).getByText(/Indian Institute of Information Technology Pune/i)).toBeInTheDocument();
+      });
+
+      // Test 2: Upload Seat Matrix Document for an institution
+      const uploadDocBtn = within(section).getByTestId('upload-doc-btn-1-100010001');
+      fireEvent.click(uploadDocBtn);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('upload-seat-matrix-modal')).toBeInTheDocument();
+      });
+
+      const uploadModal = screen.getByTestId('upload-seat-matrix-modal');
+      const intakeInput = within(uploadModal).getByTestId('seat-intake-input');
+      fireEvent.change(intakeInput, { target: { value: '480' } });
+
+      const submitUploadBtn = within(uploadModal).getByTestId('submit-seat-matrix-btn');
+      fireEvent.click(submitUploadBtn);
+
+      await waitFor(() => {
+        expect(within(uploadModal).getByText(/Seat Matrix Document & Capacity Updated Successfully!/i)).toBeInTheDocument();
+      });
+
+      const closeUploadBtn = within(uploadModal).getByTestId('close-upload-seat-modal-btn');
+      fireEvent.click(closeUploadBtn);
+
+      // Test 3: Inspect Certificate
+      const certBtn = within(section).getByTestId('inspect-seat-cert-1-100010001');
+      fireEvent.click(certBtn);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('seat-matrix-certificate-modal')).toBeInTheDocument();
+      });
+
+      const certModal = screen.getByTestId('seat-matrix-certificate-modal');
+      expect(within(certModal).getByText(/AICTE Sanctioned Intake & Seat Matrix Certificate/i)).toBeInTheDocument();
+      expect(within(certModal).getByText(/General \(GEN - Open\)/i)).toBeInTheDocument();
+      expect(within(certModal).getByText(/Other Backward Classes \(OBC-NCL\)/i)).toBeInTheDocument();
+
+      const closeCertBtn = within(certModal).getByTestId('close-seat-cert-modal');
+      fireEvent.click(closeCertBtn);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('seat-matrix-certificate-modal')).not.toBeInTheDocument();
       });
     });
   });

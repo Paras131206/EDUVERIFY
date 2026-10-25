@@ -10,6 +10,7 @@ import { ReviewPage } from '@/features/institution/ReviewPage';
 import { TransfersPage } from '@/features/institution/TransfersPage';
 import { StudentsPage } from '@/features/institution/StudentsPage';
 import { AggregatesPage } from '@/features/institution/AggregatesPage';
+import { InstitutionAuditPage } from '@/features/institution/InstitutionAuditPage';
 import { AicteDashboardPage } from '@/features/aicte/AicteDashboardPage';
 import { DabDashboardPage } from '@/features/dab/DabDashboardPage';
 import { StudentWalletPage } from '@/features/student/StudentWalletPage';
@@ -17,6 +18,7 @@ import { VerifierPage } from '@/features/verifier/VerifierPage';
 import { ReportsPage } from '@/features/reports/ReportsPage';
 import { AuthorityAccessPage } from '@/features/reports/AuthorityAccessPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
+import { EmployerPortalPage } from '@/features/employer/EmployerPortalPage';
 
 const RootLayout: React.FC = () => (
   <AuthProvider>
@@ -117,6 +119,14 @@ export const router = createBrowserRouter([
               </RequireRole>
             ),
           },
+          {
+            path: 'institution/audit',
+            element: (
+              <RequireRole roles={['INSTITUTION_ADMIN', 'INSTITUTION_STAFF']}>
+                <InstitutionAuditPage />
+              </RequireRole>
+            ),
+          },
           // AICTE Console
           {
             path: 'aicte',
@@ -148,6 +158,15 @@ export const router = createBrowserRouter([
           {
             path: 'verify',
             element: <VerifierPage />,
+          },
+          // Employer Hiring Portal
+          {
+            path: 'employer',
+            element: (
+              <RequireRole roles={['EMPLOYER', 'AICTE_ADMIN']}>
+                <EmployerPortalPage />
+              </RequireRole>
+            ),
           },
           // Reports
           {

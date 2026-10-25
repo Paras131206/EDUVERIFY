@@ -17,8 +17,10 @@ import {
   LogIn,
   Users,
   BarChart3,
+  Briefcase,
   Sun,
   Moon,
+  History,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { useTheme } from '@/lib/theme';
@@ -61,10 +63,7 @@ export const Sidebar: React.FC = () => {
       visible:
         !role ||
         role === 'INSTITUTION_ADMIN' ||
-        role === 'INSTITUTION_STAFF' ||
-        role === 'AICTE_ADMIN' ||
-        role === 'AICTE_ANALYST' ||
-        role === 'AICTE_VIEWER',
+        role === 'INSTITUTION_STAFF',
     },
     {
       to: '/institution/batches/batch-demo-2/review',
@@ -96,6 +95,12 @@ export const Sidebar: React.FC = () => {
       icon: <BarChart3 className="w-4 h-4" aria-hidden="true" />,
       visible: !role || role === 'INSTITUTION_ADMIN' || role === 'INSTITUTION_STAFF',
     },
+    {
+      to: '/institution/audit',
+      label: t('nav.audit_log', 'Document Audit & Revert'),
+      icon: <History className="w-4 h-4" aria-hidden="true" />,
+      visible: !role || role === 'INSTITUTION_ADMIN' || role === 'INSTITUTION_STAFF',
+    },
     // AICTE items
     {
       to: '/aicte',
@@ -121,12 +126,12 @@ export const Sidebar: React.FC = () => {
       icon: <Wallet className="w-4 h-4" aria-hidden="true" />,
       visible: !role || role === 'STUDENT',
     },
-    // Verifier items
+    // Employer items
     {
-      to: '/verify',
-      label: t('nav.verifier'),
-      icon: <ShieldCheck className="w-4 h-4" aria-hidden="true" />,
-      visible: true,
+      to: '/employer',
+      label: t('nav.employer', 'Employer Hiring Portal'),
+      icon: <Briefcase className="w-4 h-4" aria-hidden="true" />,
+      visible: !role || role === 'EMPLOYER' || role === 'AICTE_ADMIN',
     },
     // Reports
     {

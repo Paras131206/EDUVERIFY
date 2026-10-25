@@ -160,3 +160,110 @@ export interface TrustListItem {
   status: 'ACTIVE' | 'REVOKED' | 'EXPIRED';
   expires_at: string;
 }
+
+export interface InstitutionMasterRecord {
+  institution_aicte_id: string;
+  name: string;
+  state_code: string | number;
+  state_name?: string;
+  district_code: string | number;
+  district_name?: string;
+  type: string;
+  affiliated_dab_id: string;
+  onboarding_level: 'FULL' | 'AGGREGATE_ONLY' | string;
+  did: string;
+  aishe_code?: string;
+  approval_order_ref?: string;
+  source_authority?: string;
+  source_file_name?: string;
+  source_file_hash?: string;
+  verified_by?: string;
+  verified_at?: string;
+}
+
+export interface IngestInstitutionsPayload {
+  source_authority: string;
+  approval_order_ref: string;
+  aishe_cycle_code?: string;
+  authorizing_officer: string;
+  source_file_name?: string;
+  institutions: Partial<InstitutionMasterRecord>[];
+}
+
+export interface IngestInstitutionsResult {
+  success: boolean;
+  ingested_count: number;
+  updated_count: number;
+  total_records: number;
+  source_authority: string;
+  approval_order_ref: string;
+  batch_hash: string;
+  ingested_at: string;
+  institutions: InstitutionMasterRecord[];
+}
+
+export interface QuotaAllocation {
+  gen: number;
+  sc: number;
+  st: number;
+  obc: number;
+  ews: number;
+  pwd?: number;
+}
+
+export interface SupernumeraryAllocation {
+  tfw: number;
+  pmsss: number;
+  nri_oci_fn: number;
+  ciwg?: number;
+}
+
+export interface InstitutionSeatMatrixRecord extends InstitutionMasterRecord {
+  approved_intake: number;
+  academic_year: string;
+  quotas: QuotaAllocation;
+  supernumerary: SupernumeraryAllocation;
+  document_name?: string;
+  document_type?: string;
+  document_url?: string;
+  document_hash?: string;
+  document_uploaded_at?: string;
+  authorizing_director?: string;
+}
+
+export interface RegisterInstitutionPayload {
+  institution_aicte_id: string;
+  name: string;
+  state_code: string | number;
+  state_name: string;
+  district_code: string | number;
+  district_name: string;
+  type: string;
+  affiliated_dab_id: string;
+  onboarding_level: 'FULL' | 'AGGREGATE_ONLY';
+  aishe_code?: string;
+  approved_intake: number;
+  academic_year: string;
+  quotas: QuotaAllocation;
+  supernumerary: SupernumeraryAllocation;
+  approval_order_ref: string;
+  document_name?: string;
+  document_type?: string;
+  authorizing_director?: string;
+  source_authority?: string;
+}
+
+export interface UploadSeatMatrixPayload {
+  institution_aicte_id: string;
+  academic_year: string;
+  approved_intake: number;
+  quotas: QuotaAllocation;
+  supernumerary: SupernumeraryAllocation;
+  approval_order_ref: string;
+  document_name: string;
+  document_type: string;
+  authorizing_director?: string;
+  remarks?: string;
+}
+
+

@@ -41,6 +41,7 @@ import {
   mockStudentCredentials,
   mockDabGraduates,
   mockReportItems,
+  mockEmployerRequests,
 } from './data';
 import {
   StudentOwnRecord,
@@ -50,6 +51,7 @@ import {
   StudentCredentialItem,
   DabGraduateItem,
   UserTypeConsentSetting,
+  EmployerHiringRequestItem,
 } from '@/features/student/types';
 import { ReportItem, ReportJob } from '@/features/reports/types';
 import { parsePresentation } from '@/lib/sdjwt';
@@ -86,6 +88,7 @@ let crossDuplicatesState: DuplicateClusterItem[] = JSON.parse(JSON.stringify(moc
 let auditVerificationState: AuditVerificationVerdict = JSON.parse(JSON.stringify(mockAuditVerification));
 let auditLogState: AuditLogEntry[] = JSON.parse(JSON.stringify(mockAuditLog));
 let aicteReconciliationState: ReconciliationRecordItem[] = JSON.parse(JSON.stringify(mockAicteReconciliation));
+export let masterInstitutionsState = JSON.parse(JSON.stringify(mockMasterInstitutions));
 
 export const resetAicteMock = () => {
   aicteSummaryState = JSON.parse(JSON.stringify(mockAicteSummary));
@@ -94,6 +97,7 @@ export const resetAicteMock = () => {
   auditVerificationState = JSON.parse(JSON.stringify(mockAuditVerification));
   auditLogState = JSON.parse(JSON.stringify(mockAuditLog));
   aicteReconciliationState = JSON.parse(JSON.stringify(mockAicteReconciliation));
+  masterInstitutionsState = JSON.parse(JSON.stringify(mockMasterInstitutions));
 };
 
 export const setMockAicteSummary = (summary: Partial<typeof mockAicteSummary>) => {
@@ -108,6 +112,7 @@ export let userTypeConsentsState: UserTypeConsentSetting[] = JSON.parse(JSON.str
 export let consentHistoryState: ConsentHistoryRecord[] = JSON.parse(JSON.stringify(mockConsentHistory));
 export let studentCredentialsState: StudentCredentialItem[] = JSON.parse(JSON.stringify(mockStudentCredentials));
 export let dabGraduatesState: DabGraduateItem[] = JSON.parse(JSON.stringify(mockDabGraduates));
+export let employerRequestsState: EmployerHiringRequestItem[] = JSON.parse(JSON.stringify(mockEmployerRequests));
 export let holderRegisteredKeyState: any = null;
 
 export const resetTrustMock = () => {
@@ -118,6 +123,7 @@ export const resetTrustMock = () => {
   consentHistoryState = JSON.parse(JSON.stringify(mockConsentHistory));
   studentCredentialsState = JSON.parse(JSON.stringify(mockStudentCredentials));
   dabGraduatesState = JSON.parse(JSON.stringify(mockDabGraduates));
+  employerRequestsState = JSON.parse(JSON.stringify(mockEmployerRequests));
   holderRegisteredKeyState = null;
 };
 
@@ -654,11 +660,173 @@ export const handlers = [
       proposed_value: proposedVal,
       value_masked: valMasked,
       decided_by: body.user_role || 'INSTITUTION_ADMIN',
+      decided_at: new Date().toISOString(),
+      original_value: (issue as any).original_value || issue.value_masked,
     };
 
     currentBatchReport.issues[issueIndex] = updatedIssue;
     return HttpResponse.json(updatedIssue);
   }),
+
+  http.post('*/v1/issues/:id/revert', async ({ params, request }) => {
+    let body: { reason?: string } = {};
+    try {
+      body = (await request.json()) as { reason?: string };
+    } catch {
+      // empty body
+    }
+
+    const issueIndex = currentBatchReport.issues.findIndex(
+      (i: typeof currentBatchReport.issues[0]) => i.issue_id === params.id
+    );
+
+    if (issueIndex === -1) {
+      return HttpResponse.json({ detail: 'Issue not found' }, { status: 404 });
+    }
+
+    const issue = currentBatchReport.issues[issueIndex];
+    const originalVal = (issue as any).original_value || issue.value_masked;
+
+    const revertedIssue = {
+      ...issue,
+      status: 'OPEN' as const,
+      decision_note: undefined,
+      proposed_value: undefined,
+      value_masked: originalVal,
+      decided_by: undefined,
+      decided_at: undefined,
+      is_reverted: true,
+      revert_reason: body.reason || 'Rollback to original document value',
+    };
+
+    currentBatchReport.issues[issueIndex] = revertedIssue;
+
+    // Append to audit log
+    const auditEntry: AuditLogEntry = {
+      id: `aud-rev-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      actor_email: 'inst.admin@demo.local',
+      actor_role: 'INSTITUTION_ADMIN',
+      action: 'REVERT_ISSUE_DECISION',
+      resource: 'ISSUE',
+      record_hash: Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
+      prev_record_hash: auditLogState[0]?.record_hash || '0'.repeat(64),
+      metadata: {
+        issue_id: params.id,
+        revert_reason: body.reason || 'Reverted by Institution Admin',
+        batch_id: 'batch-demo-2',
+      },
+    };
+    auditLogState.unshift(auditEntry);
+
+    return HttpResponse.json(revertedIssue);
+  }),
+
+  http.post('*/v1/batches/:batch_id/issues/:id/revert', async ({ params, request }) => {
+    let body: { reason?: string } = {};
+    try {
+      body = (await request.json()) as { reason?: string };
+    } catch {
+      // empty body
+    }
+
+    const issueIndex = currentBatchReport.issues.findIndex(
+      (i: typeof currentBatchReport.issues[0]) => i.issue_id === params.id
+    );
+
+    if (issueIndex === -1) {
+      return HttpResponse.json({ detail: 'Issue not found' }, { status: 404 });
+    }
+
+    const issue = currentBatchReport.issues[issueIndex];
+    const originalVal = (issue as any).original_value || issue.value_masked;
+
+    const revertedIssue = {
+      ...issue,
+      status: 'OPEN' as const,
+      decision_note: undefined,
+      proposed_value: undefined,
+      value_masked: originalVal,
+      decided_by: undefined,
+      decided_at: undefined,
+      is_reverted: true,
+      revert_reason: body.reason || 'Rollback to original document value',
+    };
+
+    currentBatchReport.issues[issueIndex] = revertedIssue;
+    return HttpResponse.json(revertedIssue);
+  }),
+
+  http.get('*/v1/institution/audit-trail', ({ request }) => {
+    const url = new URL(request.url);
+    const filterBatchId = url.searchParams.get('batch_id');
+
+    let filteredBatches = batches;
+    if (filterBatchId) {
+      filteredBatches = batches.filter((b) => (b.id || b.batch_id) === filterBatchId);
+    }
+
+    const issues = currentBatchReport.issues.map((iss: typeof currentBatchReport.issues[0]) => {
+      const isModified = iss.status === 'FIXED' || iss.status === 'DISMISSED';
+      const isReverted = Boolean((iss as any).is_reverted);
+      return {
+        issue_id: iss.issue_id,
+        batch_id: 'batch-demo-2',
+        batch_filename: 'batch_2_errors.xlsx',
+        rule_id: iss.rule_id,
+        row: iss.row,
+        field: iss.field,
+        apaar_id: (iss as any).apaar_id || (iss.evidence as any)?.apaar_id || '987654321012',
+        severity: iss.severity,
+        priority: iss.priority,
+        message: iss.message,
+        reason: iss.reason,
+        original_value: (iss as any).original_value || iss.value_masked,
+        modified_value: isModified ? iss.value_masked : null,
+        status: iss.status,
+        decided_by_id: iss.decided_by || (isModified ? 'inst.admin@demo.local' : null),
+        decided_by_name: iss.decided_by ? 'Institution Admin' : (isModified ? 'Institution Admin' : null),
+        decided_by_role: isModified ? 'INSTITUTION_ADMIN' : null,
+        decided_at: (iss as any).decided_at || (isModified ? '2026-08-11T14:35:00Z' : null),
+        decision_note: iss.decision_note || (isModified ? 'Admin accepted suggested correction' : null),
+        is_reverted: isReverted,
+        revert_reason: (iss as any).revert_reason || null,
+        can_revert: isModified && !isReverted,
+      };
+    });
+
+    const totalModified = issues.filter((i: { status: string }) => i.status === 'FIXED' || i.status === 'DISMISSED').length;
+    const totalReverted = issues.filter((i: { is_reverted: boolean }) => i.is_reverted).length;
+
+    return HttpResponse.json({
+      batches: filteredBatches.map((b) => ({
+        batch_id: b.id || b.batch_id,
+        id: b.id || b.batch_id,
+        academic_year: b.academic_year,
+        filename: b.filename,
+        size_bytes: 48291,
+        status: b.status,
+        version: 1,
+        quality_score_before: b.quality_score_before,
+        quality_score_after: b.quality_score_after,
+        quality_score: b.quality_score ?? b.quality_score_after ?? b.quality_score_before,
+        created_at: b.created_at,
+        updated_at: b.updated_at,
+        rows_total: b.rows_total || 65,
+        rows_error: b.rows_error || 12,
+        rows_warning: b.rows_warning || 5,
+      })),
+      discrepancies: issues,
+      audit_logs: auditLogState.slice(0, 20),
+      stats: {
+        total_documents: filteredBatches.length,
+        total_discrepancies: issues.length,
+        total_modified: totalModified,
+        total_reverted: totalReverted,
+      },
+    });
+  }),
+
 
   http.post('*/v1/batches/:id/issues/bulk-decide', async ({ request }) => {
     const body = (await request.json()) as {
@@ -977,11 +1145,222 @@ export const handlers = [
 
   http.get('*/v1/admin/master/:entity', ({ params }) => {
     const entity = params.entity as string;
-    if (entity === 'institutions') return HttpResponse.json(mockMasterInstitutions);
+    if (entity === 'institutions') return HttpResponse.json(masterInstitutionsState);
     if (entity === 'dabs') return HttpResponse.json(mockMasterDabs);
     if (entity === 'programs') return HttpResponse.json(mockMasterPrograms);
     if (entity === 'academic-years') return HttpResponse.json(mockMasterAcademicYears);
     return HttpResponse.json({ message: `Entity ${entity} not found` }, { status: 404 });
+  }),
+
+  http.get('*/v1/master/institutions', () => {
+    return HttpResponse.json(masterInstitutionsState);
+  }),
+
+  http.post('*/v1/admin/master/institutions/upload', async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as Record<string, any>;
+    const sourceAuthority = body.source_authority || 'AICTE Approval Process Handbook (APH) 2026-27';
+    const approvalOrderRef = body.approval_order_ref || `F.No. AICTE/AB/2026/APH-${Date.now().toString().slice(-4)}`;
+    const authorizingOfficer = body.authorizing_officer || 'AICTE Master Data Administrator';
+    const sourceFileName = body.source_file_name || 'uploaded_institutions_dataset.csv';
+    const nowIso = new Date().toISOString();
+    const batchHash = `sha256:${Math.random().toString(16).slice(2, 10)}${Math.random().toString(16).slice(2, 10)}7f83b165`;
+
+    const rawInstitutions = Array.isArray(body.institutions) ? body.institutions : [];
+    let ingestedCount = 0;
+    let updatedCount = 0;
+
+    rawInstitutions.forEach((inst: any, idx: number) => {
+      const aicteId = inst.institution_aicte_id || `1-${100010050 + masterInstitutionsState.length + idx}`;
+      const existingIdx = masterInstitutionsState.findIndex((m: any) => m.institution_aicte_id === aicteId);
+
+      const record = {
+        institution_aicte_id: aicteId,
+        name: inst.name || `Institution ${aicteId}`,
+        state_code: inst.state_code || '07',
+        state_name: inst.state_name || 'Delhi',
+        district_code: inst.district_code || '101',
+        district_name: inst.district_name || 'Central Delhi',
+        type: (inst.type || 'ENGINEERING').toUpperCase(),
+        affiliated_dab_id: inst.affiliated_dab_id || 'DAB-101',
+        onboarding_level: (inst.onboarding_level || 'FULL') as 'FULL' | 'AGGREGATE_ONLY',
+        did: inst.did || `did:web:${aicteId.toLowerCase().replace(/[^a-z0-9]/g, '')}.eduverify.ac.in`,
+        aishe_code: inst.aishe_code || `C-${Math.floor(10000 + Math.random() * 89999)}`,
+        approval_order_ref: inst.approval_order_ref || approvalOrderRef,
+        source_authority: inst.source_authority || sourceAuthority,
+        source_file_name: sourceFileName,
+        source_file_hash: batchHash,
+        verified_by: authorizingOfficer,
+        verified_at: nowIso,
+      };
+
+      if (existingIdx >= 0) {
+        masterInstitutionsState[existingIdx] = { ...masterInstitutionsState[existingIdx], ...record };
+        updatedCount++;
+      } else {
+        masterInstitutionsState.unshift(record);
+        ingestedCount++;
+      }
+    });
+
+    // Record provenance action in audit log chain
+    auditLogState.unshift({
+      id: `aud-prov-${Date.now()}`,
+      timestamp: nowIso,
+      actor_email: 'aicte.admin@aicte-india.org',
+      actor_role: 'AICTE_ADMIN',
+      action: 'MASTER_INSTITUTION_INGESTION',
+      resource: `master.institutions (${rawInstitutions.length} records)`,
+      record_hash: batchHash,
+      prev_record_hash: auditLogState[0]?.record_hash || '0000000000000000',
+      metadata: {
+        source_authority: sourceAuthority,
+        approval_order_ref: approvalOrderRef,
+        ingested_count: ingestedCount,
+        updated_count: updatedCount,
+      },
+    });
+
+    return HttpResponse.json({
+      success: true,
+      ingested_count: ingestedCount,
+      updated_count: updatedCount,
+      total_records: masterInstitutionsState.length,
+      source_authority: sourceAuthority,
+      approval_order_ref: approvalOrderRef,
+      batch_hash: batchHash,
+      ingested_at: nowIso,
+      institutions: masterInstitutionsState,
+    });
+  }),
+
+  http.post('*/v1/admin/institutions/register', async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as Record<string, any>;
+    const nowIso = new Date().toISOString();
+    const docHash = `sha256:${Math.random().toString(16).slice(2, 10)}${Math.random().toString(16).slice(2, 10)}seatmatrix`;
+
+    const aicteId = body.institution_aicte_id || `1-${100010060 + masterInstitutionsState.length}`;
+    const intake = Number(body.approved_intake) || 360;
+
+    const defaultQuotas = {
+      gen: Math.round(intake * 0.5),
+      obc: Math.round(intake * 0.27),
+      sc: Math.round(intake * 0.15),
+      st: Math.round(intake * 0.075),
+      ews: Math.round(intake * 0.1),
+      pwd: Math.round(intake * 0.05),
+    };
+
+    const record = {
+      institution_aicte_id: aicteId,
+      name: body.name || `Registered Institution ${aicteId}`,
+      state_code: body.state_code || '07',
+      state_name: body.state_name || 'Delhi',
+      district_code: body.district_code || '101',
+      district_name: body.district_name || 'Central Delhi',
+      type: (body.type || 'ENGINEERING').toUpperCase(),
+      affiliated_dab_id: body.affiliated_dab_id || 'DAB-101',
+      onboarding_level: (body.onboarding_level || 'FULL') as 'FULL' | 'AGGREGATE_ONLY',
+      did: body.did || `did:web:${aicteId.toLowerCase().replace(/[^a-z0-9]/g, '')}.eduverify.ac.in`,
+      aishe_code: body.aishe_code || `C-${Math.floor(10000 + Math.random() * 89999)}`,
+      approval_order_ref: body.approval_order_ref || `F.No. AICTE/AB/2026/APH-${aicteId.slice(-4)}`,
+      source_authority: body.source_authority || 'AICTE Approval Process Handbook (APH) 2026-27',
+      source_file_name: body.document_name || 'statutory_seat_matrix_approval.pdf',
+      source_file_hash: docHash,
+      verified_by: body.authorizing_director || 'Dr. T.G. Sitharam, Chairman AICTE',
+      verified_at: nowIso,
+      approved_intake: intake,
+      academic_year: body.academic_year || '2026-27',
+      quotas: body.quotas || defaultQuotas,
+      supernumerary: body.supernumerary || {
+        tfw: Math.round(intake * 0.05),
+        pmsss: 10,
+        nri_oci_fn: Math.round(intake * 0.15),
+        ciwg: 15,
+      },
+      document_name: body.document_name || 'official_intake_approval.pdf',
+      document_type: body.document_type || 'AICTE_APPROVAL_LETTER',
+      document_hash: docHash,
+      document_uploaded_at: nowIso,
+      authorizing_director: body.authorizing_director || 'Dr. T.G. Sitharam, Chairman AICTE',
+    };
+
+    const existingIdx = masterInstitutionsState.findIndex((m: any) => m.institution_aicte_id === aicteId);
+    if (existingIdx >= 0) {
+      masterInstitutionsState[existingIdx] = { ...masterInstitutionsState[existingIdx], ...record };
+    } else {
+      masterInstitutionsState.unshift(record);
+    }
+
+    auditLogState.unshift({
+      id: `aud-reg-${Date.now()}`,
+      timestamp: nowIso,
+      actor_email: 'aicte.admin@aicte-india.org',
+      actor_role: 'AICTE_ADMIN',
+      action: 'INSTITUTION_REGISTERED',
+      resource: `${record.institution_aicte_id} - ${record.name} (${record.approved_intake} seats)`,
+      record_hash: docHash,
+      prev_record_hash: auditLogState[0]?.record_hash || '0000000000000000',
+      metadata: {
+        institution_aicte_id: record.institution_aicte_id,
+        approved_intake: record.approved_intake,
+        approval_order_ref: record.approval_order_ref,
+        document_name: record.document_name,
+      },
+    });
+
+    return HttpResponse.json({ success: true, institution: record }, { status: 201 });
+  }),
+
+  http.post('*/v1/admin/institutions/:id/seat-matrix', async ({ params, request }) => {
+    const id = params.id as string;
+    const body = (await request.json().catch(() => ({}))) as Record<string, any>;
+    const nowIso = new Date().toISOString();
+    const docHash = `sha256:${Math.random().toString(16).slice(2, 10)}${Math.random().toString(16).slice(2, 10)}reviseddoc`;
+
+    const instIdx = masterInstitutionsState.findIndex((m: any) => m.institution_aicte_id === id);
+    if (instIdx < 0) {
+      return HttpResponse.json({ message: `Institution ${id} not found` }, { status: 404 });
+    }
+
+    const current = masterInstitutionsState[instIdx];
+    const newIntake = Number(body.approved_intake) || current.approved_intake || 360;
+
+    const updated = {
+      ...current,
+      approved_intake: newIntake,
+      academic_year: body.academic_year || current.academic_year || '2026-27',
+      quotas: body.quotas || current.quotas,
+      supernumerary: body.supernumerary || current.supernumerary,
+      approval_order_ref: body.approval_order_ref || current.approval_order_ref,
+      document_name: body.document_name || current.document_name || 'revised_seat_matrix.pdf',
+      document_type: body.document_type || current.document_type || 'SEAT_MATRIX_GAZETTE',
+      document_hash: docHash,
+      document_uploaded_at: nowIso,
+      authorizing_director: body.authorizing_director || current.authorizing_director || 'Dr. T.G. Sitharam, Chairman AICTE',
+      source_file_hash: docHash,
+      verified_at: nowIso,
+    };
+
+    masterInstitutionsState[instIdx] = updated;
+
+    auditLogState.unshift({
+      id: `aud-seat-${Date.now()}`,
+      timestamp: nowIso,
+      actor_email: 'aicte.admin@aicte-india.org',
+      actor_role: 'AICTE_ADMIN',
+      action: 'SEAT_MATRIX_DOCUMENT_UPLOADED',
+      resource: `${id} - ${updated.name} (Sanctioned Intake: ${newIntake})`,
+      record_hash: docHash,
+      prev_record_hash: auditLogState[0]?.record_hash || '0000000000000000',
+      metadata: {
+        institution_aicte_id: id,
+        new_approved_intake: newIntake,
+        document_name: updated.document_name,
+        approval_order_ref: updated.approval_order_ref,
+      },
+    });
+
+    return HttpResponse.json({ success: true, institution: updated });
   }),
 
   http.post('*/v1/admin/rollover', async ({ request }) => {
@@ -1183,6 +1562,184 @@ export const handlers = [
     });
   }),
 
+  // Student Employer Access Requests
+  http.get('*/v1/students/me/employer-requests', () => {
+    return HttpResponse.json(employerRequestsState);
+  }),
+
+  http.post('*/v1/students/me/employer-requests/:id/decision', async ({ params, request }) => {
+    const { id } = params;
+    const body = (await request.json().catch(() => ({}))) as any;
+    const decision = body.decision; // 'APPROVED' | 'REJECTED'
+
+    const reqItem = employerRequestsState.find((r) => r.id === id);
+    if (!reqItem) {
+      return HttpResponse.json({ detail: 'Access request not found' }, { status: 404 });
+    }
+
+    reqItem.status = decision === 'APPROVED' ? 'APPROVED' : 'REJECTED';
+    reqItem.decided_at = new Date().toISOString();
+
+    // If approved, update EMPLOYER_HIRING purpose state
+    const hiringPurpose = consentPurposesState.find((p) => p.purpose === 'EMPLOYER_HIRING');
+    if (hiringPurpose && decision === 'APPROVED') {
+      hiringPurpose.is_granted = true;
+    }
+
+    const historyRecord: ConsentHistoryRecord = {
+      id: `cst-${Date.now()}`,
+      purpose: 'EMPLOYER_HIRING',
+      action: decision === 'APPROVED' ? 'GRANTED' : 'WITHDRAWN',
+      timestamp: new Date().toISOString(),
+      actor: 'Student (Self via Wallet)',
+      notes: `${decision === 'APPROVED' ? 'Approved' : 'Rejected'} employer access request for ${reqItem.employer_name}`,
+    };
+    consentHistoryState = [historyRecord, ...consentHistoryState];
+
+    return HttpResponse.json(reqItem);
+  }),
+
+  // Employer Portal Handlers
+  http.get('*/v1/employer/candidates', ({ request }) => {
+    const url = new URL(request.url);
+    const search = url.searchParams.get('q')?.toLowerCase() || '';
+    const consentOnly = url.searchParams.get('consent_only') === 'true';
+
+    const hiringPurpose = consentPurposesState.find((p) => p.purpose === 'EMPLOYER_HIRING');
+    const hasGlobalConsent = !!hiringPurpose?.is_granted;
+
+    const candidates = studentsState.slice(0, 50).map((s) => {
+      // For demo student, check matching request or global consent
+      const isDemoStudent = s.apaar_id === mockStudentOwnRecord.apaar_id;
+      const approvedReq = employerRequestsState.find(
+        (r) => r.apaar_id === s.apaar_id && r.status === 'APPROVED'
+      );
+      const consented = isDemoStudent ? (hasGlobalConsent || !!approvedReq) : s.apaar_id.endsWith('1') || s.apaar_id.endsWith('7');
+      const latestReq = employerRequestsState.find((r) => r.apaar_id === s.apaar_id);
+
+      return {
+        apaar_id: s.apaar_id,
+        full_name: s.full_name,
+        institution_aicte_id: s.institution_aicte_id,
+        institution_name: s.institution_aicte_id === '1-1234567890' ? 'Indian Institute of Technology, Bombay' : 'Delhi Technological University',
+        program_code: s.program_code,
+        course_level: s.course_level,
+        academic_year: s.academic_year,
+        enrolment_status: s.enrolment_status,
+        cgpa: consented ? 8.92 : null,
+        has_consent: consented,
+        consent_status: consented ? 'GRANTED' : (latestReq ? latestReq.status : 'WITHDRAWN'),
+        request_status: latestReq?.status || null,
+      };
+    });
+
+    let filtered = candidates;
+    if (search) {
+      filtered = filtered.filter(
+        (c) =>
+          c.full_name.toLowerCase().includes(search) ||
+          c.apaar_id.includes(search) ||
+          c.program_code.toLowerCase().includes(search)
+      );
+    }
+    if (consentOnly) {
+      filtered = filtered.filter((c) => c.has_consent);
+    }
+
+    return HttpResponse.json(filtered);
+  }),
+
+  http.get('*/v1/employer/candidates/:apaarId', ({ params }) => {
+    const { apaarId } = params;
+    const student = studentsState.find((s) => s.apaar_id === apaarId) || studentsState[0];
+
+    const hiringPurpose = consentPurposesState.find((p) => p.purpose === 'EMPLOYER_HIRING');
+    const hasGlobalConsent = !!hiringPurpose?.is_granted;
+    const approvedReq = employerRequestsState.find(
+      (r) => r.apaar_id === apaarId && r.status === 'APPROVED'
+    );
+    const hasConsent = hasGlobalConsent || !!approvedReq || (typeof apaarId === 'string' && (apaarId.endsWith('1') || apaarId.endsWith('7')));
+
+    if (!hasConsent) {
+      return HttpResponse.json({
+        apaar_id: apaarId,
+        has_consent: false,
+        consent_status: 'WITHDRAWN',
+        student: {
+          full_name: student?.full_name || 'Student Candidate',
+          institution_aicte_id: student?.institution_aicte_id || '1-1234567890',
+          program_code: student?.program_code || 'BTECH-CSE',
+          course_level: student?.course_level || 'UG',
+          academic_year: student?.academic_year || '2024-25',
+          enrolment_status: student?.enrolment_status || 'ACTIVE',
+        },
+        academic_record: null,
+        message: 'Student consent is required before previous marks and transcripts can be viewed.',
+      });
+    }
+
+    return HttpResponse.json({
+      apaar_id: apaarId,
+      has_consent: true,
+      consent_status: 'GRANTED',
+      student: {
+        full_name: student?.full_name || 'Aarav Patel',
+        institution_aicte_id: student?.institution_aicte_id || '1-1234567890',
+        program_code: student?.program_code || 'BTECH-CSE',
+        course_level: student?.course_level || 'UG',
+        academic_year: student?.academic_year || '2024-25',
+        enrolment_status: student?.enrolment_status || 'ACTIVE',
+      },
+      academic_record: {
+        tenth_board: 'CBSE',
+        tenth_percentage: 94.2,
+        tenth_year: 2020,
+        tenth_school: 'Delhi Public School, R.K. Puram',
+        twelfth_board: 'CBSE',
+        twelfth_percentage: 96.8,
+        twelfth_stream: 'Science (PCM)',
+        twelfth_year: 2022,
+        twelfth_school: 'Delhi Public School, R.K. Puram',
+        cgpa: 8.92,
+        total_credits: 160,
+        completed_credits: 120,
+        active_backlogs: 0,
+        semester_marks: [
+          { semester: 1, sgpa: 8.8, credits: 20, status: 'PASS' },
+          { semester: 2, sgpa: 9.1, credits: 20, status: 'PASS' },
+          { semester: 3, sgpa: 8.7, credits: 20, status: 'PASS' },
+          { semester: 4, sgpa: 9.0, credits: 20, status: 'PASS' },
+          { semester: 5, sgpa: 9.2, credits: 20, status: 'PASS' },
+          { semester: 6, sgpa: 8.7, credits: 20, status: 'PASS' },
+        ],
+        skills: ['Python', 'Distributed Systems', 'Cryptography', 'TypeScript', 'Docker', 'PostgreSQL'],
+        achievements: [
+          'Ranked 1st in ACM ICPC Regional Qualifier 2025',
+          'Published paper on SD-JWT Identity at IEEE Conf 2025',
+          'Dean Merit List for Academic Excellence (Consecutive 3 Years)',
+        ],
+      },
+      message: 'Consent verified: Academic record and previous marks unlocked.',
+    });
+  }),
+
+  http.post('*/v1/employer/requests', async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as any;
+    const newReq: EmployerHiringRequestItem = {
+      id: `req-${Date.now()}`,
+      employer_id: 'usr-employer-1',
+      employer_name: 'Infosys Talent Acquisition Desk',
+      apaar_id: body.apaar_id,
+      job_title: body.job_title || 'Campus Placement 2026',
+      organization: body.organization || 'Infosys Limited',
+      purpose: body.purpose || 'Hiring academic marks review',
+      status: 'PENDING',
+      requested_at: new Date().toISOString(),
+      decided_at: null,
+    };
+    employerRequestsState = [newReq, ...employerRequestsState];
+    return HttpResponse.json(newReq, { status: 201 });
+  }),
   // Students & Lifecycle transitions
   http.get('*/v1/students', ({ request }) => {
     const url = new URL(request.url);

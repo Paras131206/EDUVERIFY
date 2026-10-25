@@ -173,6 +173,31 @@ def test_issue_decision_staff_propose_vs_admin_decide(client, db_session: Sessio
     assert len(approved_corrs) >= 1
     assert approved_corrs[0]["new_value"] == "M"
 
+    # 4. Admin user reverts the fix
+    revert_resp = client.post(
+        f"/v1/issues/{issue_id}/revert",
+        headers=admin_headers,
+        json={"reason": "Rollback gender fix - original documentation re-verified"},
+    )
+    assert revert_resp.status_code == 200
+    revert_res_data = revert_resp.json()
+    assert revert_res_data["status"] == "OPEN"
+
+    # 5. Query institution audit trail endpoint
+    audit_resp = client.get(
+        f"/v1/institution/audit-trail?batch_id={batch_id}",
+        headers=admin_headers,
+    )
+    assert audit_resp.status_code == 200
+    audit_data = audit_resp.json()
+    assert len(audit_data["batches"]) >= 1
+    assert len(audit_data["discrepancies"]) >= 1
+    disc = audit_data["discrepancies"][0]
+    assert disc["issue_id"] == issue_id
+    assert disc["is_reverted"] is True
+    assert "Rollback gender fix" in disc["revert_reason"]
+
+
 
 def test_batch_revalidate_and_dq_comparison(client, db_session: Session):
     """

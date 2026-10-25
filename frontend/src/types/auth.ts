@@ -7,7 +7,8 @@ export type UserRole =
   | 'DAB_ADMIN'
   | 'DAB_MEMBER'
   | 'STUDENT'
-  | 'VERIFIER';
+  | 'VERIFIER'
+  | 'EMPLOYER';
 
 export interface User {
   id: string;
