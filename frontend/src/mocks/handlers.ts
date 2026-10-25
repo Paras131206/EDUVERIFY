@@ -647,7 +647,7 @@ export const handlers = [
 
   http.post('*/v1/batches/:id/issues/bulk-decide', async ({ request }) => {
     const body = (await request.json()) as {
-      action: 'ACCEPT_INFO' | 'DISMISS_SELECTED';
+      action: 'ACCEPT_INFO' | 'ACCEPT_SELECTED' | 'DISMISS_SELECTED';
       issue_ids?: string[];
       remarks?: string;
     };
@@ -655,12 +655,32 @@ export const handlers = [
     if (body.action === 'ACCEPT_INFO') {
       currentBatchReport.issues = currentBatchReport.issues.map(
         (iss: typeof currentBatchReport.issues[0]) => {
-          if (iss.severity === 'INFO' || iss.bucket === 'INFO') {
+          const isInfo =
+            iss.severity === 'INFO' ||
+            iss.bucket === 'INFO' ||
+            iss.priority === 'LOW' ||
+            iss.rule_id === 'V030' ||
+            (iss.suggested_fix && !iss.suggested_fix.requires_approval);
+          if (isInfo) {
             return {
               ...iss,
               status: 'FIXED',
               value_masked: iss.suggested_fix?.value ? String(iss.suggested_fix.value) : iss.value_masked,
               decision_note: 'Bulk accepted standard normalisation',
+            };
+          }
+          return iss;
+        }
+      );
+    } else if (body.action === 'ACCEPT_SELECTED' && Array.isArray(body.issue_ids)) {
+      currentBatchReport.issues = currentBatchReport.issues.map(
+        (iss: typeof currentBatchReport.issues[0]) => {
+          if (body.issue_ids?.includes(iss.issue_id)) {
+            return {
+              ...iss,
+              status: 'FIXED',
+              value_masked: iss.suggested_fix?.value ? String(iss.suggested_fix.value) : iss.value_masked,
+              decision_note: body.remarks || 'Bulk accepted selected safe fixes',
             };
           }
           return iss;

@@ -95,3 +95,10 @@ class CommitResponse(BaseModel):
 class EventTicketResponse(BaseModel):
     ticket: str
     expires_in: int = 60
+
+
+class BulkDecideRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    action: str = Field(..., description="Action: ACCEPT_INFO, ACCEPT_SELECTED, DISMISS_SELECTED")
+    issue_ids: list[str] = Field(default_factory=list, description="Target issue IDs")
+    remarks: str | None = Field(default=None, description="Remarks or decision notes")

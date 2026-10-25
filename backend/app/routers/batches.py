@@ -13,12 +13,14 @@ from app.models.core import BatchReport as BatchReportModel
 from app.schemas.batches import (
     BatchIssueResponse,
     BatchSummary,
+    BulkDecideRequest,
     ColumnMappingModel,
     CommitRequest,
     CommitResponse,
     ConfirmMappingRequest,
 )
 from app.security.deps import Principal, get_current_principal
+from app.services.audit import append_audit_log
 from app.services.batches import (
     commit_batch_service,
     confirm_mapping_service,
@@ -483,16 +485,14 @@ def get_batch_issues(
 
 @router.post(
     "/{id}/issues/bulk-decide",
-    include_in_schema=False,
-    summary="Submit bulk review decision on issues (e.g. ACCEPT_INFO or DISMISS_SELECTED)",
+    summary="Bulk decide issues (ACCEPT_INFO, ACCEPT_SELECTED, DISMISS_SELECTED)",
 )
 def bulk_decide_batch_issues(
     id: str,
-    body: dict[str, Any],
+    body: BulkDecideRequest,
     principal: Principal = Depends(get_current_principal),
     db: Session = Depends(get_db),
-) -> dict[str, Any]:
-    """Applies bulk review decision across multiple validation issues."""
+):
     batch = db.scalars(select(Batch).where(Batch.batch_id == id)).first()
     if not batch:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Batch not found")
@@ -504,57 +504,91 @@ def bulk_decide_batch_issues(
     ):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
-    action = body.get("action")
-    remarks = body.get("remarks")
-    issue_ids = body.get("issue_ids", [])
+    is_admin = principal.role in ("INSTITUTION_ADMIN", "AICTE_ADMIN")
+    target_status = "FIXED" if is_admin else "PROPOSED"
     now = datetime.now(UTC)
 
-    stmt = select(Issue).where(Issue.batch_id == id)
-    all_issues = db.scalars(stmt).all()
+    issues = db.scalars(select(Issue).where(Issue.batch_id == id)).all()
     updated_count = 0
 
-    if action == "ACCEPT_INFO":
-        for iss in all_issues:
-            if (iss.severity == "INFO" or iss.bucket == "INFO") and iss.status == "OPEN":
-                iss.status = "FIXED"
+    if body.action == "ACCEPT_INFO":
+        for iss in issues:
+            if (
+                iss.severity == "INFO"
+                or iss.bucket == "INFO"
+                or iss.priority == "LOW"
+                or iss.rule_id == "V030"
+                or (
+                    iss.suggested_fix_json
+                    and not iss.suggested_fix_json.get("requires_approval", True)
+                )
+            ):
+                iss.status = target_status
                 iss.decided_by = principal.id
                 iss.decided_at = now
+                if iss.suggested_fix_json and "value" in iss.suggested_fix_json:
+                    iss.value_masked = str(iss.suggested_fix_json["value"])
                 updated_count += 1
-    elif action == "DISMISS_SELECTED" and isinstance(issue_ids, list):
-        for iss in all_issues:
-            if iss.id in issue_ids:
-                iss.status = "DISMISSED"
+    elif body.action == "ACCEPT_SELECTED":
+        for iss in issues:
+            if iss.id in body.issue_ids:
+                iss.status = target_status
+                iss.decided_by = principal.id
+                iss.decided_at = now
+                if iss.suggested_fix_json and "value" in iss.suggested_fix_json:
+                    iss.value_masked = str(iss.suggested_fix_json["value"])
+                updated_count += 1
+    elif body.action == "DISMISS_SELECTED":
+        for iss in issues:
+            if iss.id in body.issue_ids:
+                iss.status = "DISMISSED" if is_admin else "PROPOSED"
                 iss.decided_by = principal.id
                 iss.decided_at = now
                 updated_count += 1
 
-    report_record = db.scalars(
+    # Also update the BatchReportModel report_json if present
+    db_report = db.scalars(
         select(BatchReportModel).where(BatchReportModel.batch_id == id)
     ).first()
-    if report_record and isinstance(report_record.report_json, dict):
-        rep = dict(report_record.report_json)
-        rep_issues = rep.get("issues", [])
-        if isinstance(rep_issues, list):
-            for r_iss in rep_issues:
-                iss_id = r_iss.get("issue_id") or r_iss.get("id")
-                if action == "ACCEPT_INFO":
-                    if r_iss.get("severity") == "INFO" or r_iss.get("bucket") == "INFO":
-                        r_iss["status"] = "FIXED"
-                        r_iss["decision_note"] = "Bulk accepted standard normalisation"
-                elif action == "DISMISS_SELECTED" and iss_id in issue_ids:
-                    r_iss["status"] = "DISMISSED"
-                    r_iss["decision_note"] = remarks or "Bulk dismissed with justification"
-            rep["issues"] = rep_issues
-            report_record.report_json = rep
-            db.add(report_record)
+    if db_report and isinstance(db_report.report_json, dict) and "issues" in db_report.report_json:
+        report_data = dict(db_report.report_json)
+        updated_issues_list = []
+        for rep_iss in report_data.get("issues", []):
+            iss_id = rep_iss.get("issue_id") or rep_iss.get("id")
+            matched = next((i for i in issues if i.id == iss_id), None)
+            if matched:
+                rep_iss["status"] = matched.status
+                if matched.value_masked:
+                    rep_iss["value_masked"] = matched.value_masked
+            updated_issues_list.append(rep_iss)
+        report_data["issues"] = updated_issues_list
+        db_report.report_json = report_data
 
+    append_audit_log(
+        db,
+        action="BULK_DECIDE",
+        actor_type="USER",
+        actor_id=principal.id,
+        role=principal.role,
+        resource="BATCH",
+        payload={
+            "batch_id": id,
+            "action": body.action,
+            "updated_count": updated_count,
+            "remarks": body.remarks,
+        },
+    )
     db.commit()
 
-    issues_out = [BatchIssueResponse.model_validate(i) for i in all_issues]
+    if db_report and isinstance(db_report.report_json, dict) and "issues" in db_report.report_json:
+        formatted_issues = db_report.report_json["issues"]
+    else:
+        formatted_issues = [BatchIssueResponse.model_validate(i).model_dump() for i in issues]
+
     return {
         "success": True,
         "count": updated_count,
-        "issues": [i.model_dump() for i in issues_out],
+        "issues": formatted_issues,
     }
 
 
@@ -634,8 +668,6 @@ def get_batch_record_by_row(
         pass
 
     return default_record
-
-
 @router.post(
     "/{id}/commit",
     response_model=CommitResponse,

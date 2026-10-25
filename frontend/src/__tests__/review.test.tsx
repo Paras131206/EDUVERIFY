@@ -259,6 +259,26 @@ describe('Review Workspace & Decision Flow (Task A3)', () => {
       });
     });
 
+    it('accepts selected issues in bulk when rows are checked', async () => {
+      renderReviewPage(mockAdminUser);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText(/select all issues/i)).toBeInTheDocument();
+      });
+
+      // Select all issues
+      fireEvent.click(screen.getByLabelText(/select all issues/i));
+
+      // Accept Selected Fixes button appears with count
+      const acceptSelectedBtn = screen.getByRole('button', { name: /accept selected fixes/i });
+      expect(acceptSelectedBtn).toBeInTheDocument();
+      fireEvent.click(acceptSelectedBtn);
+
+      await waitFor(() => {
+        expect(screen.queryByRole('button', { name: /accept selected fixes/i })).not.toBeInTheDocument();
+      });
+    });
+
     it('dismisses selected issues with prompt reason', async () => {
       renderReviewPage(mockAdminUser);
 
