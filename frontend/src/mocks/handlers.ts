@@ -1222,6 +1222,115 @@ export const handlers = [
     return HttpResponse.json(updatedStudent);
   }),
 
+  http.put('*/v1/students/:apaar_id', async ({ params, request }) => {
+    const body = (await request.json()) as any;
+    const studentIndex = studentsState.findIndex((s) => s.apaar_id === params.apaar_id);
+    if (studentIndex === -1) {
+      return HttpResponse.json({ message: 'Student record not found' }, { status: 404 });
+    }
+    const current = studentsState[studentIndex];
+    const prevProgram = current.program_code;
+    const newProgram = body.program_code || prevProgram;
+    const isBranchSwitch = newProgram !== prevProgram;
+
+    const summary = isBranchSwitch
+      ? `Branch switched from ${prevProgram} to ${newProgram}. Reason: ${body.reason || 'Merit sliding round'}`
+      : (body.changes_summary || `Student record updated: ${body.reason || 'Administrative update'}`);
+
+    const newVersionNumber = (current.versions?.length || 1) + 1;
+    const updatedStudent: StudentDetailRecord = {
+      ...current,
+      ...body,
+      program_code: newProgram,
+      department: body.department || current.department,
+      versions: [
+        {
+          version_id: `ver-${Date.now()}`,
+          version_number: newVersionNumber,
+          changed_at: new Date().toISOString(),
+          changed_by: 'inst.admin@demo.local',
+          changes_summary: summary,
+          previous_status: current.enrolment_status,
+          new_status: current.enrolment_status,
+        },
+        ...(current.versions || []),
+      ],
+      timeline: [
+        {
+          id: `tl-${Date.now()}`,
+          event_type: isBranchSwitch ? 'BRANCH_SWITCH' : 'STATUS_CHANGE',
+          from_status: current.enrolment_status,
+          to_status: current.enrolment_status,
+          effective_date: body.effective_date || new Date().toISOString().split('T')[0],
+          reason: summary,
+          evidence_ref: body.evidence_ref || 'SENATE-DIR-2026',
+          actor: 'Dean Academic Affairs',
+          timestamp: new Date().toISOString(),
+        },
+        ...(current.timeline || []),
+      ],
+    };
+
+    studentsState[studentIndex] = updatedStudent;
+    return HttpResponse.json(updatedStudent);
+  }),
+
+  http.post('*/v1/students', async ({ request }) => {
+    const body = (await request.json()) as any;
+    const newStudent: StudentDetailRecord = {
+      row: studentsState.length + 1,
+      apaar_id: body.apaar_id || `${Math.floor(100000000000 + Math.random() * 900000000000)}`,
+      institution_aicte_id: '1-1234567890',
+      institution_student_id: body.institution_student_id || `PRN-2026-${String(studentsState.length + 1).padStart(3, '0')}`,
+      full_name: body.full_name || 'New Enrolled Student',
+      dob: body.dob || '2004-01-01',
+      gender: body.gender || 'M',
+      category: body.category || 'GEN',
+      program_code: body.program_code || 'UG-CSE',
+      course_level: body.course_level || 'UG',
+      department: body.department || 'Engineering',
+      academic_year: body.academic_year || '2026-27',
+      year_of_study: body.year_of_study || 1,
+      admission_date: body.admission_date || new Date().toISOString().split('T')[0],
+      admission_type: body.admission_type || 'REGULAR',
+      seat_type: body.seat_type || 'REGULAR',
+      quota: body.quota || 'NONE',
+      nationality: 'IN',
+      enrolment_status: 'ACTIVE',
+      consent_status: 'GRANTED',
+      email: body.email || `${body.full_name?.toLowerCase().replace(/\s+/g, '.') || 'student'}@example.edu.in`,
+      mobile: body.mobile || '+91 98765 43210',
+      versions: [
+        {
+          version_id: `ver-${Date.now()}`,
+          version_number: 1,
+          changed_at: new Date().toISOString(),
+          changed_by: 'inst.admin@demo.local',
+          changes_summary: `Enrolled via ${body.admission_type === 'LATERAL' ? 'Direct Second Year (DSE) Lateral Entry' : body.admission_type === 'TRANSFER_IN' ? 'Inter-College Transfer In' : 'First Year Regular Entry'}`,
+          new_status: 'ACTIVE',
+        },
+      ],
+      timeline: [
+        {
+          id: `tl-${Date.now()}`,
+          event_type: 'ADMISSION',
+          to_status: 'ACTIVE',
+          effective_date: body.admission_date || new Date().toISOString().split('T')[0],
+          reason: body.admission_type === 'LATERAL'
+            ? 'Admitted to Direct Second Year (DSE) under AICTE Lateral Entry Quota'
+            : body.admission_type === 'TRANSFER_IN'
+            ? `Inter-College Transfer-In admitted from ${body.source_institution || 'External Institution'}`
+            : 'Admitted via State Centralized Admission Process (CAP)',
+          evidence_ref: body.evidence_ref || 'CAP-ALLOT-2026',
+          actor: 'Admissions Office',
+          timestamp: new Date().toISOString(),
+        },
+      ],
+    };
+    studentsState.unshift(newStudent);
+    return HttpResponse.json(newStudent, { status: 201 });
+  }),
+
   // Transfers
   http.get('*/v1/transfers', ({ request }) => {
     const url = new URL(request.url);

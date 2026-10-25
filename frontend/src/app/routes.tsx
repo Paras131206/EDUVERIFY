@@ -15,6 +15,7 @@ import { DabDashboardPage } from '@/features/dab/DabDashboardPage';
 import { StudentWalletPage } from '@/features/student/StudentWalletPage';
 import { VerifierPage } from '@/features/verifier/VerifierPage';
 import { ReportsPage } from '@/features/reports/ReportsPage';
+import { AuthorityAccessPage } from '@/features/reports/AuthorityAccessPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 
 const RootLayout: React.FC = () => (
@@ -30,6 +31,10 @@ export const router = createBrowserRouter([
       {
         path: '/login',
         element: <LoginPage />,
+      },
+      {
+        path: '/auth-access',
+        element: <AuthorityAccessPage />,
       },
       {
         path: '/',

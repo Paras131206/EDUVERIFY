@@ -20,7 +20,9 @@ import {
   FileSpreadsheet,
   RotateCcw,
   Sparkles,
+  Link2,
 } from 'lucide-react';
+import { AuthorityLinkModal } from '@/features/reports/AuthorityLinkModal';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -121,6 +123,7 @@ export const InstitutionDashboardPage: React.FC = () => {
 
   const [hasUploaded, setHasUploaded] = useState<boolean>(isUploadedInitial);
   const [summary, setSummary] = useState(isUploadedInitial() ? DEMO_SUMMARY : ZERO_SUMMARY);
+  const [authorityModalOpen, setAuthorityModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -212,6 +215,16 @@ export const InstitutionDashboardPage: React.FC = () => {
               Transfers
             </Button>
           </Link>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setAuthorityModalOpen(true)}
+            className="text-xs text-gov-navy border-slate-300 hover:bg-slate-50 gap-1.5"
+            data-testid="authority-link-btn"
+          >
+            <Link2 className="w-3.5 h-3.5 text-gov-navy" />
+            Authority File Link
+          </Button>
           <Link to="/institution/upload">
             <Button variant="default" size="sm" className="bg-gov-navy hover:bg-gov-navyDark text-white text-xs">
               <UploadCloud className="w-4 h-4 mr-1.5" />
@@ -403,6 +416,56 @@ export const InstitutionDashboardPage: React.FC = () => {
           )}
         </Card>
       </div>
+
+      {/* INSTITUTION-WIDE & CROSS-INSTITUTION DEDUPLICATION SCANNER (Req 5) */}
+      <Card className="p-4 border border-purple-200 bg-linear-to-r from-purple-50/70 via-indigo-50/40 to-white shadow-xs">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-start gap-3.5">
+            <div className="p-2.5 rounded-lg bg-purple-100 text-purple-800 shrink-0 mt-0.5">
+              <Users className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h4 className="text-sm font-bold text-slate-900">
+                  Institution-Wide & Cross-Institution Deduplication Engine
+                </h4>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 border border-purple-200">
+                  Rules V007 &middot; V008 &middot; V010 &middot; V011
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 mt-1 max-w-2xl leading-relaxed">
+                Biometric Soundex &amp; Jaro-Winkler phonetic algorithms continuously check duplicates across all batches in this institution as well as cross-institutional dual-enrolments in the National AICTE Central Repository.
+              </p>
+              <div className="flex flex-wrap items-center gap-3 mt-2 text-xs font-medium">
+                <span className="flex items-center gap-1.5 text-slate-700">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                  Intra-Batch Duplicates: <strong className="text-slate-900">{hasUploaded ? 'None' : 'None Detected'}</strong>
+                </span>
+                <span className="text-slate-300">•</span>
+                <span className="flex items-center gap-1.5 text-purple-800">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                  Cross-Institution Matches: <strong className="text-purple-900">{hasUploaded ? '1 Flagged' : 'None Detected'}</strong>
+                </span>
+                <span className="text-slate-300">•</span>
+                <span className="text-slate-500 font-mono text-[11px]">
+                  Fuzzy Match Confidence: 93%
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="shrink-0 w-full md:w-auto">
+            <Link to="/institution/batches/batch-demo-2/review">
+              <Button
+                size="sm"
+                className="w-full md:w-auto bg-purple-700 hover:bg-purple-800 text-white text-xs gap-1.5 font-semibold"
+              >
+                <span>Inspect Deduplication Resolution Desk</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </Card>
 
       {/* CHARTS GRID (DQ Trend Line + Intake vs Enrolment Bar Chart) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -648,6 +711,12 @@ export const InstitutionDashboardPage: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Authority Access Link Generation Modal */}
+      <AuthorityLinkModal
+        isOpen={authorityModalOpen}
+        onClose={() => setAuthorityModalOpen(false)}
+      />
     </div>
   );
 };

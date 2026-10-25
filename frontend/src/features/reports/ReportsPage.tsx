@@ -25,7 +25,9 @@ import {
   Eye,
   AlertCircle,
   X,
+  Link2,
 } from 'lucide-react';
+import { AuthorityLinkModal } from './AuthorityLinkModal';
 
 export const ReportsPage: React.FC = () => {
   // Builder form state
@@ -50,6 +52,7 @@ export const ReportsPage: React.FC = () => {
 
   // Preview modal state
   const [previewReport, setPreviewReport] = useState<ReportItem | null>(null);
+  const [authorityModalOpen, setAuthorityModalOpen] = useState<boolean>(false);
 
   // Fetch report history
   const fetchReports = useCallback(async () => {
@@ -172,6 +175,16 @@ export const ReportsPage: React.FC = () => {
             >
               <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh
+            </Button>
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => setAuthorityModalOpen(true)}
+              className="bg-gov-navy hover:bg-slate-800 text-white text-xs gap-1.5"
+              data-testid="generate-authority-link-btn"
+            >
+              <Link2 className="w-3.5 h-3.5" />
+              Generate Authority Access Link
             </Button>
           </div>
         </div>
@@ -831,6 +844,12 @@ export const ReportsPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Authority-Restricted Link Modal */}
+      <AuthorityLinkModal
+        isOpen={authorityModalOpen}
+        onClose={() => setAuthorityModalOpen(false)}
+      />
     </div>
   );
 };

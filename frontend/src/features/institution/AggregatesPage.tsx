@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from '@/components/ui/table';
 import { API_BASE_URL, fetchWithAuth } from '@/lib/api';
 import { ProgramAggregateItem, ReconciliationStatusItem } from './types';
+import { CategoryQuotaEngine } from './components/CategoryQuotaEngine';
 import {
   CheckCircle2,
   AlertTriangle,
@@ -365,6 +366,9 @@ export const AggregatesPage: React.FC = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* SECTION 3: STATUTORY CATEGORY QUOTA & SEAT ALLOCATION ENGINE */}
+      <CategoryQuotaEngine />
     </div>
   );
 };
