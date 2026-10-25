@@ -128,8 +128,31 @@ describe('Site-Wide Language Translation System', () => {
       .toBe('आइडम्पोटेंसी सुरक्षा सक्षम (प्रति अपलोड UUID कुंजी उत्पन्न)');
     expect(translateText('Proceed to Column Mapping')).toBe('कॉलम मैपिंग पर आगे बढ़ें');
 
-    // Step 2, 3, 4 & Commit
+    // Step 2: Smart Column Mapping & Table Headers
     expect(translateText('Step 2: Smart Column Mapping')).toBe('चरण 2: स्मार्ट कॉलम मैपिंग');
+    expect(translateText('SUGGESTED CANONICAL FIELD')).toBe('सुझाया गया विहित फ़ील्ड');
+    expect(translateText('METHOD')).toBe('विधि');
+    expect(translateText('SAMPLE VALUES PREVIEW (APAAR MASKED)')).toBe('नमूना मान पूर्वावलोकन (अपार मास्क किया गया)');
+    expect(translateText('Mandatory Canonical Field')).toBe('अनिवार्य विहित फ़ील्ड');
+    expect(translateText('Synonym')).toBe('समानार्थी');
+    expect(translateText('Fuzzy Match')).toBe('फ़ज़ी मिलान');
+    expect(translateText('Fuzzy सटीक मिलान')).toBe('फ़ज़ी मिलान');
+    expect(translateText('Pattern / Regex')).toBe('पैटर्न / रेगेक्स');
+    expect(translateText('Saved Profile')).toBe('सहेजी गई प्रोफ़ाइल');
+    expect(translateText('Institution Student / Roll / PRN *')).toBe('संस्थान छात्र / रोल / पीआरएन *');
+    expect(translateText('Institution छात्र / रोल / पीआरएन *')).toBe('संस्थान छात्र / रोल / पीआरएन *');
+    expect(translateText('Full Name *')).toBe('पूरा नाम *');
+    expect(translateText('Department Name')).toBe('विभाग का नाम');
+    expect(translateText('Quota (NONE/NRI/OCI/FN/PIO/CIWG) *')).toBe('कोटा (NONE/NRI/OCI/FN/PIO/CIWG) *');
+    expect(translateText('Nationality (ISO-2 Code) *')).toBe('राष्ट्रीयता (ISO-2 कोड) *');
+    expect(translateText('Foreign National Status *')).toBe('विदेशी नागरिक स्थिति *');
+    expect(translateText('Foreign National स्थिति')).toBe('विदेशी नागरिक स्थिति');
+    expect(translateText('Consent Status (GRANTED/REFUSED) *')).toBe('सहमति स्थिति (स्वीकृत/अस्वीकृत) *');
+    expect(translateText('Consent स्थिति')).toBe('सहमति स्थिति');
+    expect(translateText('Target Academic Year: 2026-27')).toBe('लक्षित शैक्षणिक वर्ष: 2026-27');
+    expect(translateText('Target शैक्षणिक वर्ष: 2026-27')).toBe('लक्षित शैक्षणिक वर्ष: 2026-27');
+    expect(translateText('File: batch_2_errors.xlsx')).toBe('फ़ाइल: batch_2_errors.xlsx');
+    expect(translateText('Batch ID: batch-123')).toBe('बैच आईडी: batch-123');
     expect(translateText('22 / 22 Required Fields Mapped')).toBe('22 / 22 आवश्यक फ़ील्ड मैप किए गए');
     expect(translateText('6 columns identified')).toBe('6 कॉलम पहचाने गए');
     expect(translateText('Commit Batch to Central Repository')).toBe('बैच को केंद्रीय भंडार में कमिट करें');

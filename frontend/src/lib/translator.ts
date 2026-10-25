@@ -612,6 +612,117 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Confirm Mapping & Start Validation": "मैपिंग की पुष्टि करें एवं सत्यापन प्रारंभ करें",
   "Saving Mapping...": "मैपिंग सहेजी जा रही है...",
 
+  // Step 2: Table Headers & Labels
+  "Suggested Canonical Field": "सुझाया गया विहित फ़ील्ड",
+  "SUGGESTED CANONICAL FIELD": "सुझाया गया विहित फ़ील्ड",
+  "Method": "विधि",
+  "METHOD": "विधि",
+  "Sample Values Preview (APAAR Masked)": "नमूना मान पूर्वावलोकन (अपार मास्क किया गया)",
+  "SAMPLE VALUES PREVIEW (APAAR MASKED)": "नमूना मान पूर्वावलोकन (अपार मास्क किया गया)",
+  "Sample Values Preview": "नमूना मान पूर्वावलोकन",
+  "SAMPLE VALUES PREVIEW": "नमूना मान पूर्वावलोकन",
+  "CONFIDENCE": "विश्वसनीयता",
+  "SOURCE COLUMN": "स्रोत कॉलम",
+  "Mandatory Canonical Field": "अनिवार्य विहित फ़ील्ड",
+  "Mandatory Canonical": "अनिवार्य विहित",
+  "Mandatory": "अनिवार्य",
+
+  // Step 2: Mapping Methods
+  "Synonym": "समानार्थी",
+  "Fuzzy Match": "फ़ज़ी मिलान",
+  "Fuzzy": "फ़ज़ी",
+  "Pattern / Regex": "पैटर्न / रेगेक्स",
+  "Pattern": "पैटर्न",
+  "Regex": "रेगेक्स",
+  "Saved Profile": "सहेजी गई प्रोफ़ाइल",
+  "User Selected": "उपयोगकर्ता द्वारा चयनित",
+
+  // Step 2: Canonical Field Select Options & Simulated Source Headers
+  "-- Select Canonical Field --": "-- विहित फ़ील्ड चुनें --",
+  "Institution Student / Roll / PRN *": "संस्थान छात्र / रोल / पीआरएन *",
+  "Institution Student / Roll / PRN": "संस्थान छात्र / रोल / पीआरएन",
+  "Institution Student": "संस्थान छात्र",
+  "AICTE Institution ID *": "एआईसीटीई संस्थान आईडी *",
+  "AICTE Institution ID": "एआईसीटीई संस्थान आईडी",
+  "APAAR ID (12 digits) *": "अपार आईडी (12-अंकीय) *",
+  "APAAR ID (12 digits)": "अपार आईडी (12-अंकीय)",
+  "Full Name *": "पूरा नाम *",
+  "Full Name": "पूरा नाम",
+  "Date of Birth (YYYY-MM-DD) *": "जन्म तिथि (YYYY-MM-DD) *",
+  "Gender (M/F/T) *": "लिंग (M/F/T) *",
+  "Gender (M/F/T)": "लिंग (M/F/T)",
+  "Category (GEN/EWS/OBC-NCL/SC/ST) *": "श्रेणी (GEN/EWS/OBC-NCL/SC/ST) *",
+  "Category (GEN/EWS/OBC-NCL/SC/ST)": "श्रेणी (GEN/EWS/OBC-NCL/SC/ST)",
+  "Person with Disability (PWD) *": "दिव्यांग व्यक्ति (PWD) *",
+  "Person with Disability (PWD)": "दिव्यांग व्यक्ति (PWD)",
+  "Person with Disability": "दिव्यांग व्यक्ति",
+  "Program Code *": "कार्यक्रम कोड *",
+  "Course Level (UG/PG/DIPLOMA/PHD) *": "पाठ्यक्रम स्तर (UG/PG/DIPLOMA/PHD) *",
+  "Course Level (UG/PG/DIPLOMA/PHD)": "पाठ्यक्रम स्तर (UG/PG/DIPLOMA/PHD)",
+  "Department Name *": "विभाग का नाम *",
+  "Department Name": "विभाग का नाम",
+  "Dept": "विभाग",
+  "Academic Year *": "शैक्षणिक वर्ष *",
+  "Year of Study (1-6) *": "अध्ययन का वर्ष (1-6) *",
+  "Year of Study (1-6)": "अध्ययन का वर्ष (1-6)",
+  "Admission Date (YYYY-MM-DD) *": "प्रवेश तिथि (YYYY-MM-DD) *",
+  "Admission Date (YYYY-MM-DD)": "प्रवेश तिथि (YYYY-MM-DD)",
+  "Adm Date": "प्रवेश तिथि",
+  "Admission Type (REGULAR/LATERAL/TRANSFER_IN) *": "प्रवेश प्रकार (REGULAR/LATERAL/TRANSFER_IN) *",
+  "Admission Type (REGULAR/LATERAL/TRANSFER_IN)": "प्रवेश प्रकार (REGULAR/LATERAL/TRANSFER_IN)",
+  "Expected Graduation Year *": "अपेक्षित स्नातक वर्ष *",
+  "Expected Graduation Year": "अपेक्षित स्नातक वर्ष",
+  "Seat Type (REGULAR/SUPERNUMERARY) *": "सीट प्रकार (REGULAR/अतिरिक्त सीटें) *",
+  "Seat Type (REGULAR/SUPERNUMERARY)": "सीट प्रकार (REGULAR/अतिरिक्त सीटें)",
+  "Supernumerary Scheme (TFW/PMSSS/JK/NE/etc.) *": "अतिरिक्त सीटें योजना (TFW/PMSSS/JK/NE/इत्यादि) *",
+  "Supernumerary Scheme (TFW/PMSSS/JK/NE/etc.)": "अतिरिक्त सीटें योजना (TFW/PMSSS/JK/NE/इत्यादि)",
+  "Supernumerary Scheme": "अतिरिक्त सीटें योजना",
+  "Quota (NONE/NRI/OCI/FN/PIO/CIWG) *": "कोटा (NONE/NRI/OCI/FN/PIO/CIWG) *",
+  "Quota (NONE/NRI/OCI/FN/PIO/CIWG)": "कोटा (NONE/NRI/OCI/FN/PIO/CIWG)",
+  "Quota": "कोटा",
+  "Nationality (ISO-2 Code) *": "राष्ट्रीयता (ISO-2 कोड) *",
+  "Nationality (ISO-2 Code)": "राष्ट्रीयता (ISO-2 कोड)",
+  "Nationality": "राष्ट्रीयता",
+  "NRI Status *": "एनआरआई (NRI) स्थिति *",
+  "NRI Status": "एनआरआई (NRI) स्थिति",
+  "NRI स्थिति *": "एनआरआई (NRI) स्थिति *",
+  "NRI स्थिति": "एनआरआई (NRI) स्थिति",
+  "OCI Status *": "ओसीआई (OCI) स्थिति *",
+  "OCI Status": "ओसीआई (OCI) स्थिति",
+  "OCI स्थिति *": "ओसीआई (OCI) स्थिति *",
+  "OCI स्थिति": "ओसीआई (OCI) स्थिति",
+  "Foreign National Status *": "विदेशी नागरिक स्थिति *",
+  "Foreign National Status": "विदेशी नागरिक स्थिति",
+  "Foreign National": "विदेशी नागरिक",
+  "Foreign National स्थिति *": "विदेशी नागरिक स्थिति *",
+  "Foreign National स्थिति": "विदेशी नागरिक स्थिति",
+  "Enrolment Status (ACTIVE/WITHDRAWN/etc.) *": "नामांकन स्थिति (सक्रिय/वापस लिया गया/इत्यादि) *",
+  "Enrolment Status (ACTIVE/WITHDRAWN/etc.)": "नामांकन स्थिति (सक्रिय/वापस लिया गया/इत्यादि)",
+  "Consent Status (GRANTED/REFUSED) *": "सहमति स्थिति (स्वीकृत/अस्वीकृत) *",
+  "Consent Status (GRANTED/REFUSED)": "सहमति स्थिति (स्वीकृत/अस्वीकृत)",
+  "Consent Status": "सहमति स्थिति",
+  "Consent स्थिति *": "सहमति स्थिति *",
+  "Consent स्थिति": "सहमति स्थिति",
+  "Consent": "सहमति",
+  "Consent Date *": "सहमति तिथि *",
+  "Consent Date": "सहमति तिथि",
+  "Guardian Consent (if < 18) *": "अभिभावक सहमति (यदि < 18) *",
+  "Guardian Consent (if < 18)": "अभिभावक सहमति (यदि < 18)",
+  "Guardian Consent": "अभिभावक सहमति",
+  "Email Address *": "ईमेल पता *",
+  "Email Address": "ईमेल पता",
+  "Mobile Number *": "मोबाइल नंबर *",
+  "Mobile Number": "मोबाइल नंबर",
+
+  // Metadata prefixes
+  "File:": "फ़ाइल:",
+  "File": "फ़ाइल",
+  "Target Academic Year:": "लक्षित शैक्षणिक वर्ष:",
+  "Target Academic Year": "लक्षित शैक्षणिक वर्ष",
+  "Target शैक्षणिक वर्ष:": "लक्षित शैक्षणिक वर्ष:",
+  "Batch ID:": "बैच आईडी:",
+
+
   // Step 3: Validate
   "Step 3: Validation Engine Progress": "चरण 3: सत्यापन इंजन प्रगति",
   "Validating student admission records against national AICTE statutory guidelines...": "राष्ट्रीय एआईसीटीई वैधानिक दिशानिर्देशों के अनुसार छात्र प्रवेश रिकॉर्ड का सत्यापन जारी...",
@@ -739,9 +850,45 @@ export function translateText(text: string): string {
     hasMatch = true;
   }
 
-  // Pattern: "Target Academic Year: 2026-27"
-  if (/Target\s+Academic\s+Year:\s*([^\s·]+)/i.test(result)) {
-    result = result.replace(/Target\s+Academic\s+Year:\s*([^\s·]+)/gi, 'लक्षित शैक्षणिक वर्ष: $1');
+  // Pattern: "Target Academic Year: 2026-27" or "Target Academic Year:" or "Target शैक्षणिक वर्ष:"
+  if (/Target\s+(?:Academic\s+Year|शैक्षणिक\s+वर्ष)\s*:/i.test(result)) {
+    result = result.replace(/Target\s+(?:Academic\s+Year|शैक्षणिक\s+वर्ष)\s*:/gi, 'लक्षित शैक्षणिक वर्ष:');
+    hasMatch = true;
+  }
+
+  // Pattern: "File:" at start of line or standalone
+  if (/(?:^|\b)File\s*:\s*/i.test(result)) {
+    result = result.replace(/(^|\b)File\s*:\s*/gi, '$1फ़ाइल: ');
+    hasMatch = true;
+  }
+
+  // Pattern: "Batch ID:"
+  if (/(?:^|\b)Batch\s+ID\s*:\s*/i.test(result)) {
+    result = result.replace(/(^|\b)Batch\s+ID\s*:\s*/gi, '$1बैच आईडी: ');
+    hasMatch = true;
+  }
+
+  // Pattern: "Fuzzy सटीक मिलान" or "Fuzzy Match"
+  if (/Fuzzy\s+(?:Match|सटीक\s+मिलान)/i.test(result)) {
+    result = result.replace(/Fuzzy\s+(?:Match|सटीक\s+मिलान)/gi, 'फ़ज़ी मिलान');
+    hasMatch = true;
+  }
+
+  // Pattern: "Institution छात्र / रोल / पीआरएन"
+  if (/Institution\s+छात्र\s*\/\s*रोल\s*\/\s*पीआरएन/i.test(result)) {
+    result = result.replace(/Institution\s+छात्र\s*\/\s*रोल\s*\/\s*पीआरएन/gi, 'संस्थान छात्र / रोल / पीआरएन');
+    hasMatch = true;
+  }
+
+  // Pattern: "Consent स्थिति"
+  if (/Consent\s+स्थिति/i.test(result)) {
+    result = result.replace(/Consent\s+स्थिति/gi, 'सहमति स्थिति');
+    hasMatch = true;
+  }
+
+  // Pattern: "Foreign National स्थिति"
+  if (/Foreign\s+National\s+स्थिति/i.test(result)) {
+    result = result.replace(/Foreign\s+National\s+स्थिति/gi, 'विदेशी नागरिक स्थिति');
     hasMatch = true;
   }
 
