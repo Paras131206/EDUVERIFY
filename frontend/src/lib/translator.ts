@@ -541,7 +541,118 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Quota Category": "कोटा श्रेणी",
   "DPDP Consent Status": "DPDP सहमति स्थिति",
   "Loading student records...": "छात्र रिकॉर्ड लोड हो रहे हैं...",
-  "Loading student registry...": "छात्र रजिस्ट्री लोड हो रही है..."
+  "Loading student registry...": "छात्र रजिस्ट्री लोड हो रही है...",
+
+  // Step 1: File Choose & Session
+  "Official Student Ingestion Template": "आधिकारिक छात्र अंतर्ग्रहण टेम्पलेट",
+  "Official Ingestion Template": "आधिकारिक अंतर्ग्रहण टेम्पलेट",
+  "Pre-formatted with 12-digit APAAR text validation, dropdown lists for categories & quotas, and field instructions.": "12-अंकीय अपार पाठ सत्यापन, श्रेणियों और कोटे के लिए ड्रॉपडाउन सूची, और फ़ील्ड निर्देशों के साथ पूर्व-स्वरूपित।",
+  "Download Template (.xlsx)": "टेम्पलेट डाउनलोड करें (.xlsx)",
+  "Download Template": "टेम्पलेट डाउनलोड करें",
+  "Step 1: Choose File & Academic Session": "चरण 1: फ़ाइल चुनें एवं शैक्षणिक सत्र",
+  "Choose File & Academic Session": "फ़ाइल चुनें एवं शैक्षणिक सत्र",
+  "Select the target academic year and upload student admission records (CSV or XLSX up to 10 MB).": "लक्षित शैक्षणिक वर्ष चुनें और छात्र प्रवेश रिकॉर्ड (CSV या XLSX 10 MB तक) अपलोड करें।",
+  "2026-27 (Current Academic Year)": "2026-27 (वर्तमान शैक्षणिक वर्ष)",
+  "Current Academic Year": "वर्तमान शैक्षणिक वर्ष",
+  "(Current Academic Year)": "(वर्तमान शैक्षणिक वर्ष)",
+  "Records will be validated against this year's AICTE approved intake.": "रिकॉर्ड को इस वर्ष की एआईसीटीई स्वीकृत प्रवेश क्षमता के अनुसार सत्यापित किया जाएगा।",
+  "Records will be validated against this year’s AICTE approved intake.": "रिकॉर्ड को इस वर्ष की एआईसीटीई स्वीकृत प्रवेश क्षमता के अनुसार सत्यापित किया जाएगा।",
+  "Replaces Previous Batch": "पिछला बैच प्रतिस्थापित करें",
+  "REPLACES PREVIOUS BATCH": "पिछला बैच प्रतिस्थापित करें",
+  "Replaces Previous Batch (Optional)": "पिछला बैच प्रतिस्थापित करें (वैकल्पिक)",
+  "REPLACES PREVIOUS BATCH (OPTIONAL)": "पिछला बैच प्रतिस्थापित करें (वैकल्पिक)",
+  "Optional": "वैकल्पिक",
+  "(Optional)": "(वैकल्पिक)",
+  "-- None (New independent batch) --": "-- कोई नहीं (नया स्वतंत्र बैच) --",
+  "-- None (new independent batch) --": "-- कोई नहीं (नया स्वतंत्र बैच) --",
+  "None (New independent batch)": "कोई नहीं (नया स्वतंत्र बैच)",
+  "None (new independent batch)": "कोई नहीं (नया स्वतंत्र बैच)",
+  "New independent batch": "नया स्वतंत्र बैच",
+  "new independent batch": "नया स्वतंत्र बैच",
+  "If replacing an earlier revision, previous uncommitted records will be marked SUPERSEDED.": "यदि किसी पूर्व संशोधन को प्रतिस्थापित कर रहे हैं, तो पिछले असंबद्ध रिकॉर्ड को 'अतिक्रमित' (SUPERSEDED) चिह्नित किया जाएगा।",
+  "Select or Drop Batch File": "बैच फ़ाइल चुनें या यहाँ छोड़ें",
+  "SELECT OR DROP BATCH FILE": "बैच फ़ाइल चुनें या यहाँ छोड़ें",
+  "SELECT OR DROP BATCH FILE *": "बैच फ़ाइल चुनें या यहाँ छोड़ें *",
+  "Drag & drop batch file here, or click to browse": "बैच फ़ाइल यहाँ खींचें और छोड़ें, या ब्राउज़ करने के लिए क्लिक करें",
+  "Drop file here to upload...": "अपलोड करने के लिए फ़ाइल यहाँ छोड़ें...",
+  "Supports .csv, .xlsx, .xls up to 10 MB per file": ".csv, .xlsx, .xls प्रति फ़ाइल 10 MB तक समर्थित",
+  "Want to test real verification with errors?": "त्रुटियों के साथ वास्तविक सत्यापन का परीक्षण करना चाहते हैं?",
+  "Use Demo File: batch_2_errors.xlsx": "डेमो फ़ाइल का उपयोग करें: batch_2_errors.xlsx",
+  "Use Demo File:": "डेमो फ़ाइल का उपयोग करें:",
+  "Ready for smart column mapping": "स्मार्ट कॉलम मैपिंग के लिए तैयार",
+  "Remove": "हटाएं",
+  "Idempotency protection enabled (UUID key generated per upload)": "आइडम्पोटेंसी सुरक्षा सक्षम (प्रति अपलोड UUID कुंजी उत्पन्न)",
+  "Proceed to Column Mapping": "कॉलम मैपिंग पर आगे बढ़ें",
+  "Uploading Batch...": "बैच अपलोड हो रहा है...",
+  "File rejected. Please upload a valid CSV or XLSX file under 10 MB.": "फ़ाइल अस्वीकृत। कृपया 10 MB से कम की मान्य CSV या XLSX फ़ाइल अपलोड करें।",
+  "File size exceeds the 10 MB limit.": "फ़ाइल का आकार 10 MB की सीमा से अधिक है।",
+  "Batch Conflict (HTTP 409) — Open Batch Exists": "बैच विरोध (HTTP 409) — खुला बैच मौजूद है",
+  "Go to Open Batch": "खुले बैच पर जाएं",
+  "Set as Batch to Supersede & Retry": "अतिक्रमित करने हेतु बैच सेट करें और पुनः प्रयास करें",
+
+  // Step 2: Smart Column Mapping
+  "Step 2: Smart Column Mapping": "चरण 2: स्मार्ट कॉलम मैपिंग",
+  "Smart Column Mapping": "स्मार्ट कॉलम मैपिंग",
+  "Auto-mapped all canonical fields": "सभी विहित फ़ील्ड स्वतः मैप किए गए",
+  "Required Fields Mapped": "आवश्यक फ़ील्ड मैप किए गए",
+  "Analyzing spreadsheet headers with smart synonym dictionary...": "स्मार्ट समानार्थी शब्दकोश के साथ स्प्रेडशीट हेडर का विश्लेषण जारी...",
+  "Rule V001: Required Column Missing After Column Mapping": "नियम V001: कॉलम मैपिंग के बाद आवश्यक कॉलम अनुपलब्ध",
+  "Mandatory canonical fields are currently unmapped:": "अनिवार्य विहित फ़ील्ड वर्तमान में अनमैप हैं:",
+  "Per AICTE Rule V001, batches cannot proceed to validation until all 22 required fields are explicitly mapped.": "एआईसीटीई नियम V001 के अनुसार, सभी 22 आवश्यक फ़ील्ड स्पष्ट रूप से मैप होने तक बैच सत्यापन पर आगे नहीं बढ़ सकते।",
+  "Auto-Map Remaining Canonical Fields": "शेष विहित फ़ील्ड स्वतः मैप करें",
+  "Auto-Map Canonical Fields": "विहित फ़ील्ड स्वतः मैप करें",
+  "Spreadsheet Header → Canonical Field Mapping": "स्प्रेडशीट हेडर → विहित फ़ील्ड मैपिंग",
+  "Verify each detected column. APAAR values are masked automatically.": "प्रत्येक पहचाने गए कॉलम को सत्यापित करें। अपार मान स्वतः मास्क किए जाते हैं।",
+  "columns identified": "कॉलम पहचाने गए",
+  "Save as my institution's mapping profile": "मेरे संस्थान के मैपिंग प्रोफ़ाइल के रूप में सहेजें",
+  "Save as my institution’s mapping profile": "मेरे संस्थान के मैपिंग प्रोफ़ाइल के रूप में सहेजें",
+  "Future uploads from this institution with matching headers will be automatically mapped with highest confidence (Saved Profile method).": "मिलान वाले हेडर के साथ इस संस्थान से भविष्य के अपलोड उच्चतम विश्वसनीयता (सहेजी गई प्रोफ़ाइल विधि) के साथ स्वचालित रूप से मैप किए जाएंगे।",
+  "Back to File Selection": "फ़ाइल चयन पर वापस जाएं",
+  "V001 Active: Map all required fields to confirm": "V001 सक्रिय: पुष्टि करने के लिए सभी आवश्यक फ़ील्ड मैप करें",
+  "Confirm Mapping & Start Validation": "मैपिंग की पुष्टि करें एवं सत्यापन प्रारंभ करें",
+  "Saving Mapping...": "मैपिंग सहेजी जा रही है...",
+
+  // Step 3: Validate
+  "Step 3: Validation Engine Progress": "चरण 3: सत्यापन इंजन प्रगति",
+  "Validating student admission records against national AICTE statutory guidelines...": "राष्ट्रीय एआईसीटीई वैधानिक दिशानिर्देशों के अनुसार छात्र प्रवेश रिकॉर्ड का सत्यापन जारी...",
+  "1. Parsing": "1. पार्सिंग",
+  "Checking file structure, header encoding, and row delimiters": "फ़ाइल संरचना, हेडर एन्कोडिंग और पंक्ति विभाजक की जाँच जारी",
+  "2. Mapping": "2. मैपिंग",
+  "Applying canonical column dictionary and data type coercions": "विहित कॉलम शब्दकोश और डेटा प्रकार परिवर्तन लागू करना",
+  "3. Rules Engine": "3. नियम इंजन",
+  "Evaluating 35 AICTE validation rules (V001–V035)": "35 एआईसीटीई सत्यापन नियमों (V001–V035) का मूल्यांकन",
+  "4. Duplicates": "4. डुप्लिकेट पहचान",
+  "Running Demographics + APAAR intra-batch & cross-institution match": "जनसांख्यिकी + अपार अंतः-बैच एवं अंतर-संस्थान मिलान जारी",
+  "5. Anomalies": "5. विसंगति पहचान",
+  "Detecting quota distribution drift and statistical z-score outliers": "कोटा वितरण विचलन और सांख्यिकीय z-स्कोर आउटलेयर की पहचान",
+  "6. Report Generation": "6. रिपोर्ट तैयार करना",
+  "Computing Quality Score gauge and intake reconciliation metrics": "गुणवत्ता स्कोर गेज और प्रवेश समाधान मेट्रिक्स की गणना",
+  "Validation in Progress": "सत्यापन प्रगति पर है",
+  "Validation Complete": "सत्यापन पूर्ण हुआ",
+  "Proceed to Summary": "सारांश पर आगे बढ़ें",
+
+  // Step 4: Summary
+  "Step 4: Batch Validation Summary & Health Report": "चरण 4: बैच सत्यापन सारांश एवं स्वास्थ्य रिपोर्ट",
+  "Review detailed validation results, error breakdown, and intake ceiling reconciliation before committing records.": "रिकॉर्ड कमिट करने से पहले विस्तृत सत्यापन परिणाम, त्रुटि विवरण और प्रवेश सीमा समाधान की समीक्षा करें।",
+  "Download XLSX": "XLSX डाउनलोड करें",
+  "Download PDF Report": "PDF रिपोर्ट डाउनलोड करें",
+  "Total Records Processed": "कुल प्रसंस्कृत रिकॉर्ड",
+  "Valid Records (Zero Errors)": "मान्य रिकॉर्ड (शून्य त्रुटियां)",
+  "Records with Warnings": "चेतावनियों वाले रिकॉर्ड",
+  "Records with Critical Errors": "गंभीर त्रुटियों वाले रिकॉर्ड",
+  "Intake Ceiling vs Uploaded Headcount": "स्वीकृत प्रवेश सीमा बनाम अपलोड की गई संख्या",
+  "Program-wise reconciliation against AICTE approved ceilings": "एआईसीटीई स्वीकृत सीमा के विरुद्ध कार्यक्रम-वार समाधान",
+  "Detected Schema Drift": "पहचाना गया स्कीमा विचलन",
+
+  // Commit Modal
+  "Commit Batch to Central Repository": "बैच को केंद्रीय भंडार में कमिट करें",
+  "Committed Records": "कमिट किए गए रिकॉर्ड",
+  "Approved & Verifiable": "स्वीकृत एवं सत्यापन योग्य",
+  "Excluded Records": "बहिष्कृत रिकॉर्ड",
+  "Pending Human Review": "मानव समीक्षा लंबित",
+  "Excluded / Unapproved Rows:": "बहिष्कृत / अस्वीकृत पंक्तियां:",
+  "Excluded rows will remain in draft status and will NOT be committed until resolved.": "बहिष्कृत पंक्तियां ड्राफ्ट स्थिति में रहेंगी और समाधान होने तक कमिट नहीं की जाएंगी।",
+  "Once committed, students will be issued SD-JWT credentials keyed to their 12-digit APAAR ID and become eligible for verification desks.": "एक बार कमिट होने के बाद, छात्रों को उनके 12-अंकीय अपार आईडी से जुड़े SD-JWT क्रेडेंशियल जारी किए जाएंगे और वे सत्यापन डेस्क के लिए पात्र हो जाएंगे।"
 };
 
 // Sorted keys by length descending to match longest phrases first
@@ -593,6 +704,46 @@ export function translateText(text: string): string {
   // 2. Dynamic regular expression patterns for dynamic values
   let result = text;
   let hasMatch = false;
+
+  // Pattern: "Use Demo File: batch_2_errors.xlsx"
+  if (/Use\s+Demo\s+File:\s*([^\s]+)/i.test(result)) {
+    result = result.replace(/Use\s+Demo\s+File:\s*([^\s]+)/gi, 'डेमो फ़ाइल का उपयोग करें: $1');
+    hasMatch = true;
+  }
+
+  // Pattern: "11.6 KB · Ready for smart column mapping"
+  if (/(\d+(?:\.\d+)?\s*KB)\s*·\s*Ready\s+for\s+smart\s+column\s+mapping/i.test(result)) {
+    result = result.replace(/(\d+(?:\.\d+)?\s*KB)\s*·\s*Ready\s+for\s+smart\s+column\s+mapping/gi, '$1 · स्मार्ट कॉलम मैपिंग के लिए तैयार');
+    hasMatch = true;
+  }
+
+  // Pattern: "22 / 22 Required Fields Mapped"
+  if (/(\d+)\s*\/\s*(\d+)\s*Required\s+Fields\s+Mapped/i.test(result)) {
+    result = result.replace(/(\d+)\s*\/\s*(\d+)\s*Required\s+Fields\s+Mapped/gi, '$1 / $2 आवश्यक फ़ील्ड मैप किए गए');
+    hasMatch = true;
+  }
+
+  // Pattern: "6 columns identified"
+  if (/(\d+)\s*columns?\s*identified/i.test(result)) {
+    result = result.replace(/(\d+)\s*columns?\s*identified/gi, '$1 कॉलम पहचाने गए');
+    hasMatch = true;
+  }
+
+  // Pattern: "2026-27 (Current Academic Year)"
+  if (/(\d{4}-\d{2})\s*\(Current\s+Academic\s+Year\)/i.test(result)) {
+    result = result.replace(/(\d{4}-\d{2})\s*\(Current\s+Academic\s+Year\)/gi, '$1 (वर्तमान शैक्षणिक वर्ष)');
+    hasMatch = true;
+  }
+  if (/\(?Current\s+Academic\s+Year\)?/i.test(result)) {
+    result = result.replace(/\(?Current\s+Academic\s+Year\)?/gi, '(वर्तमान शैक्षणिक वर्ष)');
+    hasMatch = true;
+  }
+
+  // Pattern: "Target Academic Year: 2026-27"
+  if (/Target\s+Academic\s+Year:\s*([^\s·]+)/i.test(result)) {
+    result = result.replace(/Target\s+Academic\s+Year:\s*([^\s·]+)/gi, 'लक्षित शैक्षणिक वर्ष: $1');
+    hasMatch = true;
+  }
 
   // Pattern: "Row #22", "• Row #22", "(Row #22)", "Row 22"
   if (/(\b|•\s*|\()Row\s*(?:#|No\.?|Number)?\s*(\d+)(\)?)/i.test(result)) {
