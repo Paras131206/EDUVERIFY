@@ -13,6 +13,7 @@ export interface User {
   id: string;
   email: string;
   full_name: string;
+  name?: string;
   role: UserRole;
   institution_aicte_id: string | null;
   dab_id: string | null;

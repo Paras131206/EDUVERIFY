@@ -1018,11 +1018,6 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Cryptographic Audit Chain:": "क्रिप्टोग्राफ़िक ऑडिट श्रृंखला:",
   "Generated & Authenticated by:": "द्वारा तैयार एवं प्रमाणित:",
   "Digital Seal:": "डिजिटल मुहर:",
-  "Generate Authority-Restricted Link": "प्राधिकरण-प्रतिबंधित लिंक उत्पन्न करें",
-  "Grant role-scoped, cryptographic file access exclusively to verified authorities": "सत्यापित प्राधिकरणों को विशेष रूप से भूमिका-दायरे, क्रिप्टोग्राफ़िक फ़ाइल पहुंच प्रदान करें",
-  "Zero-Trust Access Control: Only users possessing active credentials for the selected authority role will be permitted to open and download the file. Unauthorized users will receive a 403 Forbidden security block.": "ज़ीरो-ट्रस्ट एक्सेस नियंत्रण: केवल चयनित प्राधिकरण भूमिका के लिए सक्रिय क्रेडेंशियल रखने वाले उपयोगकर्ताओं को फ़ाइल खोलने और डाउनलोड करने की अनुमति होगी। अनधिकृत उपयोगकर्ताओं को 403 निषिद्ध सुरक्षा ब्लॉक प्राप्त होगा।",
-  "Authorized Authority Role": "अधिकृत प्राधिकरण भूमिका",
-  "Restricted Resource / File": "प्रतिबंधित संसाधन / फ़ाइल",
 
   // Verifier Tab (Image 3)
   "PUBLIC VERIFIER": "सार्वजनिक सत्यापनकर्ता",
@@ -1068,7 +1063,112 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Attribute Value": "विशेषता मान (Attribute Value)",
   "Cryptographically Disclosed": "क्रिप्टोग्राफ़िक रूप से प्रकट",
   "No claims disclosed because the holder has suspended verification consent under Section 8.4.": "कोई दावा प्रकट नहीं किया गया क्योंकि धारक ने धारा 8.4 के तहत सत्यापन सहमति को निलंबित कर दिया है।",
-  "No selective claims were disclosed in this presentation.": "इस प्रस्तुति में कोई चयनात्मक दावा प्रकट नहीं किया गया था।"
+  "No selective claims were disclosed in this presentation.": "इस प्रस्तुति में कोई चयनात्मक दावा प्रकट नहीं किया गया था।",
+
+  // Institution Dashboard, Empty States, Deduplication & Authority Link (Screenshots 1-5)
+  "Reset Stats to Zero": "आंकड़े शून्य पर रीसेट करें",
+  "Reset stats to zero to simulate fresh state": "ताज़ा स्थिति का अनुकरण करने के लिए आंकड़े शून्य पर रीसेट करें",
+  "Authority File Link": "प्राधिकरण फ़ाइल लिंक",
+  "Authority फ़ाइल Link": "प्राधिकरण फ़ाइल लिंक",
+  "Authority File Access Link": "प्राधिकरण फ़ाइल एक्सेस लिंक",
+  "Load Demo Document": "डेमो दस्तावेज़ लोड करें",
+
+  "No Student Data Uploaded Yet": "अभी तक कोई छात्र डेटा अपलोड नहीं हुआ",
+  "No विद्यार्थी Data Uploaded Yet": "अभी तक कोई छात्र डेटा अपलोड नहीं हुआ",
+  "No student admission batches have been ingested yet. All enrolment statistics, data quality scores, and statutory validation checks are currently set to zero. Upload your institution's batch file or load the demo document to populate real-time analytics.": "अभी तक कोई छात्र प्रवेश बैच अंतर्ग्रहीत नहीं किया गया है। सभी नामांकन आंकड़े, डेटा गुणवत्ता स्कोर और वैधानिक सत्यापन वर्तमान में शून्य पर सेट हैं। वास्तविक समय के विश्लेषण देखने के लिए अपने संस्थान की बैच फ़ाइल अपलोड करें या डेमो दस्तावेज़ लोड करें।",
+  "No विद्यार्थी admission batches have been ingested yet. सभी enrolment statistics, data quality scores, and statutory validation checks are currently set to zero. Upload your institution's batch फ़ाइल or load the demo document to populate real-time analytics.": "अभी तक कोई छात्र प्रवेश बैच अंतर्ग्रहीत नहीं किया गया है। सभी नामांकन आंकड़े, डेटा गुणवत्ता स्कोर और वैधानिक सत्यापन वर्तमान में शून्य पर सेट हैं। वास्तविक समय के विश्लेषण देखने के लिए अपने संस्थान की बैच फ़ाइल अपलोड करें या डेमो दस्तावेज़ लोड करें।",
+
+  "Awaiting batch data upload": "बैच डेटा अपलोड की प्रतीक्षा है",
+  "No student records uploaded": "कोई छात्र रिकॉर्ड अपलोड नहीं हुआ",
+  "No विद्यार्थी रिकॉर्ड uploaded": "कोई छात्र रिकॉर्ड अपलोड नहीं हुआ",
+  "No Issues Pending": "कोई मुद्दा लंबित नहीं",
+  "No Issues लंबित": "कोई मुद्दा लंबित नहीं",
+  "0 Pending Inbound • 0 Outbound": "0 लंबित आवक • 0 जावक",
+  "0 Pending Inbound": "0 लंबित आवक",
+  "0 Outbound": "0 जावक",
+
+  "Institution-Wide & Cross-Institution Deduplication Engine": "संस्थान-व्यापी एवं अंतर-संस्थान डुप्लिकेट पहचान इंजन",
+  "Rules V007 · V008 · V010 · V011": "नियम V007 · V008 · V010 · V011",
+  "Rules V007 &middot; V008 &middot; V010 &middot; V011": "नियम V007 · V008 · V010 · V011",
+  "Rules": "नियम",
+  "Biometric Soundex & Jaro-Winkler phonetic algorithms continuously check duplicates across all batches in this institution as well as cross-institutional dual-enrolments in the National AICTE Central Repository.": "बायोमेट्रिक साउंडेक्स और जेरो-विंकलर ध्वन्यात्मक एल्गोरिदम इस संस्थान के सभी बैचों के साथ-साथ राष्ट्रीय एआईसीटीई केंद्रीय भंडार में अंतर-संस्थागत दोहरे नामांकनों की निरंतर जांच करते हैं।",
+  "Biometric Soundex &amp; Jaro-Winkler phonetic algorithms continuously check duplicates across all batches in this institution as well as cross-institutional dual-enrolments in the National AICTE Central Repository.": "बायोमेट्रिक साउंडेक्स और जेरो-विंकलर ध्वन्यात्मक एल्गोरिदम इस संस्थान के सभी बैचों के साथ-साथ राष्ट्रीय एआईसीटीई केंद्रीय भंडार में अंतर-संस्थागत दोहरे नामांकनों की निरंतर जांच करते हैं।",
+  "Biometric Soundex & Jaro-Winkler phonetic algorithms continuously check duplicates across सभी batches in this institution as well as cross-institutional dual-enrolments in the National AICTE Central Repository.": "बायोमेट्रिक साउंडेक्स और जेरो-विंकलर ध्वन्यात्मक एल्गोरिदम इस संस्थान के सभी बैचों के साथ-साथ राष्ट्रीय एआईसीटीई केंद्रीय भंडार में अंतर-संस्थागत दोहरे नामांकनों की निरंतर जांच करते हैं।",
+
+  "Intra-Batch Duplicates:": "अंतः-बैच डुप्लिकेट:",
+  "Intra-Batch Duplicates": "अंतः-बैच डुप्लिकेट",
+  "Intra-Batch Duplicates: None": "अंतः-बैच डुप्लिकेट: कोई नहीं",
+  "Intra-Batch Duplicates: None Detected": "अंतः-बैच डुप्लिकेट: कोई नहीं मिला",
+  "Cross-Institution Matches:": "अंतर-संस्थान मिलान:",
+  "Cross-Institution Matches": "अंतर-संस्थान मिलान",
+  "Cross-Institution Matches: 1 Flagged": "अंतर-संस्थान मिलान: 1 ध्वजांकित",
+  "Cross-Institution Matches: None Detected": "अंतर-संस्थान मिलान: कोई नहीं मिला",
+  "1 Flagged": "1 ध्वजांकित",
+  "None Detected": "कोई नहीं मिला",
+  "None": "कोई नहीं",
+  "Inspect Deduplication Resolution Desk": "डुप्लिकेट समाधान डेस्क का निरीक्षण करें",
+  "निरीक्षण करें Deduplication Resolution Desk": "डुप्लिकेट समाधान डेस्क का निरीक्षण करें",
+  "Deduplication Resolution Desk": "डुप्लिकेट समाधान डेस्क",
+  "Fuzzy Match Confidence:": "फ़ज़ी मिलान विश्वसनीयता:",
+  "Fuzzy Match Confidence": "फ़ज़ी मिलान विश्वसनीयता",
+
+  "No Historical Batch Data": "कोई ऐतिहासिक बैच डेटा नहीं",
+  "Batch-by-batch data quality progression will plot here automatically once batches are uploaded and validated.": "बैच अपलोड और सत्यापित होने के बाद बैच-वार डेटा गुणवत्ता प्रगति यहाँ स्वतः प्रदर्शित होगी।",
+  "No Enrolment Records": "कोई नामांकन रिकॉर्ड नहीं",
+  "No Enrolment रिकॉर्ड": "कोई नामांकन रिकॉर्ड नहीं",
+  "Intake ceiling comparisons per program will populate once student admission batches are uploaded.": "छात्र प्रवेश बैच अपलोड होने के बाद कार्यक्रम-वार प्रवेश सीमा तुलना यहाँ प्रदर्शित होगी।",
+  "Intake ceiling comparisons per program will populate once विद्यार्थी admission batches are uploaded.": "छात्र प्रवेश बैच अपलोड होने के बाद कार्यक्रम-वार प्रवेश सीमा तुलना यहाँ प्रदर्शित होगी।",
+  "No Open Issues": "कोई सक्रिय मुद्दा नहीं",
+  "No सक्रिय मुद्दे": "कोई सक्रिय मुद्दा नहीं",
+  "No data uploaded yet. Ingest student admission records to run statutory validation checks.": "अभी तक कोई डेटा अपलोड नहीं हुआ। वैधानिक सत्यापन जांच चलाने के लिए छात्र प्रवेश रिकॉर्ड अंतर्ग्रहीत करें।",
+  "No data uploaded yet. Ingest विद्यार्थी admission रिकॉर्ड to run statutory validation checks.": "अभी तक कोई डेटा अपलोड नहीं हुआ। वैधानिक सत्यापन जांच चलाने के लिए छात्र प्रवेश रिकॉर्ड अंतर्ग्रहीत करें।",
+  "No Notifications": "कोई सूचना नहीं",
+  "Regulatory alerts, deadline notices, and ingestion events will appear here once active.": "सक्रिय होने पर नियामक अलर्ट, अंतिम तिथि नोटिस और अंतर्ग्रहण घटनाएं यहाँ दिखाई देंगी।",
+  "Regulatory alerts, अंतिम तिथि notices, and ingestion events will appear here once सक्रिय.": "सक्रिय होने पर नियामक अलर्ट, अंतिम तिथि नोटिस और अंतर्ग्रहण घटनाएं यहाँ दिखाई देंगी।",
+
+  // Step 4 Summary specific additions
+  "Auto Flag": "स्वतः चिह्नित",
+  "Header '": "शीर्षक '",
+  "' has shifted from canonical '": "' प्रामाणिक '",
+  "' has shifted from canonical": "' प्रामाणिक",
+  "has shifted from canonical": "प्रामाणिक से बदला है",
+  "Column mapping profile updated to maintain backward compatibility.": "पश्चगामी संगतता बनाए रखने के लिए कॉलम मैपिंग प्रोफ़ाइल अद्यतन की गई।",
+  "Column mapping profile updated to maintain backward compatibility": "पश्चगामी संगतता बनाए रखने के लिए कॉलम मैपिंग प्रोफ़ाइल अद्यतन की गई",
+  "error(s) and": "त्रुटि(यां) और",
+  "त्रुटि(s) and": "त्रुटि(यां) और",
+  "candidate records": "उम्मीदवार रिकॉर्ड",
+  "candidate records.": "उम्मीदवार रिकॉर्ड।",
+  "candidate रिकॉर्ड": "उम्मीदवार रिकॉर्ड",
+  "candidate रिकॉर्ड.": "उम्मीदवार रिकॉर्ड।",
+  "You can accept automated suggestions, edit cells with inline rationale, or dismiss items.": "आप स्वचालित सुझाव स्वीकार कर सकते हैं, इनलाइन औचित्य के साथ सेल संपादित कर सकते हैं, या खारिज कर सकते हैं।",
+  "You can accept automated suggestions, संपादित करें cells with inline rationale, or dismiss items.": "आप स्वचालित सुझाव स्वीकार कर सकते हैं, इनलाइन औचित्य के साथ सेल संपादित कर सकते हैं, या खारिज कर सकते हैं।",
+
+  // Authority Modal & Gateway Access
+  "Generate Authority-Restricted Link": "प्राधिकरण-प्रतिबंधित लिंक उत्पन्न करें",
+  "Grant role-scoped, cryptographic file access exclusively to verified authorities": "केवल सत्यापित प्राधिकरणों को भूमिका-आधारित, क्रिप्टोग्राफ़िक फ़ाइल एक्सेस प्रदान करें",
+  "Zero-Trust Access Control:": "शून्य-विश्वास एक्सेस नियंत्रण (Zero-Trust):",
+  "Zero-Trust Access Control: Only users possessing active credentials for the selected authority role will be permitted to open and download the file. Unauthorized users will receive a 403 Forbidden security block.": "ज़ीरो-ट्रस्ट एक्सेस नियंत्रण: केवल चयनित प्राधिकरण भूमिका के लिए सक्रिय क्रेडेंशियल रखने वाले उपयोगकर्ताओं को फ़ाइल खोलने और डाउनलोड करने की अनुमति होगी। अनधिकृत उपयोगकर्ताओं को 403 निषिद्ध सुरक्षा ब्लॉक प्राप्त होगा।",
+  "Authorized Authority Role": "अधिकृत प्राधिकरण भूमिका",
+  "Restricted Resource / File": "प्रतिबंधित संसाधन / फ़ाइल",
+  "Link Expiration Window": "लिंक समाप्ति समयसीमा",
+  "24 Hours": "24 घंटे",
+  "7 Days": "7 दिन",
+  "30 Days": "30 दिन",
+  "Generated Authorized Access Link:": "उत्पन्न अधिकृत एक्सेस लिंक:",
+  "Test Access Link": "एक्सेस लिंक का परीक्षण करें",
+  "Active persona:": "सक्रिय भूमिका:",
+  "Statutory Category Reservation & Quota Clearance Certificate": "वैधानिक श्रेणी आरक्षण एवं कोटा मंजूरी प्रमाणपत्र",
+  "AICTE Ingestion Quality & Compliance Audit Report (PDF)": "एआईसीटीई अंतर्ग्रहण गुणवत्ता एवं अनुपालन ऑडिट रिपोर्ट (PDF)",
+  "Batch Ingestion Ledger & Deduplication Audit Log (Excel)": "बैच अंतर्ग्रहण खाता एवं डुप्लिकेट पहचान ऑडिट लॉग (Excel)",
+  "Student Cryptographic SD-JWT Verification Package": "छात्र क्रिप्टोग्राफ़िक SD-JWT सत्यापन पैकेज",
+  "EduVerify Authority File Access Gateway": "एडुवेरीफाई प्राधिकरण फ़ाइल एक्सेस गेटवे",
+  "National Secure Cryptographic Clearance & File Dispatch": "राष्ट्रीय सुरक्षित क्रिप्टोग्राफ़िक मंजूरी एवं फ़ाइल प्रेषण",
+  "Authentication Required for Authority Link": "प्राधिकरण लिंक के लिए प्रमाणीकरण आवश्यक",
+  "Log In with Authority Credentials": "प्राधिकरण क्रेडेंशियल के साथ लॉग इन करें",
+  "AICTE National Directorate & Inspection Desk": "एआईसीटीई राष्ट्रीय निदेशालय एवं निरीक्षण डेस्क",
+  "Affiliating University & Degree Awarding Body": "संबद्ध विश्वविद्यालय एवं डिग्री प्रदाता संस्था",
+  "Certified Institutional Auditor": "प्रमाणित संस्थागत लेखा परीक्षक",
+  "Authorized Statutory & Employer Verification Agency": "अधिकृत वैधानिक एवं नियोक्ता सत्यापन एजेंसी"
 };
 
 // Sorted keys by length descending to match longest phrases first
@@ -1457,6 +1557,150 @@ export function translateText(text: string): string {
   }
   if (/(\d+)\s*LOW\b/i.test(result)) {
     result = result.replace(/(\d+)\s*LOW\b/gi, '$1 निम्न');
+    hasMatch = true;
+  }
+
+  // Pattern: "Rules V007 · V008 · V010 · V011" or "Rules V001"
+  if (/^Rules\s+(V\d+.*)$/i.test(result.trim())) {
+    result = result.replace(/\bRules\b/gi, 'नियम');
+    hasMatch = true;
+  }
+
+  // Pattern: "Biometric Soundex & Jaro-Winkler phonetic algorithms..."
+  if (/Biometric\s+Soundex\s*&(?:amp;)?\s*Jaro-Winkler\s+phonetic\s+algorithms/i.test(result)) {
+    result = 'बायोमेट्रिक साउंडेक्स और जेरो-विंकलर ध्वन्यात्मक एल्गोरिदम इस संस्थान के सभी बैचों के साथ-साथ राष्ट्रीय एआईसीटीई केंद्रीय भंडार में अंतर-संस्थागत दोहरे नामांकनों की निरंतर जांच करते हैं।';
+    hasMatch = true;
+  }
+
+  // Pattern: "Intra-Batch Duplicates: None" / "Cross-Institution Matches: 1 Flagged"
+  if (/Intra-Batch\s+Duplicates\s*:\s*(?:None\s*Detected|कोई\s*नहीं\s*मिला)/i.test(result)) {
+    result = result.replace(/Intra-Batch\s+Duplicates\s*:\s*(?:None\s*Detected|कोई\s*नहीं\s*मिला)/gi, 'अंतः-बैच डुप्लिकेट: कोई नहीं मिला');
+    hasMatch = true;
+  } else if (/Intra-Batch\s+Duplicates\s*:\s*(?:None|कोई\s*नहीं)/i.test(result)) {
+    result = result.replace(/Intra-Batch\s+Duplicates\s*:\s*(?:None|कोई\s*नहीं)/gi, 'अंतः-बैच डुप्लिकेट: कोई नहीं');
+    hasMatch = true;
+  }
+  if (/Cross-Institution\s+Matches\s*:\s*(\d+)\s*Flagged/i.test(result)) {
+    result = result.replace(/Cross-Institution\s+Matches\s*:\s*(\d+)\s*Flagged/gi, 'अंतर-संस्थान मिलान: $1 ध्वजांकित');
+    hasMatch = true;
+  }
+  if (/Cross-Institution\s+Matches\s*:\s*(?:None\s*(?:Detected)?|कोई\s*नहीं\s*(?:मिला)?)/i.test(result)) {
+    result = result.replace(/Cross-Institution\s+Matches\s*:\s*(?:None\s*(?:Detected)?|कोई\s*नहीं\s*(?:मिला)?)/gi, 'अंतर-संस्थान मिलान: कोई नहीं मिला');
+    hasMatch = true;
+  }
+
+  // Pattern: "Inspect Deduplication Resolution Desk" / "निरीक्षण करें Deduplication Resolution Desk"
+  if (/(?:Inspect|निरीक्षण\s*करें)?\s*Deduplication\s+Resolution\s+Desk/i.test(result)) {
+    result = result.replace(/(?:Inspect|निरीक्षण\s*करें)?\s*Deduplication\s+Resolution\s+Desk/gi, 'डुप्लिकेट समाधान डेस्क का निरीक्षण करें');
+    hasMatch = true;
+  }
+
+  // Pattern: "Authority File Link" / "Authority फ़ाइल Link"
+  if (/Authority\s+(?:File|फ़ाइल)\s+(?:Access\s+)?Link/i.test(result)) {
+    result = result.replace(/Authority\s+(?:File|फ़ाइल)\s+(?:Access\s+)?Link/gi, 'प्राधिकरण फ़ाइल लिंक');
+    hasMatch = true;
+  }
+
+  // Pattern: "AICTE Demographics and Rule Catalog v0.1.0 executed across 65 candidate records."
+  if (/AICTE\s+Demographics\s+and\s+Rule\s+Catalog\s+(v?[\d.]+)\s+executed\s+across\s+(\d+)\s+candidate\s+(?:records|रिकॉर्ड)\.?/i.test(result)) {
+    result = result.replace(
+      /AICTE\s+Demographics\s+and\s+Rule\s+Catalog\s+(v?[\d.]+)\s+executed\s+across\s+(\d+)\s+candidate\s+(?:records|रिकॉर्ड)\.?/gi,
+      'एआईसीटीई जनसांख्यिकी एवं नियम कैटलॉग $1 को $2 उम्मीदवार रिकॉर्ड पर निष्पादित किया गया।'
+    );
+    hasMatch = true;
+  }
+
+  // Pattern: Schema drift full sentence
+  if (/Header\s*['‘"]([^'’"]+)['’"]\s*has\s*shifted\s*from\s*canonical\s*['‘"]([^'’"]+)['’"]\s*\(([^)]+)\)\.\s*Column\s*mapping\s*profile\s*updated\s*to\s*maintain\s*backward\s*compatibility\.?/i.test(result)) {
+    result = result.replace(
+      /Header\s*['‘"]([^'’"]+)['’"]\s*has\s*shifted\s*from\s*canonical\s*['‘"]([^'’"]+)['’"]\s*\(([^)]+)\)\.\s*Column\s*mapping\s*profile\s*updated\s*to\s*maintain\s*backward\s*compatibility\.?/gi,
+      'शीर्षक \'$1\' प्रामाणिक \'$2\' ($3) से परिवर्तित हुआ है। पश्चगामी संगतता बनाए रखने के लिए कॉलम मैपिंग प्रोफ़ाइल अद्यतन की गई।'
+    );
+    hasMatch = true;
+  }
+
+  // Pattern: Schema drift chunk "' (COLUMN_RENAMED). Column mapping profile updated to maintain backward compatibility."
+  if (/^'\s*\(([A-Z_]+)\)\.\s*Column\s+mapping\s+profile\s+updated\s+to\s+maintain\s+backward\s+compatibility\.?/i.test(result.trim())) {
+    result = result.replace(
+      /^'\s*\(([A-Z_]+)\)\.\s*Column\s+mapping\s+profile\s+updated\s+to\s+maintain\s+backward\s+compatibility\.?/gi,
+      '\' ($1) से बदला है। पश्चगामी संगतता बनाए रखने के लिए कॉलम मैपिंग प्रोफ़ाइल अद्यतन की गई।'
+    );
+    hasMatch = true;
+  }
+
+  // Pattern: Next Step issue review full sentence
+  if (/(?:error\(s\)|त्रुटि\(s\)|त्रुटियां|त्रुटि\(यां\))\s*and\s*.*(?:warning\(s\)|चेतावनी\(s\)|चेतावनी\(यां\))\s*require\s*review/i.test(result)) {
+    result = result.replace(
+      /(\d+)\s*(?:error\(s\)|त्रुटि\(s\)|त्रुटियां|त्रुटि\(यां\))\s*and\s*(\d+)\s*(?:warning\(s\)|चेतावनी\(s\)|चेतावनी\(यां\))\s*require\s*review[.\s]*You\s*can\s*accept\s*automated\s*suggestions,\s*(?:edit|संपादित\s*करें)\s*cells\s*with\s*inline\s*rationale,\s*or\s*dismiss\s*items\.?/gi,
+      '$1 त्रुटि(यां) और $2 चेतावनी(यां) समीक्षा योग्य हैं। आप स्वचालित सुझाव स्वीकार कर सकते हैं, इनलाइन औचित्य के साथ सेल संपादित कर सकते हैं, या खारिज कर सकते हैं।'
+    );
+    hasMatch = true;
+  }
+
+  // Pattern: Next Step issue review partial text nodes
+  if (/^\s*(?:error\(s\)|त्रुटि\(s\))\s+and\s*$/i.test(result)) {
+    result = result.replace(/^\s*(?:error\(s\)|त्रुटि\(s\))\s+and\s*$/gi, ' त्रुटि(यां) और ');
+    hasMatch = true;
+  }
+  if (/^\s*(?:warning\(s\)|चेतावनी\(s\)|चेतावनी\(यां\))\s*require\s*review/i.test(result)) {
+    result = result.replace(
+      /^\s*(?:warning\(s\)|चेतावनी\(s\)|चेतावनी\(यां\))\s*require\s*review[.\s]*You\s*can\s*accept\s*automated\s*suggestions,\s*(?:edit|संपादित\s*करें)\s*cells\s*with\s*inline\s*rationale,\s*or\s*dismiss\s*items\.?/gi,
+      ' चेतावनी(यां) समीक्षा योग्य हैं। आप स्वचालित सुझाव स्वीकार कर सकते हैं, इनलाइन औचित्य के साथ सेल संपादित कर सकते हैं, या खारिज कर सकते हैं।'
+    );
+    hasMatch = true;
+  }
+
+  // Pattern: "No Student Data Uploaded Yet" or Hinglish
+  if (/No\s+(?:Student|विद्यार्थी)\s+Data\s+Uploaded\s+Yet/i.test(result)) {
+    result = 'अभी तक कोई छात्र डेटा अपलोड नहीं हुआ';
+    hasMatch = true;
+  }
+
+  // Pattern: "No student admission batches have been ingested yet..." or Hinglish
+  if (/No\s+(?:student|विद्यार्थी)\s+admission\s+batches\s+have\s+been\s+ingested/i.test(result)) {
+    result = 'अभी तक कोई छात्र प्रवेश बैच अंतर्ग्रहीत नहीं किया गया है। सभी नामांकन आंकड़े, डेटा गुणवत्ता स्कोर और वैधानिक सत्यापन वर्तमान में शून्य पर सेट हैं। वास्तविक समय के विश्लेषण देखने के लिए अपने संस्थान की बैच फ़ाइल अपलोड करें या डेमो दस्तावेज़ लोड करें।';
+    hasMatch = true;
+  }
+
+  // Pattern: "No student records uploaded" or Hinglish
+  if (/No\s+(?:student|विद्यार्थी)\s+(?:records|रिकॉर्ड)\s+uploaded/i.test(result)) {
+    result = 'कोई छात्र रिकॉर्ड अपलोड नहीं हुआ';
+    hasMatch = true;
+  }
+
+  // Pattern: "No Issues Pending" or Hinglish
+  if (/No\s+Issues\s+(?:Pending|लंबित)/i.test(result)) {
+    result = 'कोई मुद्दा लंबित नहीं';
+    hasMatch = true;
+  }
+
+  // Pattern: "No Enrolment Records" or Hinglish
+  if (/No\s+Enrolment\s+(?:Records|रिकॉर्ड)/i.test(result)) {
+    result = 'कोई नामांकन रिकॉर्ड नहीं';
+    hasMatch = true;
+  }
+
+  // Pattern: "Intake ceiling comparisons per program will populate..." or Hinglish
+  if (/Intake\s+ceiling\s+comparisons\s+per\s+program\s+will\s+populate/i.test(result)) {
+    result = 'छात्र प्रवेश बैच अपलोड होने के बाद कार्यक्रम-वार प्रवेश सीमा तुलना यहाँ प्रदर्शित होगी।';
+    hasMatch = true;
+  }
+
+  // Pattern: "No Open Issues" or Hinglish
+  if (/No\s+(?:Open\s+Issues|सक्रिय\s+मुद्दे)/i.test(result)) {
+    result = 'कोई सक्रिय मुद्दा नहीं';
+    hasMatch = true;
+  }
+
+  // Pattern: "No data uploaded yet. Ingest student admission records..." or Hinglish
+  if (/No\s+data\s+uploaded\s+yet\.\s*Ingest\s+(?:student|विद्यार्थी)\s+admission/i.test(result)) {
+    result = 'अभी तक कोई डेटा अपलोड नहीं हुआ। वैधानिक सत्यापन जांच चलाने के लिए छात्र प्रवेश रिकॉर्ड अंतर्ग्रहीत करें।';
+    hasMatch = true;
+  }
+
+  // Pattern: "Regulatory alerts, deadline notices, and ingestion events..." or Hinglish
+  if (/Regulatory\s+alerts,\s*(?:deadline|अंतिम\s+तिथि)\s+notices/i.test(result)) {
+    result = 'सक्रिय होने पर नियामक अलर्ट, अंतिम तिथि नोटिस और अंतर्ग्रहण घटनाएं यहाँ दिखाई देंगी।';
     hasMatch = true;
   }
 

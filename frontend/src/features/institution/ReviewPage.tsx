@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { useOptionalAuth } from '@/lib/auth';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ import {
   IssueItem,
   DuplicateClusterItem,
   RevalidationResult,
+  BatchItem,
 } from './types';
 import {
   CheckCircle2,
@@ -28,6 +29,7 @@ import {
   Users,
   BarChart3,
   ListFilter,
+  Clock,
 } from 'lucide-react';
 import { API_BASE_URL, authFetch } from '@/lib/api';
 
@@ -35,6 +37,10 @@ import { API_BASE_URL, authFetch } from '@/lib/api';
 export const ReviewPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const batchId = id && id !== 'undefined' ? id : 'batch-demo-2';
+
+  const location = useLocation();
+  const passedBatch = (location.state as { batch?: BatchItem } | null)?.batch;
+  const [batchDetails, setBatchDetails] = useState<BatchItem | null>(passedBatch || null);
 
   const auth = useOptionalAuth();
   const userRole = auth?.user?.role || 'INSTITUTION_ADMIN';
@@ -46,8 +52,19 @@ export const ReviewPage: React.FC = () => {
   const [report, setReport] = useState<BatchReportData | null>(null);
   const [issues, setIssues] = useState<IssueItem[]>([]);
   const [duplicateClusters, setDuplicateClusters] = useState<DuplicateClusterItem[]>([]);
-  const [qualityScore, setQualityScore] = useState<number>(74.0);
-  const [qualityScoreBefore, setQualityScoreBefore] = useState<number>(74.0);
+
+  const initialScore =
+    passedBatch?.quality_score ??
+    passedBatch?.quality_score_after ??
+    passedBatch?.quality_score_before;
+  const [qualityScore, setQualityScore] = useState<number>(
+    typeof initialScore === 'number' ? initialScore : 87.4
+  );
+  const [qualityScoreBefore, setQualityScoreBefore] = useState<number>(
+    typeof passedBatch?.quality_score_before === 'number'
+      ? passedBatch.quality_score_before
+      : (typeof initialScore === 'number' ? initialScore : 87.4)
+  );
   const [selectedIssue, setSelectedIssue] = useState<IssueItem | null>(null);
 
   // Re-validation state
@@ -56,7 +73,7 @@ export const ReviewPage: React.FC = () => {
   const [revalidationResult, setRevalidationResult] = useState<RevalidationResult | null>(null);
 
   // Commit state
-  const [isCommitted, setIsCommitted] = useState(false);
+  const [isCommitted, setIsCommitted] = useState(passedBatch?.status === 'COMMITTED');
   const [showCommitDialog, setShowCommitDialog] = useState(false);
   const [isCommitting, setIsCommitting] = useState(false);
 
@@ -68,21 +85,54 @@ export const ReviewPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
 
-  // Fetch batch report data
+  // Fetch batch report data and batch details in sync
   const loadBatchReport = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await authFetch(`/v1/batches/${batchId}/report`);
-      if (!res.ok) {
-        throw new Error(`Failed to load batch report (HTTP ${res.status})`);
+      const [reportRes, batchRes] = await Promise.all([
+        authFetch(`/v1/batches/${batchId}/report`),
+        authFetch(`/v1/batches/${batchId}`),
+      ]);
+
+      let fetchedBatch: BatchItem | null = null;
+      if (batchRes.ok) {
+        fetchedBatch = await batchRes.json();
+        setBatchDetails(fetchedBatch);
+        if (fetchedBatch?.status === 'COMMITTED') {
+          setIsCommitted(true);
+        }
       }
-      const data: BatchReportData = await res.json();
+
+      if (!reportRes.ok) {
+        throw new Error(`Failed to load batch report (HTTP ${reportRes.status})`);
+      }
+      const data: BatchReportData = await reportRes.json();
       setReport(data);
       setIssues(data.issues || []);
       setDuplicateClusters(data.duplicate_clusters || []);
-      setQualityScore(data.quality_score || 74.0);
-      setQualityScoreBefore(data.quality_score_before || data.quality_score || 74.0);
+
+      const currentScore =
+        fetchedBatch?.quality_score ??
+        data.quality_score ??
+        passedBatch?.quality_score;
+      const beforeScore =
+        fetchedBatch?.quality_score_before ??
+        data.quality_score_before ??
+        passedBatch?.quality_score_before ??
+        currentScore;
+
+      if (typeof currentScore === 'number') {
+        setQualityScore(currentScore);
+      }
+      if (typeof beforeScore === 'number') {
+        setQualityScoreBefore(beforeScore);
+      }
+
+      if (data.status === 'COMMITTED' || fetchedBatch?.status === 'COMMITTED') {
+        setIsCommitted(true);
+      }
+
       if (data.issues && data.issues.length > 0) {
         const sorted = [...data.issues].sort((a, b) => {
           const pOrder: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
@@ -98,7 +148,7 @@ export const ReviewPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [batchId]);
+  }, [batchId, passedBatch]);
 
   useEffect(() => {
     loadBatchReport();
@@ -479,6 +529,16 @@ export const ReviewPage: React.FC = () => {
         setRevalidationResult(result);
         setQualityScoreBefore(result.quality_score_before);
         setQualityScore(result.quality_score_after);
+        setBatchDetails((prev) =>
+          prev
+            ? {
+                ...prev,
+                quality_score: result.quality_score_after,
+                quality_score_before: result.quality_score_before,
+                quality_score_after: result.quality_score_after,
+              }
+            : prev
+        );
         // Switch to Before/After tab to display result!
         setActiveMainTab('report');
       }
@@ -505,10 +565,12 @@ export const ReviewPage: React.FC = () => {
       });
       if (res.ok) {
         setIsCommitted(true);
+        setBatchDetails((prev) => (prev ? { ...prev, status: 'COMMITTED' } : prev));
         setShowCommitDialog(false);
       }
     } catch {
       setIsCommitted(true);
+      setBatchDetails((prev) => (prev ? { ...prev, status: 'COMMITTED' } : prev));
       setShowCommitDialog(false);
     } finally {
       setIsCommitting(false);
@@ -590,20 +652,43 @@ export const ReviewPage: React.FC = () => {
             <span className="text-xs font-mono font-bold text-gov-navy bg-gov-navy/10 px-2 py-0.5 rounded">
               {batchId}
             </span>
-            {isCommitted && (
-              <span className="text-xs font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                COMMITTED
-              </span>
-            )}
+            {(() => {
+              const currentStatus = isCommitted ? 'COMMITTED' : (batchDetails?.status || report?.status);
+              if (!currentStatus) return null;
+              if (currentStatus === 'COMMITTED') {
+                return (
+                  <span className="text-xs font-bold bg-green-100 text-green-800 px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-green-200">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                    COMMITTED
+                  </span>
+                );
+              }
+              if (currentStatus === 'IN_REVIEW') {
+                return (
+                  <span className="text-xs font-bold bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-amber-300">
+                    <Clock className="w-3.5 h-3.5 text-amber-600" />
+                    IN REVIEW
+                  </span>
+                );
+              }
+              return (
+                <span className="text-xs font-bold bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full">
+                  {currentStatus}
+                </span>
+              );
+            })()}
           </div>
           <h2 className="text-2xl font-bold tracking-tight text-gov-navy">
             Validation Review Workspace
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            Academic Year: <strong className="text-slate-800">2026-27</strong> · Total Rows:{' '}
-            <strong className="text-slate-800">{report.rows_total}</strong> · Rule Catalog:{' '}
-            <strong className="text-slate-800">v{report.rule_catalog_version}</strong>
+            Academic Year: <strong className="text-slate-800">{batchDetails?.academic_year || report.academic_year || '2024-2025'}</strong>
+            {(batchDetails?.filename || report.filename) && (
+              <> · Filename: <strong className="text-slate-800">{batchDetails?.filename || report.filename}</strong></>
+            )}
+            {' '}· Total Rows:{' '}
+            <strong className="text-slate-800">{report.rows_total ?? batchDetails?.rows_total ?? 0}</strong> · Rule Catalog:{' '}
+            <strong className="text-slate-800">v{report.rule_catalog_version || batchDetails?.catalog_version || '1.0.0'}</strong>
           </p>
         </div>
 

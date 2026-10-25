@@ -88,6 +88,7 @@ class InstitutionSummaryDashboard(BaseModel):
     fill_percent: float
     active_batches: int
     avg_quality_score: float
+    latest_quality_score: float | None = None
     pending_reviews: int
     excess_seats: int
     cached_at: datetime
