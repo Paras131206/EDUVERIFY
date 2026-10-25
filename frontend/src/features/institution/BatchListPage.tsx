@@ -319,12 +319,12 @@ export const BatchListPage: React.FC = () => {
                             <div className="flex items-center gap-2 text-[10px]">
                               {batch.rows_error ? (
                                 <span className="text-red-600 font-bold">
-                                  {batch.rows_error} error(s)
+                                  {`${batch.rows_error} error(s)`}
                                 </span>
                               ) : null}
                               {batch.rows_warning ? (
                                 <span className="text-amber-700 font-semibold">
-                                  {batch.rows_warning} warn
+                                  {`${batch.rows_warning} warn`}
                                 </span>
                               ) : null}
                             </div>

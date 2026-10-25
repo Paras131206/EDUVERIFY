@@ -48,6 +48,14 @@ class InstitutionRecord(BaseModel):
     affiliated_dab_id: str | None = None
     onboarding_level: str = "FULL"
     did: str
+    # Provenance and source verification attributes
+    aishe_code: str | None = None
+    approval_order_ref: str | None = None
+    source_authority: str | None = None
+    source_file_name: str | None = None
+    source_file_hash: str | None = None
+    verified_by: str | None = None
+    verified_at: str | None = None
 
 
 class CreateInstitutionRequest(BaseModel):
@@ -59,6 +67,35 @@ class CreateInstitutionRequest(BaseModel):
     affiliated_dab_id: str | None = None
     onboarding_level: str = "FULL"
     did: str
+    # Provenance and source verification attributes
+    aishe_code: str | None = None
+    approval_order_ref: str | None = None
+    source_authority: str | None = None
+    source_file_name: str | None = None
+    source_file_hash: str | None = None
+    verified_by: str | None = None
+    verified_at: str | None = None
+
+
+class BulkIngestInstitutionsRequest(BaseModel):
+    source_authority: str
+    approval_order_ref: str
+    aishe_cycle_code: str | None = None
+    authorizing_officer: str
+    source_file_name: str | None = None
+    institutions: list[CreateInstitutionRequest]
+
+
+class BulkIngestInstitutionsResponse(BaseModel):
+    success: bool
+    ingested_count: int
+    updated_count: int
+    total_records: int
+    source_authority: str
+    approval_order_ref: str
+    batch_hash: str
+    ingested_at: str
+    institutions: list[InstitutionRecord]
 
 
 CourseLevel = Literal["DIPLOMA", "UG", "PG", "PGDM", "PHD"]

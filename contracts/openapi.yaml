@@ -396,6 +396,34 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/InstitutionRecord'
+  /v1/master/institutions/bulk:
+    post:
+      tags:
+      - Master Data
+      summary: Bulk ingest institution master data with provenance metadata
+      operationId: bulkIngestInstitutions
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkIngestInstitutionsRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkIngestInstitutionsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /v1/master/programs:
     get:
       tags:
@@ -4837,6 +4865,82 @@ components:
       - type
       - did
       title: CreateInstitutionRequest
+    BulkIngestInstitutionsRequest:
+      properties:
+        source_authority:
+          type: string
+          title: Source Authority
+        approval_order_ref:
+          type: string
+          title: Approval Order Ref
+        aishe_cycle_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Aishe Cycle Code
+        authorizing_officer:
+          type: string
+          title: Authorizing Officer
+        source_file_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Source File Name
+        institutions:
+          items:
+            $ref: '#/components/schemas/CreateInstitutionRequest'
+          type: array
+          title: Institutions
+      type: object
+      required:
+      - source_authority
+      - approval_order_ref
+      - authorizing_officer
+      - institutions
+      title: BulkIngestInstitutionsRequest
+    BulkIngestInstitutionsResponse:
+      properties:
+        success:
+          type: boolean
+          title: Success
+        ingested_count:
+          type: integer
+          title: Ingested Count
+        updated_count:
+          type: integer
+          title: Updated Count
+        total_records:
+          type: integer
+          title: Total Records
+        source_authority:
+          type: string
+          title: Source Authority
+        approval_order_ref:
+          type: string
+          title: Approval Order Ref
+        batch_hash:
+          type: string
+          title: Batch Hash
+        ingested_at:
+          type: string
+          title: Ingested At
+        institutions:
+          items:
+            $ref: '#/components/schemas/InstitutionRecord'
+          type: array
+          title: Institutions
+      type: object
+      required:
+      - success
+      - ingested_count
+      - updated_count
+      - total_records
+      - source_authority
+      - approval_order_ref
+      - batch_hash
+      - ingested_at
+      - institutions
+      title: BulkIngestInstitutionsResponse
     CreateProgramRequest:
       properties:
         program_code:

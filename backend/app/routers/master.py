@@ -30,6 +30,8 @@ from app.models.core import (
 from app.schemas.auth import UserRole
 from app.schemas.master import (
     AcademicYearRecord,
+    BulkIngestInstitutionsRequest,
+    BulkIngestInstitutionsResponse,
     CreateAcademicYearRequest,
     CreateDabRequest,
     CreateDistrictRequest,
@@ -205,6 +207,90 @@ def create_institution(
     db.commit()
     db.refresh(row)
     return InstitutionRecord.model_validate(row)
+
+
+@router.post(
+    "/institutions/bulk",
+    summary="Bulk ingest institution master data with provenance metadata",
+    response_model=BulkIngestInstitutionsResponse,
+    status_code=status.HTTP_200_OK,
+)
+def bulk_ingest_institutions(
+    data: BulkIngestInstitutionsRequest,
+    principal: Principal = Depends(require_roles(UserRole.AICTE_ADMIN)),
+    db: Session = Depends(get_db),
+) -> BulkIngestInstitutionsResponse:
+    import hashlib
+    from datetime import datetime, timezone
+
+    ingested = 0
+    updated = 0
+    saved_records = []
+    now_iso = datetime.now(timezone.utc).isoformat()
+    raw_hash_input = (
+        f"{data.source_authority}:{data.approval_order_ref}:"
+        f"{len(data.institutions)}:{now_iso}"
+    )
+    batch_hash = f"sha256:{hashlib.sha256(raw_hash_input.encode()).hexdigest()}"
+
+    for inst in data.institutions:
+        existing = db.get(InstitutionModel, inst.institution_aicte_id)
+        if existing:
+            existing.name = inst.name
+            existing.state_code = inst.state_code
+            existing.district_code = inst.district_code
+            existing.type = inst.type
+            existing.affiliated_dab_id = inst.affiliated_dab_id
+            existing.onboarding_level = inst.onboarding_level
+            existing.did = inst.did
+            updated += 1
+            saved_records.append(existing)
+        else:
+            row = InstitutionModel(
+                institution_aicte_id=inst.institution_aicte_id,
+                name=inst.name,
+                state_code=inst.state_code,
+                district_code=inst.district_code,
+                type=inst.type,
+                affiliated_dab_id=inst.affiliated_dab_id,
+                onboarding_level=inst.onboarding_level,
+                did=inst.did,
+            )
+            db.add(row)
+            ingested += 1
+            saved_records.append(row)
+
+    db.commit()
+    for r in saved_records:
+        db.refresh(r)
+
+    inst_by_id = {i.institution_aicte_id: i for i in data.institutions}
+    response_records = []
+    for r in saved_records:
+        rec = InstitutionRecord.model_validate(r)
+        rec.source_authority = data.source_authority
+        rec.approval_order_ref = data.approval_order_ref
+        req_inst = inst_by_id.get(r.institution_aicte_id)
+        rec.aishe_code = (
+            getattr(req_inst, "aishe_code", None) or f"C-{r.state_code}{r.district_code}"
+        )
+        rec.source_file_name = data.source_file_name
+        rec.source_file_hash = batch_hash
+        rec.verified_by = data.authorizing_officer
+        rec.verified_at = now_iso
+        response_records.append(rec)
+
+    return BulkIngestInstitutionsResponse(
+        success=True,
+        ingested_count=ingested,
+        updated_count=updated,
+        total_records=len(saved_records),
+        source_authority=data.source_authority,
+        approval_order_ref=data.approval_order_ref,
+        batch_hash=batch_hash,
+        ingested_at=now_iso,
+        institutions=response_records,
+    )
 
 
 # -----------------------------------------------------------------------------

@@ -159,7 +159,10 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Intake Type": "प्रवेश प्रकार",
   "Regular Intake": "नियमित प्रवेश",
   "Lateral Entry": "पार्श्व प्रवेश (Lateral Entry)",
-  "Supernumerary": "अतिरिक्त सीटें (Supernumerary)",
+  "Supernumerary": "अतिरिक्त सीटें (सुपरन्यूमरेरी)",
+  "SUPERNUMERARY": "अतिरिक्त कोटा",
+  "अतिरिक्त सीटें (Supernumerary)": "अतिरिक्त सीटें (सुपरन्यूमरेरी)",
+  "अतिरिक्त सीटें (SUPERNUMERARY)": "अतिरिक्त सीटें (सुपरन्यूमरेरी)",
   "Auto-Detect File Format": "फ़ाइल प्रारूप स्वतः पहचानें",
   "Upload & Proceed to Mapping": "अपलोड करें एवं मैपिंग पर आगे बढ़ें",
   "Step 2: Map Columns with AICTE Catalog": "चरण 2: एआईसीटीई कैटलॉग के साथ कॉलम मैप करें",
@@ -519,7 +522,7 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Loading transfer workflow registry...": "स्थानांतरण वर्कफ़्लो रजिस्ट्री लोड हो रही है...",
   "Governed by Section 8.1: Destination requests, Source approves, AICTE 15-day statutory override": "अनुभाग 8.1 द्वारा शासित: गंतव्य अनुरोध करता है, स्रोत स्वीकृत करता है, एआईसीटीई 15-दिवसीय वैधानिक ओवरराइड",
 
-  // Aggregates Extended
+  // Aggregates Extended & Intake Reconciliation (Images 1 & 2)
   "Aggregate Enrolment Reporting": "कुल नामांकन रिपोर्टिंग",
   "Dedicated submission workspace for institutions in AGGREGATE_ONLY mode and statutory AICTE intake reconciliation": "AGGREGATE_ONLY मोड में संस्थानों के लिए समर्पित सबमिशन कार्यक्षेत्र और वैधानिक एआईसीटीई प्रवेश समाधान",
   "Approved Declared Seats": "स्वीकृत घोषित सीटें",
@@ -531,6 +534,186 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Program Enrolment Breakdown Form": "कार्यक्रम नामांकन विवरण प्रपत्र",
   "Enter total enrolled heads along with supernumerary and foreign quota sub-counts for each program": "प्रत्येक कार्यक्रम के लिए अतिरिक्त और विदेशी कोटा उप-गणना के साथ कुल नामांकित छात्र दर्ज करें",
   "Evaluated under AICTE Rule V022": "एआईसीटीई नियम V022 के तहत मूल्यांकित",
+  "Sum of aggregate submissions for 2026-27": "2026-27 के लिए कुल सबमिशन का योग",
+  "Sum of aggregate submissions for 2025-26": "2025-26 के लिए कुल सबमिशन का योग",
+  "Sum of aggregate submissions for": "के लिए कुल सबमिशन का योग",
+  "Academic Year 2026-27": "शैक्षणिक वर्ष 2026-27",
+  "Academic Year 2025-26": "शैक्षणिक वर्ष 2025-26",
+  "Save & Reconcile": "सहेजें एवं सुलह करें",
+  "सहजें & Reconcile": "सहेजें एवं सुलह करें",
+  "सहेजें & Reconcile": "सहेजें एवं सुलह करें",
+  "Saving...": "सहेजा जा रहा है...",
+  "Program Code & Title": "कार्यक्रम कोड एवं शीर्षक",
+  "PROGRAM CODE & TITLE": "कार्यक्रम कोड एवं शीर्षक",
+  "Program Code & TITLE": "कार्यक्रम कोड एवं शीर्षक",
+  "कार्यक्रम कोड & TITLE": "कार्यक्रम कोड एवं शीर्षक",
+  "Total Enrolled *": "कुल नामांकित *",
+  "Total Enrolled heads": "कुल नामांकित छात्र",
+  "FN (Foreign)": "विदेशी (FN)",
+  "FN (FOREIGN)": "विदेशी (FN)",
+  "(Foreign)": "(विदेशी)",
+  "(FOREIGN)": "(विदेशी)",
+  "B.Tech in Computer Science & Engineering": "बी.टेक कंप्यूटर साइंस एवं इंजीनियरिंग",
+  "B.Tech in Electronics & Communication Engineering": "बी.टेक इलेक्ट्रॉनिक्स एवं संचार इंजीनियरिंग",
+  "B.Tech in Mechanical Engineering": "बी.टेक मैकेनिकल इंजीनियरिंग",
+  "Master of Business Administration": "मास्टर ऑफ बिजनेस एडमिनिस्ट्रेशन (MBA)",
+  "Intake Reconciliation: Declared Quota vs. Submitted Enrolment": "प्रवेश समाधान: घोषित कोटा बनाम प्रस्तुत नामांकन",
+  "Declared Quota vs. Submitted Enrolment": "घोषित कोटा बनाम प्रस्तुत नामांकन",
+  "Declared कोटा vs. Submitted Enrolment": "घोषित कोटा बनाम प्रस्तुत नामांकन",
+  "प्रवेश समाधान: Declared कोटा vs. Submitted Enrolment": "प्रवेश समाधान: घोषित कोटा बनाम प्रस्तुत नामांकन",
+  "Comparison between approved sanction from AICTE Approval Portal and actual enrolments reported by institution": "एआईसीटीई अनुमोदन पोर्टल से स्वीकृत सीटों और संस्थान द्वारा रिपोर्ट किए गए वास्तविक नामांकन के बीच तुलना",
+  "Comparison between स्वीकृत sanction from AICTE Approval Portal and वास्तविक enrolments reported by institution": "एआईसीटीई अनुमोदन पोर्टल से स्वीकृत सीटों और संस्थान द्वारा रिपोर्ट किए गए वास्तविक नामांकन के बीच तुलना",
+  "Automated Audit per Rule V022": "नियम V022 के अनुसार स्वचालित ऑडिट",
+  "Automated Audit per नियम V022": "नियम V022 के अनुसार स्वचालित ऑडिट",
+  "Automated Audit per": "के अनुसार स्वचालित ऑडिट",
+  "Declared (Approved Intake)": "घोषित (स्वीकृत प्रवेश)",
+  "DECLARED (Approved Intake)": "घोषित (स्वीकृत प्रवेश)",
+  "DECLARED (स्वीकृत प्रवेश)": "घोषित (स्वीकृत प्रवेश)",
+  "DECLARED (APPROVED INTAKE)": "घोषित (स्वीकृत प्रवेश)",
+  "Submitted Enrolment": "प्रस्तुत नामांकन",
+  "SUBMITTED ENROLMENT": "प्रस्तुत नामांकन",
+  "Variance (Delta)": "भिन्नता (अंतर (डेल्टा))",
+  "VARIANCE (Delta)": "भिन्नता (अंतर (डेल्टा))",
+  "VARIANCE (अंतर (डेल्टा))": "भिन्नता (अंतर (डेल्टा))",
+  "VARIANCE (DELTA)": "भिन्नता (अंतर (डेल्टा))",
+  "EXCESS (OVER-ENROLLED)": "अतिरिक्त (ओवर-नामांकित)",
+  "अतिरिक्त (OVER-नामांकित)": "अतिरिक्त (ओवर-नामांकित)",
+  "OVER-ENROLLED": "ओवर-नामांकित",
+  "(OVER-ENROLLED)": "(ओवर-नामांकित)",
+  "(OVER-नामांकित)": "(ओवर-नामांकित)",
+  "MISMATCH (UNDER-FILLED)": "बेमेल (अंडर-फिल्ड)",
+  "बेमेल (UNDER-FILLED)": "बेमेल (अंडर-फिल्ड)",
+  "UNDER-FILLED": "अंडर-फिल्ड",
+  "(UNDER-FILLED)": "(अंडर-फिल्ड)",
+  "MATCH": "सटीक मिलान",
+
+  // Category Quotas & Seat Allocation Engine (Image 3)
+  "ANALYTICAL ENGINE": "विश्लेषणात्मक इंजन",
+  "Analytical Engine": "विश्लेषणात्मक इंजन",
+  "Statutory Category Quotas & Seat Allocation Engine": "सांविधिक श्रेणी कोटा एवं सीट आवंटन इंजन",
+  "Statutory श्रेणी Quotas & Seat Allocation Engine": "सांविधिक श्रेणी कोटा एवं सीट आवंटन इंजन",
+  "Statutory Category Quotas": "सांविधिक श्रेणी कोटा",
+  "Seat Allocation Engine": "सीट आवंटन इंजन",
+  "Real-time compliance monitoring for SC, ST, OBC-NCL, EWS, and General category intake limits under central/state statutory reservation mandates.": "केंद्रीय/राज्य सांविधिक आरक्षण शासनादेशों के तहत SC, ST, OBC-NCL, EWS और सामान्य श्रेणी की प्रवेश सीमाओं की वास्तविक समय अनुपालन निगरानी।",
+  "Real-time compliance निगरानी (Monitoring) for SC, ST, अन्य पिछड़ा वर्ग (OBC)-NCL, आर्थिक रूप से कमजोर वर्ग (EWS), and सामान्य (General) श्रेणी intake limits under central/state statutory reservation mandates.": "केंद्रीय/राज्य सांविधिक आरक्षण शासनादेशों के तहत SC, ST, OBC-NCL, EWS और सामान्य श्रेणी की प्रवेश सीमाओं की वास्तविक समय अनुपालन निगरानी।",
+  "Real-time compliance monitoring": "वास्तविक समय अनुपालन निगरानी",
+  "Real-time compliance": "वास्तविक समय अनुपालन",
+  "All Programs (520 Seats)": "सभी कार्यक्रम (520 सीटें)",
+  "सभी Programs (520 सीटें)": "सभी कार्यक्रम (520 सीटें)",
+  "All Programs": "सभी कार्यक्रम",
+  "Programs": "कार्यक्रम",
+  "UG-CSE (Computer Science - 60)": "UG-CSE (कंप्यूटर साइंस - 60)",
+  "UG-ECE (Electronics - 60)": "UG-ECE (इलेक्ट्रॉनिक्स - 60)",
+  "UG-ME (Mechanical - 60)": "UG-ME (मैकेनिकल - 60)",
+  "PG-MBA (Management - 40)": "PG-MBA (प्रबंधन - 40)",
+  "Adjust Category Quotas": "श्रेणी कोटा समायोजित करें",
+  "Adjust श्रेणी Quotas": "श्रेणी कोटा समायोजित करें",
+  "Adjust Category Seat Quotas": "श्रेणी सीट कोटा समायोजित करें",
+  "Statutory Reservation Quota Breach Detected": "सांविधिक आरक्षण कोटा उल्लंघन का पता चला",
+  "STATUTORY RESERVATION QUOTA BREACH DETECTED": "सांविधिक आरक्षण कोटा उल्लंघन का पता चला",
+  "STATUTORY RESERVATION कोटा BREACH DETECTED": "सांविधिक आरक्षण कोटा उल्लंघन का पता चला",
+  "STATUTORY RESERVATION कोटा BREACH DETECTED (1 श्रेणी ALERT)": "सांविधिक आरक्षण कोटा उल्लंघन का पता चला (1 श्रेणी अलर्ट)",
+  "STATUTORY RESERVATION QUOTA BREACH DETECTED (1 CATEGORY ALERT)": "सांविधिक आरक्षण कोटा उल्लंघन का पता चला (1 श्रेणी अलर्ट)",
+  "Category Alert": "श्रेणी अलर्ट",
+  "CATEGORY ALERT": "श्रेणी अलर्ट",
+  "श्रेणी ALERT": "श्रेणी अलर्ट",
+  "QUOTA BREACH": "कोटा उल्लंघन",
+  "कोटा BREACH": "कोटा उल्लंघन",
+  "Quota Breach": "कोटा उल्लंघन",
+  "Breach Detected": "उल्लंघन का पता चला",
+  "BREACH DETECTED": "उल्लंघन का पता चला",
+  "Reallocate Seats": "सीटें पुन: आवंटित करें",
+  "Reallocate सीटें": "सीटें पुन: आवंटित करें",
+  "Reallocate": "पुन: आवंटित करें",
+  "Category Code": "श्रेणी कोड",
+  "CATEGORY CODE": "श्रेणी कोड",
+  "श्रेणी CODE": "श्रेणी कोड",
+  "Statutory Category Name": "सांविधिक श्रेणी का नाम",
+  "STATUTORY CATEGORY NAME": "सांविधिक श्रेणी का नाम",
+  "STATUTORY श्रेणी NAME": "सांविधिक श्रेणी का नाम",
+  "Statutory %": "सांविधिक %",
+  "STATUTORY %": "सांविधिक %",
+  "Allocated Quota": "आवंटित कोटा",
+  "ALLOCATED QUOTA": "आवंटित कोटा",
+  "ALLOCATED कोटा": "आवंटित कोटा",
+  "Allocated": "आवंटित",
+  "ALLOCATED": "आवंटित",
+  "Enrolled count": "नामांकित संख्या",
+  "नामांकित count": "नामांकित संख्या",
+  "exceeds approved statutory quota": "स्वीकृत सांविधिक कोटा से अधिक है",
+  "exceeds स्वीकृत statutory कोटा": "स्वीकृत सांविधिक कोटा से अधिक है",
+  "exceeds": "से अधिक है",
+  "excess students": "अतिरिक्त छात्र",
+  "अतिरिक्त students": "अतिरिक्त छात्र",
+  "AICTE Rule V012/V015 alert triggered.": "एआईसीटीई नियम V012/V015 अलर्ट ट्रिगर हुआ।",
+  "AICTE नियम V012/V015 alert triggered.": "एआईसीटीई नियम V012/V015 अलर्ट ट्रिगर हुआ।",
+  "AICTE Rule V012/V015 alert triggered": "एआईसीटीई नियम V012/V015 अलर्ट ट्रिगर हुआ",
+  "alert triggered.": "अलर्ट ट्रिगर हुआ।",
+  "alert triggered": "अलर्ट ट्रिगर हुआ",
+  "Vacancy / Excess": "रिक्तियां / अतिरिक्त",
+  "Compliance Status": "अनुपालन स्थिति",
+  "COMPLIANCE STATUS": "अनुपालन स्थिति",
+  "COMPLIANCE स्थिति": "अनुपालन स्थिति",
+  "COMPLIANCE": "अनुपालन",
+  "General / Open Merit": "सामान्य / ओपन मेरिट",
+  "सामान्य (General) / सक्रिय Merit": "सामान्य / ओपन मेरिट",
+  "सक्रिय Merit": "ओपन मेरिट",
+  "Open Merit": "ओपन मेरिट",
+  "Other Backward Classes (NCL)": "अन्य पिछड़ा वर्ग (OBC-NCL)",
+  "Other Backward Classes": "अन्य पिछड़ा वर्ग",
+  "Scheduled Castes": "अनुसूचित जाति",
+  "Scheduled Castes (अनुसूचित जाति (SC))": "अनुसूचित जाति (SC)",
+  "Scheduled Castes (अनुसूचित जाति (SC)):": "अनुसूचित जाति (SC):",
+  "Scheduled Tribes": "अनुसूचित जनजाति",
+  "Economically Weaker Section": "आर्थिक रूप से कमजोर वर्ग",
+  "Economically Weaker Sections": "आर्थिक रूप से कमजोर वर्ग",
+  "Persons with Disabilities (Horizontal 5%)": "दिव्यांगजन (क्षैतिज 5%)",
+  "Persons with Disabilities": "दिव्यांगजन (PwD)",
+  "Horizontal": "क्षैतिज",
+  "Horizontal 5%": "क्षैतिज 5%",
+  "NEAR LIMIT": "सीमा के निकट",
+  "Near Limit": "सीमा के निकट",
+  "COMPLIANT": "अनुपालित",
+  "Compliant": "अनुपालित",
+  "vacant": "रिक्त",
+  "Total Approved Ceiling:": "कुल स्वीकृत सीमा:",
+  "Total स्वीकृत सीमा:": "कुल स्वीकृत सीमा:",
+  "Total Quota Allocated:": "कुल आवंटित कोटा:",
+  "Total कोटा Allocated:": "कुल आवंटित कोटा:",
+  "Total Category Enrolled:": "कुल श्रेणी नामांकित:",
+  "Total श्रेणी नामांकित:": "कुल श्रेणी नामांकित:",
+  "Total Approved Ceiling": "कुल स्वीकृत सीमा",
+  "Total Quota Allocated": "कुल आवंटित कोटा",
+  "Total Category Enrolled": "कुल श्रेणी नामांकित",
+  "Automated AICTE Reservation Balancing Active": "स्वचालित एआईसीटीई आरक्षण संतुलन सक्रिय",
+  "Automated AICTE Reservation Balancing सक्रिय": "स्वचालित एआईसीटीई आरक्षण संतुलन सक्रिय",
+  "Automated AICTE Reservation Balancing": "स्वचालित एआईसीटीई आरक्षण संतुलन",
+  "Near Capacity Alert:": "क्षमता के निकट चेतावनी:",
+  "Automated admission pipeline approaching threshold.": "स्वचालित प्रवेश पाइपलाइन सीमा के निकट पहुंच रही है।",
+  "Category quota seat allocation successfully updated. Automated admission verification refreshed.": "श्रेणी कोटा सीट आवंटन सफलतापूर्वक अद्यतन किया गया। स्वचालित प्रवेश सत्यापन ताज़ा किया गया।",
+  "Dynamically adjust statutory category seats for Academic Year 2026-27": "शैक्षणिक वर्ष 2026-27 के लिए सांविधिक श्रेणी सीटों को गतिशील रूप से समायोजित करें",
+  "Reallocate seats according to state government notifications or institution reservation orders. Total regular category seats must equal": "राज्य सरकार की अधिसूचनाओं या संस्थान के आरक्षण आदेशों के अनुसार सीटें पुन: आवंटित करें। कुल नियमित श्रेणी की सीटें इसके बराबर होनी चाहिए:",
+  "Statutory Base:": "सांविधिक आधार:",
+  "Sum of Regular Category Seats:": "नियमित श्रेणी सीटों का योग:",
+  "Save & Apply Quotas": "कोटा सहेजें एवं लागू करें",
+  "Total": "कुल",
+  "TOTAL": "कुल",
+  "students": "छात्र",
+  "students.": "छात्र।",
+  "student": "छात्र",
+  "Students": "छात्र",
+  "STUDENTS": "छात्र",
+  "SEATS": "सीटें",
+  "Seats": "सीटें",
+  "intake": "प्रवेश",
+  "Intake": "प्रवेश",
+  "INTAKE": "प्रवेश",
+  "Declared": "घोषित",
+  "DECLARED": "घोषित",
+  "Variance": "भिन्नता",
+  "VARIANCE": "भिन्नता",
+  "Reconciliation": "सुलह",
+  "RECONCILIATION": "सुलह",
 
   // Students Registry Extended
   "Student / Roll / PRN": "छात्र / रोल / पीआरएन",
@@ -1285,7 +1468,115 @@ export const HINDI_DICTIONARY: Record<string, string> = {
   "Confirm identical or twin identity": "समान या जुड़वां पहचान की पुष्टि करें",
   "Nationality is IN but quota is marked as OCI": "राष्ट्रीयता IN है लेकिन कोटा OCI के रूप में चिह्नित है",
   "Leading whitespace and non-standard casing in \" computer science\" normalized to canonical catalog form": "\" computer science\" में प्रारंभिक व्हाइटस्पेस और गैर-मानक केसिंग को प्रामाणिक कैटलॉग रूप में सामान्यीकृत किया गया",
-  "admission_date 2026-08-01 + B.Tech duration 4y indicates expected 2030, got 2028": "प्रवेश तिथि 2026-08-01 + बी.टेक अवधि 4 वर्ष से 2030 अपेक्षित है, 2028 मिला"
+  "admission_date 2026-08-01 + B.Tech duration 4y indicates expected 2030, got 2028": "प्रवेश तिथि 2026-08-01 + बी.टेक अवधि 4 वर्ष से 2030 अपेक्षित है, 2028 मिला",
+
+  // Transfers & Student Registry Additions
+  "15-Day AICTE Statutory Override Rule (Agents.md §8.1)": "15-दिवसीय एआईसीटीई वैधानिक ओवरराइड नियम (Agents.md §8.1)",
+  "When a destination institution creates a transfer request, the source institution is granted exactly 15 calendar days to decide (Approve or Reject with note). If left unaddressed beyond 15 days, the AICTE Central Desk automatically executes an administrative override. Approved or overridden transfers safely transition source records to TRANSFERRED_OUT, guaranteeing that destination enrolment will not trigger duplicate student flags (Rule V010).": "जब कोई गंतव्य संस्थान स्थानांतरण अनुरोध बनाता है, तो स्रोत संस्थान को निर्णय लेने के लिए ठीक 15 कैलेंडर दिन (नोट के साथ स्वीकृत या अस्वीकार) दिए जाते हैं। यदि 15 दिनों से अधिक समय तक कोई कार्रवाई नहीं होती है, तो एआईसीटीई केंद्रीय डेस्क स्वतः प्रशासनिक ओवरराइड निष्पादित करता है। स्वीकृत या ओवरराइड किए गए स्थानांतरण स्रोत रिकॉर्ड को सुरक्षित रूप से स्थानांतरित (बाहर) में बदल देते हैं, जिससे यह सुनिश्चित होता है कि गंतव्य नामांकन से डुप्लिकेट छात्र फ़्लैग (नियम V010) ट्रिगर नहीं होंगे।",
+  "When a destination institution creates a transfer request, the source institution is granted exactly": "जब कोई गंतव्य संस्थान स्थानांतरण अनुरोध बनाता है, तो स्रोत संस्थान को निर्णय लेने के लिए ठीक",
+  "15 calendar days": "15 कैलेंडर दिन",
+  "to decide (Approve or Reject with note). If left unaddressed beyond 15 days, the": "दिए जाते हैं (नोट के साथ स्वीकृत या अस्वीकार)। यदि 15 दिनों से अधिक समय तक कोई कार्रवाई नहीं होती है, तो",
+  "AICTE Central Desk": "एआईसीटीई केंद्रीय डेस्क",
+  "automatically executes an administrative override. Approved or overridden transfers safely transition source records to": "स्वतः प्रशासनिक ओवरराइड निष्पादित करता है। स्वीकृत या ओवरराइड किए गए स्थानांतरण स्रोत रिकॉर्ड को सुरक्षित रूप से",
+  ", guaranteeing that destination enrolment will not trigger duplicate student flags (Rule V010).": " में बदल देते हैं, जिससे यह सुनिश्चित होता है कि गंतव्य नामांकन से डुप्लिकेट छात्र फ़्लैग (नियम V010) ट्रिगर नहीं होंगे।",
+  "guaranteeing that destination enrolment will not trigger duplicate student flags (Rule V010).": "में बदल देते हैं, जिससे यह सुनिश्चित होता है कि गंतव्य नामांकन से डुप्लिकेट छात्र फ़्लैग (नियम V010) ट्रिगर नहीं होंगे।",
+  "REASON": "कारण",
+  "Reason": "कारण",
+  "reason": "कारण",
+  "Family relocation to NCR": "एनसीआर (NCR) में पारिवारिक स्थानांतरण",
+  "Parent transfer of central government defense officer": "केंद्र सरकार के रक्षा अधिकारी अभिभावक का स्थानांतरण",
+  "Parent स्थानांतरण of central government defense officer": "केंद्र सरकार के रक्षा अधिकारी अभिभावक का स्थानांतरण",
+  "Medical hardship - transfer to home state": "चिकित्सा कठिनाई - गृह राज्य में स्थानांतरण",
+  "Sanctioned intake capacity exceeded in semester 3": "सत्र 3 में स्वीकृत प्रवेश क्षमता पार हो गई",
+  "Approved with Medical Board clearance and NOC": "मेडिकल बोर्ड अनापत्ति और एनओसी के साथ स्वीकृत",
+  "Awaiting Source": "स्रोत की प्रतीक्षा",
+  "Decided": "निर्णय",
+
+  "Student Central Registry": "केंद्रीय छात्र रजिस्ट्री",
+  "विद्यार्थी Central Registry": "केंद्रीय छात्र रजिस्ट्री",
+  "Central Registry": "केंद्रीय रजिस्ट्री",
+  "Canonical student records keyed by 12-digit APAAR ID with immutable branch switch history and multiple entry/exit points": "अपरिवर्तनीय शाखा परिवर्तन इतिहास और बहु-प्रवेश/निकास बिंदुओं के साथ 12-अंकीय अपार आईडी द्वारा सुरक्षित प्रामाणिक छात्र रिकॉर्ड",
+  "Canonical विद्यार्थी रिकॉर्ड keyed by 12-digit अपार आईडी with immutable branch switch history and multiple entry/exit points": "अपरिवर्तनीय शाखा परिवर्तन इतिहास और बहु-प्रवेश/निकास बिंदुओं के साथ 12-अंकीय अपार आईडी द्वारा सुरक्षित प्रामाणिक छात्र रिकॉर्ड",
+  "Admit Student (Entry Point)": "छात्र प्रवेश (प्रवेश बिंदु)",
+  "Admit विद्यार्थी (Entry Point)": "छात्र प्रवेश (प्रवेश बिंदु)",
+  "Admit Student": "छात्र प्रवेश",
+  "Entry Point": "प्रवेश बिंदु",
+  "Unmask PII (Authorized)": "व्यक्तिगत पहचान (PII) अनमास्क करें (अधिकृत)",
+  "Mask PII": "व्यक्तिगत पहचान (PII) मास्क करें",
+  "Entry & Exit Pathways:": "प्रवेश एवं निकास मार्ग:",
+  "ENTRY & EXIT PATHWAYS:": "प्रवेश एवं निकास मार्ग:",
+  "Entry & Exit Pathways": "प्रवेश एवं निकास मार्ग",
+  "ENTRY & EXIT PATHWAYS": "प्रवेश एवं निकास मार्ग",
+  "All Students": "सभी छात्र",
+  "all students": "सभी छात्र",
+  "DSE Lateral Entry (Year 2)": "डीएसई पार्श्व प्रवेश (द्वितीय वर्ष)",
+  "DSE पार्श्व प्रवेश (Lateral Entry) (Year 2)": "डीएसई पार्श्व प्रवेश (द्वितीय वर्ष)",
+  "DSE Lateral Entry": "डीएसई पार्श्व प्रवेश",
+  "DSE पार्श्व प्रवेश (Lateral Entry)": "डीएसई पार्श्व प्रवेश",
+  "Lateral Entry (Year 2)": "पार्श्व प्रवेश (द्वितीय वर्ष)",
+  "Regular Entry (Year 1)": "नियमित प्रवेश (प्रथम वर्ष)",
+  "Regular Entry": "नियमित प्रवेश",
+  "Transfer-In Entry": "आवक स्थानांतरण प्रवेश",
+  "स्थानांतरण-In Entry": "आवक स्थानांतरण प्रवेश",
+  "Transfer-In": "आवक स्थानांतरण",
+  "Exited / Withdrawn / Transferred Out": "निकास / वापस लिया गया / स्थानांतरित बाहर",
+  "Exited / वापस लिया गया / स्थानांतरित Out": "निकास / वापस लिया गया / स्थानांतरित बाहर",
+  "Search by student name, APAAR ID, or roll number...": "छात्र का नाम, अपार आईडी, या रोल नंबर द्वारा खोजें...",
+  "खोजें by छात्र का नाम, अपार आईडी, or roll number...": "छात्र का नाम, अपार आईडी, या रोल नंबर द्वारा खोजें...",
+  "सभी Programs": "सभी कार्यक्रम",
+  "programs": "कार्यक्रम",
+  "Student identities verified via Central APAAR registry with DPDP Act student consent status and branch switch tracking": "डीपीडीपी (DPDP) अधिनियम छात्र सहमति स्थिति और शाखा परिवर्तन ट्रैकिंग के साथ केंद्रीय अपार रजिस्ट्री द्वारा सत्यापित छात्र पहचान",
+  "विद्यार्थी identities verified via Central APAAR registry with DPDP Act विद्यार्थी सहमति स्थिति and branch switch tracking": "डीपीडीपी (DPDP) अधिनियम छात्र सहमति स्थिति और शाखा परिवर्तन ट्रैकिंग के साथ केंद्रीय अपार रजिस्ट्री द्वारा सत्यापित छात्र पहचान",
+  "Student ID (PRN)": "छात्र आईडी (PRN)",
+  "विद्यार्थी ID (PRN)": "छात्र आईडी (PRN)",
+  "Program & Branch": "कार्यक्रम एवं शाखा",
+  "PROGRAM & BRANCH": "कार्यक्रम एवं शाखा",
+  "Entry / Year": "प्रवेश / वर्ष",
+  "ENTRY / YEAR": "प्रवेश / वर्ष",
+  "Lifecycle Status": "जीवनचक्र स्थिति",
+  "LIFECYCLE STATUS": "जीवनचक्र स्थिति",
+  "LIFECYCLE स्थिति": "जीवनचक्र स्थिति",
+  "Branch Switched": "शाखा परिवर्तित",
+  "Switch Branch": "शाखा बदलें",
+  "Switch Branch / Program": "शाखा / कार्यक्रम बदलें",
+  "Switch Student Branch / Program": "छात्र शाखा / कार्यक्रम बदलें",
+  "Details": "विवरण",
+  "details": "विवरण",
+  "DEFERRED": "विलंबित",
+  "Deferred": "विलंबित",
+  "deferred": "विलंबित",
+  "GRADUATED": "स्नातक / उत्तीर्ण",
+  "Graduated": "स्नातक / उत्तीर्ण",
+  "graduated": "स्नातक / उत्तीर्ण",
+  "TRANSFERRED_OUT": "स्थानांतरित (बाहर)",
+  "Transferred Out": "स्थानांतरित (बाहर)",
+  "transferred_out": "स्थानांतरित (बाहर)",
+  "error(s)": "त्रुटियां",
+  "error(s) ": "त्रुटियां ",
+  "त्रुटि(s)": "त्रुटियां",
+  "त्रुटि(s) ": "त्रुटियां ",
+  "UG": "स्नातक (UG)",
+  "PG": "स्नातकोत्तर (PG)",
+  "GRANTED": "स्वीकृत",
+  "Admissions Entry Pathway": "प्रवेश मार्ग",
+  "Direct Second Year (DSE) Lateral Entry — Year 2": "सीधा द्वितीय वर्ष (डीएसई) पार्श्व प्रवेश — वर्ष 2",
+  "First Year Regular Entry — Year 1": "प्रथम वर्ष नियमित प्रवेश — वर्ष 1",
+  "Inter-College / University Transfer-In Entry": "अंतर-कॉलेज / विश्वविद्यालय आवक स्थानांतरण प्रवेश",
+  "Record immutable branch sliding with full historical audit preservation": "पूर्ण ऐतिहासिक ऑडिट संरक्षण के साथ अपरिवर्तनीय शाखा परिवर्तन दर्ज करें",
+  "New Target Program / Branch": "नया लक्षित कार्यक्रम / शाखा",
+  "Student Full Name": "छात्र का पूरा नाम",
+  "Auto-generated if empty": "खाली होने पर स्वतः उत्पन्न",
+  "Current Program": "वर्तमान कार्यक्रम",
+  "Date of Birth": "जन्म तिथि",
+  "Gender & Category": "लिंग एवं श्रेणी",
+  "Seat Type / Quota": "सीट प्रकार / कोटा",
+  "Record Version History (Immutable Audit Log)": "रिकॉर्ड संस्करण इतिहास (अपरिवर्तनीय ऑडिट लॉग)",
+  "Student Lifecycle Timeline": "छात्र जीवनचक्र समयरेखा",
+  "Summary of Modifications": "संशोधनों का सारांश",
+  "Actor / Source": "कर्ता / स्रोत",
+  "Change Status": "स्थिति बदलें",
+  "Branch Switch / Course Transfer Audit Verified": "शाखा परिवर्तन / पाठ्यक्रम स्थानांतरण ऑडिट सत्यापित",
+  "This student has an official branch switch on record. All previous course records and admission credits are retained in the immutable version log below.": "इस छात्र के रिकॉर्ड में आधिकारिक शाखा परिवर्तन दर्ज है। पिछले सभी पाठ्यक्रम रिकॉर्ड और प्रवेश क्रेडिट नीचे अपरिवर्तनीय संस्करण लॉग में बनाए रखे गए हैं।"
 };
 
 // Sorted keys by length descending to match longest phrases first
@@ -1576,6 +1867,72 @@ export function translateText(text: string): string {
   // Pattern: "/ 520 seats" or "520 seats"
   if (/(\/\s*)?(\d+)\s*seats\b/i.test(result)) {
     result = result.replace(/(\/\s*)?(\d+)\s*seats\b/gi, (_, slash, num) => (slash || '') + `${num} सीटें`);
+    hasMatch = true;
+  }
+
+  // Pattern: "Sum of aggregate submissions for 2026-27"
+  if (/Sum\s+of\s+aggregate\s+submissions\s+for\s*(\d{4}-\d{2})/i.test(result)) {
+    result = result.replace(/Sum\s+of\s+aggregate\s+submissions\s+for\s*(\d{4}-\d{2})/gi, '$1 के लिए कुल सबमिशन का योग');
+    hasMatch = true;
+  }
+
+  // Pattern: "60 students", "58 students", "508 students"
+  if (/(\d+)\s*students\b/i.test(result)) {
+    result = result.replace(/(\d+)\s*students\b/gi, '$1 छात्र');
+    hasMatch = true;
+  }
+
+  // Pattern: "6 vacant", "2 vacant", "3 vacant", "4 vacant"
+  if (/(\d+)\s*vacant\b/i.test(result)) {
+    result = result.replace(/(\d+)\s*vacant\b/gi, '$1 रिक्त');
+    hasMatch = true;
+  }
+
+  // Pattern: "STATUTORY RESERVATION कोटा BREACH DETECTED (1 श्रेणी ALERT)" or English
+  if (/STATUTORY\s+RESERVATION\s+(?:QUOTA|कोटा)\s+BREACH\s+DETECTED\s*\(\s*(\d+)\s*(?:CATEGORY|श्रेणी)\s+ALERT\s*\)/i.test(result)) {
+    result = result.replace(
+      /STATUTORY\s+RESERVATION\s+(?:QUOTA|कोटा)\s+BREACH\s+DETECTED\s*\(\s*(\d+)\s*(?:CATEGORY|श्रेणी)\s+ALERT\s*\)/gi,
+      'सांविधिक आरक्षण कोटा उल्लंघन का पता चला ($1 श्रेणी अलर्ट)'
+    );
+    hasMatch = true;
+  }
+
+  // Pattern: CategoryQuotaEngine breach alert bullet text
+  if (/(?:•\s*)?(?:Scheduled\s+Castes\s*(?:\((?:SC|अनुसूचित\s+जाति\s*\(SC\))\))?|अनुसूचित\s+जाति\s*\(SC\))\s*:\s*(?:Enrolled\s+count|नामांकित\s+count)\s*\((\d+)\s*(?:seats|सीटें)\)\s*(?:exceeds|से\s*अधिक)\s*(?:approved\s+statutory\s+quota|स्वीकृत\s+statutory\s+कोटा|स्वीकृत\s+सांविधिक\s+कोटा)\s*\((\d+)\s*(?:seats|सीटें)\)\s*by\s*(\+?\d+)\s*(?:excess\s+students|अतिरिक्त\s+students|अतिरिक्त\s+छात्र)\.\s*AICTE\s*(?:Rule|नियम)\s*(V\d+\/V\d+)\s*(?:alert\s+triggered|अलर्ट\s+ट्रिगर\s+हुआ)\.?/i.test(result)) {
+    result = result.replace(
+      /(?:•\s*)?(?:Scheduled\s+Castes\s*(?:\((?:SC|अनुसूचित\s+जाति\s*\(SC\))\))?|अनुसूचित\s+जाति\s*\(SC\))\s*:\s*(?:Enrolled\s+count|नामांकित\s+count)\s*\((\d+)\s*(?:seats|सीटें)\)\s*(?:exceeds|से\s*अधिक)\s*(?:approved\s+statutory\s+quota|स्वीकृत\s+statutory\s+कोटा|स्वीकृत\s+सांविधिक\s+कोटा)\s*\((\d+)\s*(?:seats|सीटें)\)\s*by\s*(\+?\d+)\s*(?:excess\s+students|अतिरिक्त\s+students|अतिरिक्त\s+छात्र)\.\s*AICTE\s*(?:Rule|नियम)\s*(V\d+\/V\d+)\s*(?:alert\s+triggered|अलर्ट\s+ट्रिगर\s+हुआ)\.?/gi,
+      '• अनुसूचित जाति (SC): नामांकित संख्या ($1 सीटें) स्वीकृत सांविधिक कोटा ($2 सीटें) से $3 अतिरिक्त छात्र अधिक है। एआईसीटीई नियम $4 अलर्ट ट्रिगर हुआ।'
+    );
+    hasMatch = true;
+  } else if (/(?:Enrolled\s+count|नामांकित\s+count)\s*\((\d+)\s*(?:seats|सीटें)\)\s*(?:exceeds|से\s*अधिक)\s*(?:approved\s+statutory\s+quota|स्वीकृत\s+statutory\s+कोटा|स्वीकृत\s+सांविधिक\s+कोटा)\s*\((\d+)\s*(?:seats|सीटें)\)\s*by\s*(\+?\d+)\s*(?:excess\s+students|अतिरिक्त\s+students|अतिरिक्त\s+छात्र)\.\s*AICTE\s*(?:Rule|नियम)\s*(V\d+\/V\d+)\s*(?:alert\s+triggered|अलर्ट\s+ट्रिगर\s+हुआ)\.?/i.test(result)) {
+    result = result.replace(
+      /(?:Enrolled\s+count|नामांकित\s+count)\s*\((\d+)\s*(?:seats|सीटें)\)\s*(?:exceeds|से\s*अधिक)\s*(?:approved\s+statutory\s+quota|स्वीकृत\s+statutory\s+कोटा|स्वीकृत\s+सांविधिक\s+कोटा)\s*\((\d+)\s*(?:seats|सीटें)\)\s*by\s*(\+?\d+)\s*(?:excess\s+students|अतिरिक्त\s+students|अतिरिक्त\s+छात्र)\.\s*AICTE\s*(?:Rule|नियम)\s*(V\d+\/V\d+)\s*(?:alert\s+triggered|अलर्ट\s+ट्रिगर\s+हुआ)\.?/gi,
+      'नामांकित संख्या ($1 सीटें) स्वीकृत सांविधिक कोटा ($2 सीटें) से $3 अतिरिक्त छात्र अधिक है। एआईसीटीई नियम $4 अलर्ट ट्रिगर हुआ।'
+    );
+    hasMatch = true;
+  }
+
+  // Pattern: "Total Approved Ceiling: 520 seats" or Hinglish
+  if (/(?:Total\s+Approved\s+Ceiling|Total\s+स्वीकृत\s+सीमा)\s*:\s*/i.test(result)) {
+    result = result.replace(/(?:Total\s+Approved\s+Ceiling|Total\s+स्वीकृत\s+सीमा)\s*:\s*/gi, 'कुल स्वीकृत सीमा: ');
+    hasMatch = true;
+  }
+
+  // Pattern: "Total Quota Allocated: 520 seats" or Hinglish
+  if (/(?:Total\s+Quota\s+Allocated|Total\s+कोटा\s+Allocated)\s*:\s*/i.test(result)) {
+    result = result.replace(/(?:Total\s+Quota\s+Allocated|Total\s+कोटा\s+Allocated)\s*:\s*/gi, 'कुल आवंटित कोटा: ');
+    hasMatch = true;
+  }
+
+  // Pattern: "Total Category Enrolled: 508 students" or Hinglish
+  if (/(?:Total\s+Category\s+Enrolled|Total\s+श्रेणी\s+नामांकित)\s*:\s*/i.test(result)) {
+    result = result.replace(/(?:Total\s+Category\s+Enrolled|Total\s+श्रेणी\s+नामांकित)\s*:\s*/gi, 'कुल श्रेणी नामांकित: ');
+    hasMatch = true;
+  }
+
+  // Pattern: "Automated AICTE Reservation Balancing Active" or Hinglish
+  if (/Automated\s+AICTE\s+Reservation\s+Balancing\s+(?:Active|सक्रिय)/i.test(result)) {
+    result = result.replace(/Automated\s+AICTE\s+Reservation\s+Balancing\s+(?:Active|सक्रिय)/gi, 'स्वचालित एआईसीटीई आरक्षण संतुलन सक्रिय');
     hasMatch = true;
   }
 
@@ -1914,6 +2271,69 @@ export function translateText(text: string): string {
   // Pattern: "Rationale: Prepend missing leading zero"
   if (/^Rationale:\s*(.*)$/i.test(result.trim())) {
     result = result.replace(/^Rationale:\s*/i, 'औचित्य: ');
+    hasMatch = true;
+  }
+
+  // Pattern: "12 त्रुटि(s)" or single error(s)
+  if (/(\d+)\s*त्रुटि\(s\)/gi.test(result)) {
+    result = result.replace(/(\d+)\s*त्रुटि\(s\)/gi, '$1 त्रुटियां');
+    hasMatch = true;
+  }
+  if (/^\s*(?:error\(s\)|त्रुटि\(s\))\s*$/i.test(result)) {
+    result = 'त्रुटियां';
+    hasMatch = true;
+  }
+
+  // Pattern: Statutory override notice banner (full or partial Hinglish)
+  if (/(?:When\s+a\s+(?:destination|गंतव्य)\s+(?:institution|संस्थान)\s+creates\s+a\s+(?:transfer|स्थानांतरण)\s+request|15-दिवसीय\s+एआईसीटीई\s+वैधानिक\s+ओवरराइड)/i.test(result)) {
+    result = result.replace(
+      /When\s+a\s+(?:destination|गंतव्य)\s+(?:institution|संस्थान)\s+creates\s+a\s+(?:transfer|स्थानांतरण)\s+request.*?(?:Rule\s+V010|नियम\s+V010)[^.]*\.?/gis,
+      'जब कोई गंतव्य संस्थान स्थानांतरण अनुरोध बनाता है, तो स्रोत संस्थान को निर्णय लेने के लिए ठीक 15 कैलेंडर दिन (नोट के साथ स्वीकृत या अस्वीकार) दिए जाते हैं। यदि 15 दिनों से अधिक समय तक कोई कार्रवाई नहीं होती है, तो एआईसीटीई केंद्रीय डेस्क स्वतः प्रशासनिक ओवरराइड निष्पादित करता है। स्वीकृत या ओवरराइड किए गए स्थानांतरण स्रोत रिकॉर्ड को सुरक्षित रूप से स्थानांतरित (बाहर) में बदल देते हैं, जिससे यह सुनिश्चित होता है कि गंतव्य नामांकन से डुप्लिकेट छात्र फ़्लैग (नियम V010) ट्रिगर नहीं होंगे।'
+    );
+    hasMatch = true;
+  }
+
+  // Pattern: "Decided 8/4/2026", "Decided 2026-08-04"
+  if (/Decided\s+(\d+[\/.-]\d+[\/.-]\d+)/i.test(result)) {
+    result = result.replace(/Decided\s+(\d+[\/.-]\d+[\/.-]\d+)/gi, 'निर्णय: $1');
+    hasMatch = true;
+  }
+
+  // Pattern: "All Students (8)", "सभी Students (8)"
+  if (/(?:All|सभी)\s+Students?\s*\((\d+)\)/i.test(result)) {
+    result = result.replace(/(?:All|सभी)\s+Students?\s*\((\d+)\)/gi, 'सभी छात्र ($1)');
+    hasMatch = true;
+  }
+
+  // Pattern: "Year 1 · UG", "Year 2 · PG", "Year 4 · UG"
+  if (/Year\s*(\d+)\s*(?:·|&middot;)\s*UG/i.test(result)) {
+    result = result.replace(/Year\s*(\d+)\s*(?:·|&middot;)\s*UG/gi, 'वर्ष $1 · स्नातक (UG)');
+    hasMatch = true;
+  }
+  if (/Year\s*(\d+)\s*(?:·|&middot;)\s*PG/i.test(result)) {
+    result = result.replace(/Year\s*(\d+)\s*(?:·|&middot;)\s*PG/gi, 'वर्ष $1 · स्नातकोत्तर (PG)');
+    hasMatch = true;
+  }
+  if (/Year\s*(\d+)\s*(?:·|&middot;)\s*Diploma/i.test(result)) {
+    result = result.replace(/Year\s*(\d+)\s*(?:·|&middot;)\s*Diploma/gi, 'वर्ष $1 · डिप्लोमा');
+    hasMatch = true;
+  }
+
+  // Pattern: Search placeholder
+  if (/(?:Search|खोजें)\s+by\s+(?:student\s+name|छात्र\s+का\s+नाम)/i.test(result)) {
+    result = 'छात्र का नाम, अपार आईडी, या रोल नंबर द्वारा खोजें...';
+    hasMatch = true;
+  }
+
+  // Pattern: Student identities verified banner
+  if (/(?:Student|विद्यार्थी)\s+identities\s+verified\s+via\s+Central\s+APAAR\s+registry/i.test(result)) {
+    result = 'डीपीडीपी (DPDP) अधिनियम छात्र सहमति स्थिति और शाखा परिवर्तन ट्रैकिंग के साथ केंद्रीय अपार रजिस्ट्री द्वारा सत्यापित छात्र पहचान';
+    hasMatch = true;
+  }
+
+  // Pattern: Canonical student records subtitle
+  if (/Canonical\s+(?:student|विद्यार्थी)\s+(?:records|रिकॉर्ड)\s+keyed\s+by\s+12-digit/i.test(result)) {
+    result = 'अपरिवर्तनीय शाखा परिवर्तन इतिहास और बहु-प्रवेश/निकास बिंदुओं के साथ 12-अंकीय अपार आईडी द्वारा सुरक्षित प्रामाणिक छात्र रिकॉर्ड';
     hasMatch = true;
   }
 

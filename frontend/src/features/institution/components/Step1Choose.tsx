@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { API_BASE_URL, authFetch, getAuthToken } from '@/lib/api';
+import { markDocumentUploaded } from '@/lib/uploadState';
 import { BatchItem } from '../types';
 import { getDemoBatchFile } from '../demoBatchFile';
 
@@ -215,11 +216,7 @@ export const Step1Choose: React.FC<Step1ChooseProps> = ({ onSuccess }) => {
 
       const createdBatch = await response.json();
       const resolvedBatchId = createdBatch.batch_id || createdBatch.id || '';
-      try {
-        if (typeof window !== 'undefined' && window.localStorage) {
-          window.localStorage.setItem('eduverify_data_uploaded', 'true');
-        }
-      } catch {}
+      markDocumentUploaded(true);
       setIsUploading(false);
       onSuccess({
         id: resolvedBatchId,

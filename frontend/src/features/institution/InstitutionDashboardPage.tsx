@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/button';
 import { QualityScoreGauge } from '@/components/shared/QualityScoreGauge';
 import { API_BASE_URL, fetchWithAuth } from '@/lib/api';
+import { isDocumentUploaded, markDocumentUploaded } from '@/lib/uploadState';
 import { Link } from 'react-router-dom';
 import {
   UploadCloud,
@@ -110,22 +111,18 @@ const DEMO_SUMMARY = {
 };
 
 export const InstitutionDashboardPage: React.FC = () => {
-  const isUploadedInitial = () => {
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        return window.localStorage.getItem('eduverify_data_uploaded') === 'true';
-      }
-    } catch {
-      // ignore
-    }
-    return false;
-  };
-
-  const [hasUploaded, setHasUploaded] = useState<boolean>(isUploadedInitial);
-  const [summary, setSummary] = useState(isUploadedInitial() ? DEMO_SUMMARY : ZERO_SUMMARY);
+  const [hasUploaded, setHasUploaded] = useState<boolean>(() => isDocumentUploaded());
+  const [summary, setSummary] = useState(() => (isDocumentUploaded() ? DEMO_SUMMARY : ZERO_SUMMARY));
   const [authorityModalOpen, setAuthorityModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
+    // Strictly start at zero on reload / when no documents have been uploaded
+    if (!isDocumentUploaded()) {
+      setHasUploaded(false);
+      setSummary(ZERO_SUMMARY);
+      return;
+    }
+
     const fetchDashboard = async () => {
       try {
         const res = await fetchWithAuth(`${API_BASE_URL}/v1/dashboards/institution/summary`);
@@ -137,24 +134,18 @@ export const InstitutionDashboardPage: React.FC = () => {
           const batchesCount = data.active_batches ?? data.batches_count ?? 0;
           const pendingReviews = data.pending_reviews ?? data.pending_review_count ?? 0;
 
-          const hasData = totalEnrolled > 0 || batchesCount > 0 || isUploadedInitial();
-          if (hasData) {
-            setHasUploaded(true);
-            setSummary((prev) => ({
-              ...prev,
-              ...data,
-              institution_name: data.institution_name || prev.institution_name,
-              total_enrolled: totalEnrolled,
-              approved_intake: approvedIntake,
-              batches_count: batchesCount,
-              latest_quality_score:
-                qualityScore !== undefined ? qualityScore : prev.latest_quality_score,
-              pending_review_count: pendingReviews,
-            }));
-          } else {
-            setHasUploaded(false);
-            setSummary(ZERO_SUMMARY);
-          }
+          setHasUploaded(true);
+          setSummary((prev) => ({
+            ...prev,
+            ...data,
+            institution_name: data.institution_name || prev.institution_name,
+            total_enrolled: totalEnrolled || prev.total_enrolled,
+            approved_intake: approvedIntake || prev.approved_intake,
+            batches_count: batchesCount || prev.batches_count,
+            latest_quality_score:
+              qualityScore !== undefined ? qualityScore : prev.latest_quality_score,
+            pending_review_count: pendingReviews,
+          }));
         }
       } catch (err) {
         console.error('Failed to load dashboard summary:', err);
@@ -164,21 +155,13 @@ export const InstitutionDashboardPage: React.FC = () => {
   }, []);
 
   const handleLoadDemoDocument = () => {
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        window.localStorage.setItem('eduverify_data_uploaded', 'true');
-      }
-    } catch {}
+    markDocumentUploaded(true);
     setHasUploaded(true);
     setSummary(DEMO_SUMMARY);
   };
 
   const handleResetToZero = () => {
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        window.localStorage.removeItem('eduverify_data_uploaded');
-      }
-    } catch {}
+    markDocumentUploaded(false);
     setHasUploaded(false);
     setSummary(ZERO_SUMMARY);
   };

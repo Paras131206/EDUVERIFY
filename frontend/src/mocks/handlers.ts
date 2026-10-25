@@ -53,6 +53,7 @@ import {
 } from '@/features/student/types';
 import { ReportItem, ReportJob } from '@/features/reports/types';
 import { parsePresentation } from '@/lib/sdjwt';
+import { isDocumentUploaded, markDocumentUploaded } from '@/lib/uploadState';
 
 import {
   BatchItem,
@@ -85,6 +86,7 @@ let crossDuplicatesState: DuplicateClusterItem[] = JSON.parse(JSON.stringify(moc
 let auditVerificationState: AuditVerificationVerdict = JSON.parse(JSON.stringify(mockAuditVerification));
 let auditLogState: AuditLogEntry[] = JSON.parse(JSON.stringify(mockAuditLog));
 let aicteReconciliationState: ReconciliationRecordItem[] = JSON.parse(JSON.stringify(mockAicteReconciliation));
+export let masterInstitutionsState = JSON.parse(JSON.stringify(mockMasterInstitutions));
 
 export const resetAicteMock = () => {
   aicteSummaryState = JSON.parse(JSON.stringify(mockAicteSummary));
@@ -93,6 +95,7 @@ export const resetAicteMock = () => {
   auditVerificationState = JSON.parse(JSON.stringify(mockAuditVerification));
   auditLogState = JSON.parse(JSON.stringify(mockAuditLog));
   aicteReconciliationState = JSON.parse(JSON.stringify(mockAicteReconciliation));
+  masterInstitutionsState = JSON.parse(JSON.stringify(mockMasterInstitutions));
 };
 
 export const setMockAicteSummary = (summary: Partial<typeof mockAicteSummary>) => {
@@ -126,6 +129,7 @@ export const resetOperationsMock = () => {
   aggregatesState = JSON.parse(JSON.stringify(mockAggregates));
   reconciliationState = JSON.parse(JSON.stringify(mockReconciliationStatus));
   webhooksState = JSON.parse(JSON.stringify(mockWebhooks));
+  markDocumentUploaded(false);
   resetAicteMock();
   resetReportsMock();
 };
@@ -500,11 +504,7 @@ export const handlers = [
     };
 
     batches = [newBatch, ...batches];
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        window.localStorage.setItem('eduverify_data_uploaded', 'true');
-      }
-    } catch {}
+    markDocumentUploaded(true);
     return HttpResponse.json(newBatch, { status: 201 });
   }),
 
@@ -979,11 +979,92 @@ export const handlers = [
 
   http.get('*/v1/admin/master/:entity', ({ params }) => {
     const entity = params.entity as string;
-    if (entity === 'institutions') return HttpResponse.json(mockMasterInstitutions);
+    if (entity === 'institutions') return HttpResponse.json(masterInstitutionsState);
     if (entity === 'dabs') return HttpResponse.json(mockMasterDabs);
     if (entity === 'programs') return HttpResponse.json(mockMasterPrograms);
     if (entity === 'academic-years') return HttpResponse.json(mockMasterAcademicYears);
     return HttpResponse.json({ message: `Entity ${entity} not found` }, { status: 404 });
+  }),
+
+  http.get('*/v1/master/institutions', () => {
+    return HttpResponse.json(masterInstitutionsState);
+  }),
+
+  http.post('*/v1/admin/master/institutions/upload', async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as Record<string, any>;
+    const sourceAuthority = body.source_authority || 'AICTE Approval Process Handbook (APH) 2026-27';
+    const approvalOrderRef = body.approval_order_ref || `F.No. AICTE/AB/2026/APH-${Date.now().toString().slice(-4)}`;
+    const authorizingOfficer = body.authorizing_officer || 'AICTE Master Data Administrator';
+    const sourceFileName = body.source_file_name || 'uploaded_institutions_dataset.csv';
+    const nowIso = new Date().toISOString();
+    const batchHash = `sha256:${Math.random().toString(16).slice(2, 10)}${Math.random().toString(16).slice(2, 10)}7f83b165`;
+
+    const rawInstitutions = Array.isArray(body.institutions) ? body.institutions : [];
+    let ingestedCount = 0;
+    let updatedCount = 0;
+
+    rawInstitutions.forEach((inst: any, idx: number) => {
+      const aicteId = inst.institution_aicte_id || `1-${100010050 + masterInstitutionsState.length + idx}`;
+      const existingIdx = masterInstitutionsState.findIndex((m: any) => m.institution_aicte_id === aicteId);
+
+      const record = {
+        institution_aicte_id: aicteId,
+        name: inst.name || `Institution ${aicteId}`,
+        state_code: inst.state_code || '07',
+        state_name: inst.state_name || 'Delhi',
+        district_code: inst.district_code || '101',
+        district_name: inst.district_name || 'Central Delhi',
+        type: (inst.type || 'ENGINEERING').toUpperCase(),
+        affiliated_dab_id: inst.affiliated_dab_id || 'DAB-101',
+        onboarding_level: (inst.onboarding_level || 'FULL') as 'FULL' | 'AGGREGATE_ONLY',
+        did: inst.did || `did:web:${aicteId.toLowerCase().replace(/[^a-z0-9]/g, '')}.eduverify.ac.in`,
+        aishe_code: inst.aishe_code || `C-${Math.floor(10000 + Math.random() * 89999)}`,
+        approval_order_ref: inst.approval_order_ref || approvalOrderRef,
+        source_authority: inst.source_authority || sourceAuthority,
+        source_file_name: sourceFileName,
+        source_file_hash: batchHash,
+        verified_by: authorizingOfficer,
+        verified_at: nowIso,
+      };
+
+      if (existingIdx >= 0) {
+        masterInstitutionsState[existingIdx] = { ...masterInstitutionsState[existingIdx], ...record };
+        updatedCount++;
+      } else {
+        masterInstitutionsState.unshift(record);
+        ingestedCount++;
+      }
+    });
+
+    // Record provenance action in audit log chain
+    auditLogState.unshift({
+      id: `aud-prov-${Date.now()}`,
+      timestamp: nowIso,
+      actor_email: 'aicte.admin@aicte-india.org',
+      actor_role: 'AICTE_ADMIN',
+      action: 'MASTER_INSTITUTION_INGESTION',
+      resource: `master.institutions (${rawInstitutions.length} records)`,
+      record_hash: batchHash,
+      prev_record_hash: auditLogState[0]?.record_hash || '0000000000000000',
+      metadata: {
+        source_authority: sourceAuthority,
+        approval_order_ref: approvalOrderRef,
+        ingested_count: ingestedCount,
+        updated_count: updatedCount,
+      },
+    });
+
+    return HttpResponse.json({
+      success: true,
+      ingested_count: ingestedCount,
+      updated_count: updatedCount,
+      total_records: masterInstitutionsState.length,
+      source_authority: sourceAuthority,
+      approval_order_ref: approvalOrderRef,
+      batch_hash: batchHash,
+      ingested_at: nowIso,
+      institutions: masterInstitutionsState,
+    });
   }),
 
   http.post('*/v1/admin/rollover', async ({ request }) => {
@@ -1040,12 +1121,7 @@ export const handlers = [
   }),
 
   http.get('*/v1/dashboards/institution/summary', () => {
-    let hasUploaded = false;
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        hasUploaded = window.localStorage.getItem('eduverify_data_uploaded') === 'true';
-      }
-    } catch {}
+    const hasUploaded = isDocumentUploaded();
 
     if (!hasUploaded) {
       return HttpResponse.json({
