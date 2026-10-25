@@ -489,6 +489,20 @@ def get_institution_summary_service(
 
     excess = max(0, total_stu - approved)
 
+    latest_batch_score = db.scalar(
+        select(
+            func.coalesce(Batch.quality_score_after, Batch.quality_score_before)
+        )
+        .where(Batch.institution_aicte_id == inst_aicte_id)
+        .order_by(Batch.created_at.desc())
+        .limit(1)
+    )
+    latest_score = (
+        round(float(latest_batch_score), 2)
+        if latest_batch_score is not None
+        else round(float(avg_dq), 2)
+    )
+
     result = InstitutionSummaryDashboard(
         institution_aicte_id=inst_aicte_id,
         institution_name=inst_name,
@@ -497,6 +511,7 @@ def get_institution_summary_service(
         fill_percent=fill,
         active_batches=active_b,
         avg_quality_score=round(float(avg_dq), 2),
+        latest_quality_score=latest_score,
         pending_reviews=pending_r,
         excess_seats=excess,
         cached_at=now,

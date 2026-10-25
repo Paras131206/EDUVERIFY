@@ -510,9 +510,17 @@ export const handlers = [
   }),
 
   http.get('*/v1/batches/:id/report', ({ params }) => {
+    const batchId = (params.id as string) || currentBatchReport.batch_id;
+    const batch = batches.find((b) => b.id === batchId);
     const report = {
       ...currentBatchReport,
-      batch_id: (params.id as string) || currentBatchReport.batch_id,
+      batch_id: batchId,
+      academic_year: batch?.academic_year || '2026-27',
+      status: batch?.status || 'IN_REVIEW',
+      filename: batch?.filename || 'batch_2_errors.xlsx',
+      quality_score: batch?.quality_score ?? currentBatchReport.quality_score,
+      quality_score_before: batch?.quality_score_before ?? currentBatchReport.quality_score_before,
+      quality_score_after: batch?.quality_score_after ?? currentBatchReport.quality_score_after,
       issues: currentBatchReport.issues.map((iss: typeof currentBatchReport.issues[0]) => ({
         ...iss,
         rule_name:
@@ -750,6 +758,19 @@ export const handlers = [
     currentBatchReport.quality_score_before = initialScore;
     currentBatchReport.quality_score = newScore;
     currentBatchReport.quality_score_after = newScore;
+
+    batches = batches.map((b) =>
+      b.id === batchId || b.id === 'batch-demo-2'
+        ? {
+            ...b,
+            quality_score: newScore,
+            quality_score_before: initialScore,
+            quality_score_after: newScore,
+          }
+        : b
+    );
+    mockInstitutionSummary.latest_quality_score = newScore;
+    mockInstitutionSummary.avg_quality_score = newScore;
 
     // Recalculate priority summaries
     const critOpen = currentBatchReport.issues.filter((i: typeof currentBatchReport.issues[0]) => i.priority === 'CRITICAL' && i.status === 'OPEN').length;

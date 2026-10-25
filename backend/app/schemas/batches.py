@@ -36,6 +36,9 @@ class BatchSummary(BaseModel):
     academic_year: str
     status: str
     rows_total: int = 0
+    rows_valid: int = 0
+    rows_error: int = 0
+    rows_warning: int = 0
     quality_score: float | None = None
     quality_score_before: float | None = None
     quality_score_after: float | None = None
@@ -52,6 +55,12 @@ class BatchSummary(BaseModel):
     def sync_id(self):
         if not self.id:
             self.id = self.batch_id
+        if self.quality_score is None:
+            self.quality_score = (
+                self.quality_score_after
+                if self.quality_score_after is not None
+                else self.quality_score_before
+            )
         return self
 
 

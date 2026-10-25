@@ -99,6 +99,8 @@ export interface BatchItem {
   created_at: string;
   updated_at?: string;
   supersedes_batch_id?: string | null;
+  engine_version?: string | null;
+  catalog_version?: string | null;
 }
 
 export type IssueSeverity = 'ERROR' | 'WARN' | 'INFO';
@@ -165,6 +167,9 @@ export interface BatchReportData {
   quality_score: number;
   quality_score_before?: number | null;
   quality_score_after?: number | null;
+  academic_year?: string;
+  status?: string;
+  filename?: string;
   column_mapping: ColumnMappingItem[];
   issues: IssueItem[];
   review_summary: {

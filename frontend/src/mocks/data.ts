@@ -450,9 +450,14 @@ export const mockInstitutionSummary = {
   institution_name: 'Delhi Institute of Engineering & Technology (AICTE ID: 1-1234567890)',
   total_enrolled: 480,
   approved_intake: 520,
+  total_students: 480,
+  sanctioned_intake: 520,
   batches_count: 4,
+  active_batches: 4,
   latest_quality_score: 74.0,
+  avg_quality_score: 74.0,
   pending_review_count: 4,
+  pending_reviews: 4,
 };
 
 export const mockStudents: StudentDetailRecord[] = [

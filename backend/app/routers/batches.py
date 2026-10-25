@@ -180,7 +180,45 @@ def list_batches(
 
     stmt = stmt.order_by(Batch.created_at.desc())
     batches = db.scalars(stmt).all()
-    return [BatchSummary.model_validate(b) for b in batches]
+    batch_ids = [b.batch_id for b in batches]
+    files_map: dict[str, BatchFile] = {}
+    reports_map: dict[str, BatchReportModel] = {}
+    if batch_ids:
+        files = db.scalars(
+            select(BatchFile).where(BatchFile.batch_id.in_(batch_ids))
+        ).all()
+        for f in files:
+            files_map[f.batch_id] = f
+        reports = db.scalars(
+            select(BatchReportModel).where(BatchReportModel.batch_id.in_(batch_ids))
+        ).all()
+        for r in reports:
+            reports_map[r.batch_id] = r
+
+    summaries: list[BatchSummary] = []
+    for b in batches:
+        s = BatchSummary.model_validate(b)
+        f = files_map.get(b.batch_id)
+        if f:
+            s.filename = f.filename
+            s.size_bytes = f.size_bytes
+        r = reports_map.get(b.batch_id)
+        if r and isinstance(r.report_json, dict):
+            rj = r.report_json
+            s.rows_total = rj.get("rows_total", s.rows_total or 0)
+            s.rows_valid = rj.get("rows_valid", 0)
+            s.rows_error = rj.get("rows_error", 0)
+            s.rows_warning = rj.get("rows_warning", 0)
+            if s.quality_score is None:
+                s.quality_score = rj.get("quality_score")
+        if s.quality_score is None:
+            s.quality_score = (
+                b.quality_score_after
+                if b.quality_score_after is not None
+                else b.quality_score_before
+            )
+        summaries.append(s)
+    return summaries
 
 
 @router.get("/{id}", response_model=BatchSummary, summary="Get batch status and progress")
@@ -203,10 +241,29 @@ def get_batch(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
     summary = BatchSummary.model_validate(batch)
-    batch_file = db.scalars(select(BatchFile).where(BatchFile.batch_id == batch.batch_id)).first()
+    batch_file = db.scalars(
+        select(BatchFile).where(BatchFile.batch_id == batch.batch_id)
+    ).first()
     if batch_file:
         summary.filename = batch_file.filename
         summary.size_bytes = batch_file.size_bytes
+    batch_report = db.scalars(
+        select(BatchReportModel).where(BatchReportModel.batch_id == batch.batch_id)
+    ).first()
+    if batch_report and isinstance(batch_report.report_json, dict):
+        rj = batch_report.report_json
+        summary.rows_total = rj.get("rows_total", summary.rows_total or 0)
+        summary.rows_valid = rj.get("rows_valid", 0)
+        summary.rows_error = rj.get("rows_error", 0)
+        summary.rows_warning = rj.get("rows_warning", 0)
+        if summary.quality_score is None:
+            summary.quality_score = rj.get("quality_score")
+    if summary.quality_score is None:
+        summary.quality_score = (
+            batch.quality_score_after
+            if batch.quality_score_after is not None
+            else batch.quality_score_before
+        )
     return summary
 
 
@@ -329,8 +386,38 @@ def get_batch_report(
             headers={"Content-Disposition": f'attachment; filename="report_{batch.batch_id}.pdf"'},
         )
     else:
+        report_data = report.model_dump()
+        curr_score = (
+            batch.quality_score_after
+            if batch.quality_score_after is not None
+            else (
+                batch.quality_score_before
+                if batch.quality_score_before is not None
+                else report.quality_score
+            )
+        )
+        report_data["quality_score"] = curr_score
+        report_data["quality_score_before"] = (
+            batch.quality_score_before
+            if batch.quality_score_before is not None
+            else curr_score
+        )
+        report_data["quality_score_after"] = (
+            batch.quality_score_after
+            if batch.quality_score_after is not None
+            else curr_score
+        )
+        report_data["academic_year"] = batch.academic_year
+        report_data["status"] = batch.status
+        report_data["version"] = batch.version
+        batch_file = db.scalars(
+            select(BatchFile).where(BatchFile.batch_id == batch.batch_id)
+        ).first()
+        if batch_file:
+            report_data["filename"] = batch_file.filename
+            report_data["size_bytes"] = batch_file.size_bytes
         return Response(
-            content=json.dumps(report.model_dump(), default=str),
+            content=json.dumps(report_data, default=str),
             media_type="application/json",
         )
 
