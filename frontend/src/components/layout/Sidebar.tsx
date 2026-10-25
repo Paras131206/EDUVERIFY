@@ -17,6 +17,7 @@ import {
   LogIn,
   Users,
   BarChart3,
+  Briefcase,
   Sun,
   Moon,
   History,
@@ -62,10 +63,7 @@ export const Sidebar: React.FC = () => {
       visible:
         !role ||
         role === 'INSTITUTION_ADMIN' ||
-        role === 'INSTITUTION_STAFF' ||
-        role === 'AICTE_ADMIN' ||
-        role === 'AICTE_ANALYST' ||
-        role === 'AICTE_VIEWER',
+        role === 'INSTITUTION_STAFF',
     },
     {
       to: '/institution/batches/batch-demo-2/review',
@@ -134,6 +132,13 @@ export const Sidebar: React.FC = () => {
       label: t('nav.verifier'),
       icon: <ShieldCheck className="w-4 h-4" aria-hidden="true" />,
       visible: true,
+    },
+    // Employer items
+    {
+      to: '/employer',
+      label: t('nav.employer', 'Employer Hiring Portal'),
+      icon: <Briefcase className="w-4 h-4" aria-hidden="true" />,
+      visible: !role || role === 'EMPLOYER' || role === 'AICTE_ADMIN',
     },
     // Reports
     {

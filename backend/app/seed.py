@@ -20,6 +20,7 @@ from app.models.core import (
     DeclaredTotal,
     DegreeAwardingBody,
     District,
+    EmployerAccessRequest,
     EnumItem,
     Institution,
     MetricHistory,
@@ -27,6 +28,7 @@ from app.models.core import (
     Program,
     ProgramIntake,
     State,
+    StudentAcademicRecord,
     StudentRecord,
     Transfer,
 )
@@ -103,6 +105,14 @@ DEMO_USERS = [
         "email": "verifier@demo.local",
         "full_name": "Corporate Verifier",
         "role": "VERIFIER",
+        "institution_aicte_id": None,
+        "dab_id": None,
+        "student_apaar_hash": None,
+    },
+    {
+        "email": "employer@demo.local",
+        "full_name": "Tata Consultancy Services (Talent Acquisition)",
+        "role": "EMPLOYER",
         "institution_aicte_id": None,
         "dab_id": None,
         "student_apaar_hash": None,
@@ -590,6 +600,130 @@ def seed_demo_history(db: Session, path: Path) -> int:
     return count
 
 
+def seed_demo_academic_records(db: Session) -> int:
+    """Seeds rich previous schooling, 10th/12th marks, and CGPA for demo students."""
+    students = db.query(StudentRecord).all()
+    count = 0
+
+    boards_10th = [
+        "CBSE",
+        "ICSE",
+        "State Board of Secondary Education",
+        "Maharashtra State Board",
+    ]
+    boards_12th = [
+        "CBSE (Science)",
+        "ICSE (ISC Science)",
+        "State Higher Secondary Board",
+        "Maharashtra State Board",
+    ]
+
+    for idx, s in enumerate(students):
+        existing = (
+            db.query(StudentAcademicRecord)
+            .filter(StudentAcademicRecord.apaar_id == s.apaar_id)
+            .first()
+        )
+
+        tenth_pct = round(85.0 + (idx % 12) * 1.15, 2)
+        twelfth_pct = round(84.0 + (idx % 14) * 1.05, 2)
+        cgpa_val = round(7.80 + (idx % 20) * 0.11, 2)
+        if cgpa_val > 9.85:
+            cgpa_val = 9.85
+
+        sem_marks = [
+            {"semester": 1, "sgpa": round(cgpa_val - 0.25, 2), "credits": 22, "status": "PASS"},
+            {"semester": 2, "sgpa": round(cgpa_val - 0.10, 2), "credits": 22, "status": "PASS"},
+            {"semester": 3, "sgpa": round(cgpa_val + 0.15, 2), "credits": 24, "status": "PASS"},
+            {"semester": 4, "sgpa": round(cgpa_val, 2), "credits": 24, "status": "PASS"},
+            {"semester": 5, "sgpa": round(cgpa_val + 0.20, 2), "credits": 24, "status": "PASS"},
+            {"semester": 6, "sgpa": round(cgpa_val + 0.10, 2), "credits": 24, "status": "PASS"},
+        ]
+
+        skills_list = ["Python", "Algorithms", "SQL", "Data Structures", "System Design"]
+        if idx % 3 == 0:
+            skills_list.extend(["React", "TypeScript", "Node.js"])
+        elif idx % 3 == 1:
+            skills_list.extend(["Machine Learning", "PyTorch", "Data Science"])
+        else:
+            skills_list.extend(["Embedded Systems", "IoT", "Linux Kernel"])
+
+        achievements = [
+            "AICTE National Level Technical Symposium Winner",
+            "Smart India Hackathon Institutional Finalist",
+        ]
+
+        if existing:
+            existing.tenth_percentage = tenth_pct
+            existing.twelfth_percentage = twelfth_pct
+            existing.cgpa = cgpa_val
+            existing.semester_marks_json = sem_marks
+            existing.skills_json = skills_list
+        else:
+            db.add(
+                StudentAcademicRecord(
+                    apaar_id=s.apaar_id,
+                    tenth_board=boards_10th[idx % len(boards_10th)],
+                    tenth_percentage=tenth_pct,
+                    tenth_year=2021,
+                    tenth_school=f"Model Senior Secondary School #{101 + (idx % 15)}",
+                    twelfth_board=boards_12th[idx % len(boards_12th)],
+                    twelfth_percentage=twelfth_pct,
+                    twelfth_stream="PCM with Computer Science",
+                    twelfth_year=2023,
+                    twelfth_school=f"Apex Higher Secondary College #{201 + (idx % 15)}",
+                    cgpa=cgpa_val,
+                    total_credits=160,
+                    completed_credits=120,
+                    active_backlogs=0,
+                    semester_marks_json=sem_marks,
+                    skills_json=skills_list,
+                    achievements_json=achievements,
+                )
+            )
+            count += 1
+
+    db.flush()
+    return count
+
+
+def seed_demo_employer_requests(db: Session) -> int:
+    """Seeds sample employer requests for demonstration."""
+    employer_user = db.query(User).filter(User.role == "EMPLOYER").first()
+    if not employer_user:
+        return 0
+
+    student = db.query(StudentRecord).filter(StudentRecord.apaar_id == "104332181960").first()
+    if not student:
+        return 0
+
+    existing_req = (
+        db.query(EmployerAccessRequest)
+        .filter(
+            EmployerAccessRequest.employer_id == employer_user.id,
+            EmployerAccessRequest.apaar_id == student.apaar_id,
+        )
+        .first()
+    )
+
+    if not existing_req:
+        db.add(
+            EmployerAccessRequest(
+                employer_id=employer_user.id,
+                employer_name=employer_user.full_name,
+                apaar_id=student.apaar_id,
+                job_title="Software Development Engineer (Graduate 2026)",
+                organization="Tata Consultancy Services",
+                purpose="Pre-employment academic verification & marks audit",
+                status="PENDING",
+                requested_at=datetime.now(UTC),
+            )
+        )
+        db.flush()
+        return 1
+    return 0
+
+
 def seed_database(if_empty: bool = False) -> None:
     """Seeds predefined demo accounts and master/demo data into the database."""
     if settings.ENV != "dev" and settings.SEED_PASSWORD == DEFAULT_DEV_PASSWORD:
@@ -661,7 +795,6 @@ def seed_database(if_empty: bool = False) -> None:
 
         # Seed demo user accounts
         password_hash = hash_password(settings.SEED_PASSWORD)
-        seeded_users = 0
         for udata in DEMO_USERS:
             email = str(udata["email"])
             full_name = str(udata["full_name"])
@@ -693,7 +826,14 @@ def seed_database(if_empty: bool = False) -> None:
                         created_at=datetime.now(UTC),
                     )
                 )
-                seeded_users += 1
+        # Seed demo student academic history and employer requests
+        n_acad = seed_demo_academic_records(db)
+        n_reqs = seed_demo_employer_requests(db)
+        logger.info(
+            "Academic data loaded: %d student academic records, %d sample employer requests.",
+            n_acad,
+            n_reqs,
+        )
 
         append_audit_log(
             db,

@@ -3,7 +3,6 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/button';
 import { QualityScoreGauge } from '@/components/shared/QualityScoreGauge';
 import { API_BASE_URL, fetchWithAuth } from '@/lib/api';
-import { isDocumentUploaded, markDocumentUploaded } from '@/lib/uploadState';
 import { Link } from 'react-router-dom';
 import {
   UploadCloud,
@@ -17,10 +16,6 @@ import {
   ArrowRight,
   ShieldCheck,
   CheckCircle2,
-  Info,
-  FileSpreadsheet,
-  RotateCcw,
-  Sparkles,
   Link2,
 } from 'lucide-react';
 import { AuthorityLinkModal } from '@/features/reports/AuthorityLinkModal';
@@ -36,31 +31,6 @@ import {
   Tooltip,
   Legend,
 } from 'recharts';
-
-const ZERO_SUMMARY = {
-  institution_name: 'Delhi Institute of Engineering & Technology (AICTE ID: 1-1234567890)',
-  total_enrolled: 0,
-  approved_intake: 520,
-  batches_count: 0,
-  latest_quality_score: 0.0,
-  pending_review_count: 0,
-  active_transfers_count: 0,
-  dq_trend: [] as { date: string; score: number }[],
-  intake_distribution: [
-    { program: 'UG-CSE', approved: 60, enrolled: 0 },
-    { program: 'UG-ECE', approved: 60, enrolled: 0 },
-    { program: 'UG-ME', approved: 60, enrolled: 0 },
-    { program: 'PG-MBA', approved: 40, enrolled: 0 },
-  ],
-  notifications: [] as {
-    id: string;
-    title: string;
-    message: string;
-    priority: string;
-    time: string;
-    unread: boolean;
-  }[],
-};
 
 const DEMO_SUMMARY = {
   institution_name: 'Delhi Institute of Engineering & Technology (AICTE ID: 1-1234567890)',
@@ -111,18 +81,11 @@ const DEMO_SUMMARY = {
 };
 
 export const InstitutionDashboardPage: React.FC = () => {
-  const [hasUploaded, setHasUploaded] = useState<boolean>(() => isDocumentUploaded());
-  const [summary, setSummary] = useState(() => (isDocumentUploaded() ? DEMO_SUMMARY : ZERO_SUMMARY));
+  const [summary, setSummary] = useState(DEMO_SUMMARY);
   const [authorityModalOpen, setAuthorityModalOpen] = useState<boolean>(false);
+  const hasUploaded = true;
 
   useEffect(() => {
-    // Strictly start at zero on reload / when no documents have been uploaded
-    if (!isDocumentUploaded()) {
-      setHasUploaded(false);
-      setSummary(ZERO_SUMMARY);
-      return;
-    }
-
     const fetchDashboard = async () => {
       try {
         const res = await fetchWithAuth(`${API_BASE_URL}/v1/dashboards/institution/summary`);
@@ -134,7 +97,6 @@ export const InstitutionDashboardPage: React.FC = () => {
           const batchesCount = data.active_batches ?? data.batches_count ?? 0;
           const pendingReviews = data.pending_reviews ?? data.pending_review_count ?? 0;
 
-          setHasUploaded(true);
           setSummary((prev) => ({
             ...prev,
             ...data,
@@ -154,18 +116,6 @@ export const InstitutionDashboardPage: React.FC = () => {
     fetchDashboard();
   }, []);
 
-  const handleLoadDemoDocument = () => {
-    markDocumentUploaded(true);
-    setHasUploaded(true);
-    setSummary(DEMO_SUMMARY);
-  };
-
-  const handleResetToZero = () => {
-    markDocumentUploaded(false);
-    setHasUploaded(false);
-    setSummary(ZERO_SUMMARY);
-  };
-
   const fillPercentage = summary.approved_intake > 0
     ? ((summary.total_enrolled / summary.approved_intake) * 100).toFixed(1)
     : '0.0';
@@ -179,28 +129,6 @@ export const InstitutionDashboardPage: React.FC = () => {
           <p className="text-xs text-slate-500 mt-1">{summary.institution_name}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {hasUploaded ? (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleResetToZero}
-              className="text-xs text-slate-600 border-slate-300 hover:bg-slate-50"
-              title="Reset stats to zero to simulate fresh state"
-            >
-              <RotateCcw className="w-3.5 h-3.5 mr-1.5 text-slate-500" />
-              Reset Stats to Zero
-            </Button>
-          ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleLoadDemoDocument}
-              className="text-xs font-semibold text-amber-800 bg-amber-50 border-amber-300 hover:bg-amber-100"
-            >
-              <Sparkles className="w-3.5 h-3.5 mr-1.5 text-amber-600" />
-              Load Demo Document
-            </Button>
-          )}
           <Link to="/institution/students">
             <Button variant="outline" size="sm" className="text-xs">
               <Users className="w-4 h-4 mr-1.5" />
@@ -231,54 +159,6 @@ export const InstitutionDashboardPage: React.FC = () => {
           </Link>
         </div>
       </div>
-
-      {/* No Data Uploaded Banner */}
-      {!hasUploaded && (
-        <div
-          role="status"
-          className="p-5 rounded-xl border border-amber-200 bg-linear-to-r from-amber-50/90 via-orange-50/50 to-white text-slate-800 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in fade-in"
-        >
-          <div className="flex items-start gap-3.5">
-            <div className="p-2.5 rounded-lg bg-amber-100 text-amber-800 shrink-0 mt-0.5">
-              <Info className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-slate-900">
-                  No Student Data Uploaded Yet
-                </h3>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-200/70 text-amber-900">
-                  Academic Year 2026-27
-                </span>
-              </div>
-              <p className="text-xs text-slate-600 mt-1 max-w-2xl leading-relaxed">
-                No student admission batches have been ingested yet. All enrolment statistics,
-                data quality scores, and statutory validation checks are currently set to zero.
-                Upload your institution&apos;s batch file or load the demo document to populate real-time analytics.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2.5 shrink-0 w-full md:w-auto">
-            <Button
-              onClick={handleLoadDemoDocument}
-              size="sm"
-              className="bg-gov-saffron hover:bg-amber-600 text-slate-900 font-bold text-xs shadow-xs"
-            >
-              <FileSpreadsheet className="w-3.5 h-3.5 mr-1.5" />
-              Load Demo Document
-            </Button>
-            <Link to="/institution/upload">
-              <Button
-                size="sm"
-                className="bg-gov-navy hover:bg-gov-navyDark text-white text-xs font-semibold shadow-xs"
-              >
-                <UploadCloud className="w-3.5 h-3.5 mr-1.5" />
-                Upload Batch
-              </Button>
-            </Link>
-          </div>
-        </div>
-      )}
 
       {/* KPI Cards (Students, Fill %, DQ score, Transfers) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

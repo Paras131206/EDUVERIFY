@@ -102,6 +102,15 @@ DEMO_ACCOUNTS = [
         "dab_id": None,
         "student_apaar_hash": None,
     },
+    {
+        "id": "u-employer-1",
+        "email": "employer@demo.local",
+        "full_name": "Tata Consultancy Services (Talent Acquisition)",
+        "role": "EMPLOYER",
+        "institution_aicte_id": None,
+        "dab_id": None,
+        "student_apaar_hash": None,
+    },
 ]
 
 

@@ -6,11 +6,13 @@ import {
   ConsentPurposeSetting,
   ConsentHistoryRecord,
   StudentCredentialItem,
+  EmployerHiringRequestItem,
 } from './types';
 import { getOrInitHolderKey } from '@/lib/holderKey';
 import { HolderKeyBanner } from './components/HolderKeyBanner';
 import { StudentProfileCard } from './components/StudentProfileCard';
 import { ConsentManagementCard } from './components/ConsentManagementCard';
+import { EmployerRequestsCard } from './components/EmployerRequestsCard';
 import { CredentialsListCard } from './components/CredentialsListCard';
 import { SharePresentationModal } from './components/SharePresentationModal';
 import { CertificateModal } from './components/CertificateModal';
@@ -25,6 +27,7 @@ export const StudentWalletPage: React.FC = () => {
   const [purposes, setPurposes] = useState<ConsentPurposeSetting[]>([]);
   const [history, setHistory] = useState<ConsentHistoryRecord[]>([]);
   const [credentials, setCredentials] = useState<StudentCredentialItem[]>([]);
+  const [employerRequests, setEmployerRequests] = useState<EmployerHiringRequestItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isOffline, setIsOffline] = useState<boolean>(!navigator.onLine);
@@ -68,11 +71,12 @@ export const StudentWalletPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const [recRes, verRes, cstRes, credRes] = await Promise.all([
+      const [recRes, verRes, cstRes, credRes, empReqRes] = await Promise.all([
         authFetch(`${API_BASE_URL}/v1/students/me`),
         authFetch(`${API_BASE_URL}/v1/students/me/versions`),
         authFetch(`${API_BASE_URL}/v1/students/me/consent`),
         authFetch(`${API_BASE_URL}/v1/credentials/me`),
+        authFetch(`${API_BASE_URL}/v1/students/me/employer-requests`),
       ]);
 
       if (!recRes.ok) {
@@ -83,12 +87,14 @@ export const StudentWalletPage: React.FC = () => {
       const verData = verRes.ok ? await verRes.json() : [];
       const cstData = cstRes.ok ? await cstRes.json() : { purposes: [], history: [] };
       const credData = credRes.ok ? await credRes.json() : [];
+      const empReqData = empReqRes.ok ? await empReqRes.json() : [];
 
       setRecord(recData);
       setVersions(verData);
       setPurposes(cstData.purposes || []);
       setHistory(cstData.history || []);
       setCredentials(credData);
+      setEmployerRequests(empReqData);
     } catch (err: any) {
       console.error('Student wallet fetch error:', err);
       setError(err?.message || 'Failed to load student identity wallet.');
@@ -206,7 +212,19 @@ export const StudentWalletPage: React.FC = () => {
         }}
       />
 
-      {/* 4. Credentials List & Selective Sharing Builder (Req 3) */}
+      {/* 4. Employer Hiring Access Requests (DPDP Act §8.4) */}
+      <EmployerRequestsCard
+        requests={employerRequests}
+        onRequestDecided={(msg) => {
+          fetchData();
+          if (msg) {
+            setToastMessage(msg);
+            setTimeout(() => setToastMessage(null), 6000);
+          }
+        }}
+      />
+
+      {/* 5. Credentials List & Selective Sharing Builder (Req 3) */}
       <CredentialsListCard
         credentials={credentials}
         onOpenShareModal={(cred) => setSelectedCredForShare(cred)}

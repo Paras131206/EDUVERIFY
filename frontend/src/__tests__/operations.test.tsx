@@ -462,20 +462,12 @@ describe('Task A4: Institution Operations & Lifecycle Management', () => {
   });
 
   describe('5. Institution Portal (/institution)', () => {
-    it('renders zero stats initially, shows no data uploaded message, and loads demo document stats on demand', async () => {
-      localStorage.removeItem('eduverify_data_uploaded');
+    it('renders institution portal overview metrics and ensures load demo doc button and banner are absent', async () => {
       renderComponent(<InstitutionDashboardPage />, '/institution');
 
       expect(screen.getByText(/institution (portal|dashboard)/i)).toBeInTheDocument();
-      expect(screen.getByText(/no student data uploaded/i)).toBeInTheDocument();
-
-      // Initially zero stats
-      expect(screen.getByText('0')).toBeInTheDocument();
-      expect(screen.getByText(/0\.0%/)).toBeInTheDocument();
-
-      // Click "Load Demo Document"
-      const loadDemoBtns = screen.getAllByRole('button', { name: /load demo document/i });
-      fireEvent.click(loadDemoBtns[0]);
+      expect(screen.queryByText(/load demo document/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/no student data uploaded/i)).not.toBeInTheDocument();
 
       await waitFor(() => {
         expect(screen.getByTestId('kpi-dq-score')).toBeInTheDocument();
@@ -484,7 +476,7 @@ describe('Task A4: Institution Operations & Lifecycle Management', () => {
         expect(screen.getByTestId('kpi-open-issues')).toBeInTheDocument();
       });
 
-      // Check populated stats after demo document loaded
+      // Check populated stats
       expect(screen.getByText('480')).toBeInTheDocument();
       expect(screen.getByText(/92\.3%/)).toBeInTheDocument();
 

@@ -12,6 +12,7 @@ from app.routers.consent import router as consent_router
 from app.routers.credentials import router as credentials_router
 from app.routers.dashboards import router as dashboards_router
 from app.routers.duplicates import router as duplicates_router
+from app.routers.employer import router as employer_router
 from app.routers.events import router as events_router
 from app.routers.exports import router as exports_router
 from app.routers.issues import router as issues_router
@@ -39,6 +40,7 @@ ROUTERS: list[APIRouter] = [
     credentials_router,
     dashboards_router,
     duplicates_router,
+    employer_router,
     events_router,
     exports_router,
     issues_router,

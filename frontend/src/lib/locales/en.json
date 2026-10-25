@@ -20,6 +20,7 @@
     "students": "Student Registry",
     "aggregates": "Aggregate Intake",
     "dab": "DAB Portal & Degrees",
+    "employer": "Employer Hiring Portal",
     "portals_modules": "Portals & Modules",
     "signin_portal": "Sign In to Portal",
     "audit_log": "Document Audit & Revert"
@@ -32,7 +33,8 @@
     "INSTITUTION_ADMIN": "Institution Admin",
     "INSTITUTION_STAFF": "Institution Staff",
     "VERIFIER": "Authorized Verifier",
-    "STUDENT": "Student"
+    "STUDENT": "Student",
+    "EMPLOYER": "Employer & Hiring Partner"
   },
   "shell": {
     "language": "Language",
