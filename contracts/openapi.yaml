@@ -724,6 +724,56 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Issue'
+  /v1/batches/{id}/issues/bulk-decide:
+    post:
+      tags:
+      - Batches
+      summary: Bulk decide issues (ACCEPT_INFO, ACCEPT_SELECTED, DISMISS_SELECTED)
+      operationId: bulkDecideBatchIssues
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - action
+              properties:
+                action:
+                  type: string
+                  description: 'Action: ACCEPT_INFO, ACCEPT_SELECTED, DISMISS_SELECTED'
+                issue_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: Target issue IDs
+                remarks:
+                  type: string
+                  description: Remarks or decision notes
+      responses:
+        '200':
+          description: Bulk decision applied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  count:
+                    type: integer
+                  issues:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Issue'
   /v1/batches/{id}/commit:
     post:
       tags:

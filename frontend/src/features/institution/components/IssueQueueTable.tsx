@@ -19,6 +19,7 @@ interface IssueQueueTableProps {
   selectedIssueId: string | null;
   onSelectIssue: (issue: IssueItem) => void;
   onBulkAcceptInfo: () => Promise<void> | void;
+  onBulkAcceptSelected?: (issueIds: string[]) => Promise<void> | void;
   onBulkDismissSelected: (issueIds: string[], note: string) => Promise<void> | void;
 }
 
@@ -40,6 +41,7 @@ export const IssueQueueTable: React.FC<IssueQueueTableProps> = ({
   selectedIssueId,
   onSelectIssue,
   onBulkAcceptInfo,
+  onBulkAcceptSelected,
   onBulkDismissSelected,
 }) => {
   // Tabs & Filters
@@ -88,8 +90,28 @@ export const IssueQueueTable: React.FC<IssueQueueTableProps> = ({
       ALL: issues.length,
       AUTO_FLAG: issues.filter((i) => i.bucket === 'AUTO_FLAG').length,
       HUMAN_REVIEW: issues.filter((i) => i.bucket === 'HUMAN_REVIEW').length,
-      INFO: issues.filter((i) => i.bucket === 'INFO' || i.severity === 'INFO').length,
+      INFO: issues.filter(
+        (i) =>
+          i.bucket === 'INFO' ||
+          i.severity === 'INFO' ||
+          i.priority === 'LOW' ||
+          i.rule_id === 'V030'
+      ).length,
     };
+  }, [issues]);
+
+  // Open INFO normalisations count
+  const openInfoCount = useMemo(() => {
+    return issues.filter(
+      (i) =>
+        (i.bucket === 'INFO' ||
+          i.severity === 'INFO' ||
+          i.priority === 'LOW' ||
+          i.rule_id === 'V030' ||
+          (i.suggested_fix && !i.suggested_fix.requires_approval)) &&
+        i.status !== 'FIXED' &&
+        i.status !== 'DISMISSED'
+    ).length;
   }, [issues]);
 
   // Filtered & Sorted items
@@ -98,7 +120,14 @@ export const IssueQueueTable: React.FC<IssueQueueTableProps> = ({
       // Tab filter
       if (activeTab === 'AUTO_FLAG' && iss.bucket !== 'AUTO_FLAG') return false;
       if (activeTab === 'HUMAN_REVIEW' && iss.bucket !== 'HUMAN_REVIEW') return false;
-      if (activeTab === 'INFO' && iss.bucket !== 'INFO' && iss.severity !== 'INFO') return false;
+      if (
+        activeTab === 'INFO' &&
+        iss.bucket !== 'INFO' &&
+        iss.severity !== 'INFO' &&
+        iss.priority !== 'LOW' &&
+        iss.rule_id !== 'V030'
+      )
+        return false;
 
       // Select filters
       if (filterRule !== 'ALL' && iss.rule_id !== filterRule) return false;
@@ -184,6 +213,17 @@ export const IssueQueueTable: React.FC<IssueQueueTableProps> = ({
     }
   };
 
+  const handleBulkAcceptSelected = async () => {
+    if (selectedIds.size === 0 || !onBulkAcceptSelected) return;
+    setIsProcessingBulk(true);
+    try {
+      await onBulkAcceptSelected(Array.from(selectedIds));
+      setSelectedIds(new Set());
+    } finally {
+      setIsProcessingBulk(false);
+    }
+  };
+
   const handleConfirmBulkDismiss = async () => {
     if (!dismissReason.trim()) return;
     setIsProcessingBulk(true);
@@ -227,15 +267,37 @@ export const IssueQueueTable: React.FC<IssueQueueTableProps> = ({
 
           {/* Bulk actions */}
           <div className="flex items-center gap-2 flex-wrap">
+            {selectedIds.size > 0 && onBulkAcceptSelected && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={handleBulkAcceptSelected}
+                disabled={isProcessingBulk}
+                className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white h-8 shadow-sm font-medium"
+              >
+                <CheckCheck className="w-3.5 h-3.5 mr-1.5" />
+                Accept Selected Fixes ({selectedIds.size})
+              </Button>
+            )}
+
             <Button
               variant="outline"
               size="sm"
               onClick={handleBulkAccept}
               disabled={isProcessingBulk}
-              className="text-xs text-blue-700 border-blue-200 hover:bg-blue-50 h-8"
+              className={`text-xs h-8 font-medium transition ${
+                openInfoCount === 0
+                  ? 'text-emerald-700 border-emerald-300 bg-emerald-50/70 hover:bg-emerald-100'
+                  : 'text-blue-700 border-blue-200 hover:bg-blue-50'
+              }`}
             >
-              <CheckCheck className="w-3.5 h-3.5 mr-1.5 text-blue-600" />
+              {openInfoCount === 0 ? (
+                <CheckCircle2 className="w-3.5 h-3.5 mr-1.5 text-emerald-600" />
+              ) : (
+                <CheckCheck className="w-3.5 h-3.5 mr-1.5 text-blue-600" />
+              )}
               Accept All INFO Normalisations
+              {openInfoCount > 0 ? ` (${openInfoCount})` : ' (All Accepted)'}
             </Button>
 
             {selectedIds.size > 0 && (
