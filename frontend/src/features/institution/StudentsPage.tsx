@@ -364,7 +364,7 @@ export const StudentsPage: React.FC = () => {
               : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
           }`}
         >
-          All Students ({students.length})
+          {`All Students (${students.length})`}
         </button>
         <button
           onClick={() => setEntryExitFilter('LATERAL')}
@@ -542,7 +542,7 @@ export const StudentsPage: React.FC = () => {
                       </TableCell>
                       <TableCell className="text-xs text-slate-600">
                         <div className="flex flex-col gap-0.5">
-                          <span>Year {student.year_of_study || 1} &middot; {student.course_level}</span>
+                          <span>{`Year ${student.year_of_study || 1} · ${student.course_level}`}</span>
                           {isDSE && (
                             <span className="text-[10px] text-blue-700 font-semibold bg-blue-50 px-1.5 py-0.2 rounded border border-blue-200 w-fit">
                               DSE Lateral Entry
