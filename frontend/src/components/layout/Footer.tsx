@@ -15,15 +15,17 @@ export const Footer: React.FC = () => {
 
         <div className="flex items-center gap-4">
           <a href="#privacy" className="hover:text-gov-navy underline-offset-2 hover:underline">
-            Privacy Policy (DPDP 2023)
+            {t('shell.privacy_policy', 'Privacy Policy (DPDP 2023)')}
           </a>
           <span>•</span>
           <a href="#terms" className="hover:text-gov-navy underline-offset-2 hover:underline">
-            AICTE Guidelines
+            {t('shell.aicte_guidelines', 'AICTE Guidelines')}
           </a>
           <span>•</span>
           <span className="flex items-center gap-1">
-            Built with <Heart className="w-3.5 h-3.5 text-gov-saffron fill-gov-saffron" aria-hidden="true" /> for Digital India
+            {t('shell.built_with', 'Built with')}{' '}
+            <Heart className="w-3.5 h-3.5 text-gov-saffron fill-gov-saffron" aria-hidden="true" />{' '}
+            {t('shell.for_digital_india', 'for Digital India')}
           </span>
         </div>
 
