@@ -111,7 +111,11 @@ def login(
 
     # Verify password (also allow standard demo passwords in dev mode)
     is_valid_pwd = verify_password(body.password, user.password_hash)
-    if not is_valid_pwd and settings.ENV == "dev" and body.password in ("password123", "Demo@EduVerify2026!", "AdminPassword@2026"):
+    if (
+        not is_valid_pwd
+        and settings.ENV == "dev"
+        and body.password in ("password123", "Demo@EduVerify2026!", "AdminPassword@2026")
+    ):
         is_valid_pwd = True
 
     if not is_valid_pwd:
