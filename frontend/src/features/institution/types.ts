@@ -84,6 +84,7 @@ export interface SchemaDriftData {
 
 export interface BatchItem {
   id: string;
+  batch_id?: string;
   institution_aicte_id: string;
   academic_year: string;
   filename: string;

@@ -34,7 +34,6 @@ export const getHomeRouteForRole = (role?: UserRole | string): string => {
       return '/institution';
     case 'DAB_ADMIN':
     case 'DAB_MEMBER':
-    case 'DAB_ADMIN':
       return '/dab';
     case 'STUDENT':
       return '/student';
