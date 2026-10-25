@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { MaskedValue } from '@/components/shared/MaskedValue';
 import { X, AlertTriangle, Eye, ShieldCheck } from 'lucide-react';
+import { authFetch } from '@/lib/api';
 import { CanonicalStudentRecord } from '../types';
 
 interface RowInspectorModalProps {
@@ -24,7 +25,7 @@ export const RowInspectorModal: React.FC<RowInspectorModalProps> = ({
   useEffect(() => {
     let isMounted = true;
     setIsLoading(true);
-    fetch(`/v1/batches/${batchId}/records/${row}`)
+    authFetch(`/v1/batches/${batchId}/records/${row}`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();

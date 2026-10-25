@@ -26,7 +26,7 @@ import {
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { OfflineBanner } from '@/components/shared/OfflineBanner';
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, authFetch } from '@/lib/api';
 import { BatchItem } from './types';
 
 export const BatchListPage: React.FC = () => {
@@ -39,7 +39,7 @@ export const BatchListPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
 
-    fetch(`${API_BASE_URL}/v1/batches`)
+    authFetch(`${API_BASE_URL}/v1/batches`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();

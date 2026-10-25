@@ -85,3 +85,84 @@ apiClient.use({
     return response;
   },
 });
+
+export async function authFetch(
+  input: RequestInfo | URL,
+  init?: RequestInit
+): Promise<Response> {
+  const token = getAuthToken();
+  const headers = new Headers(init?.headers);
+
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  let url = input;
+  if (typeof input === 'string') {
+    if (input.startsWith('/v1/')) {
+      url = `${API_BASE_URL}${input}`;
+    } else if (!input.startsWith('http://') && !input.startsWith('https://') && !input.startsWith('/')) {
+      url = `${API_BASE_URL}/${input}`;
+    }
+  }
+
+  const response = await fetch(url, {
+    ...init,
+    headers,
+    credentials: init?.credentials || 'include',
+  });
+
+  const urlStr = typeof url === 'string' ? url : url.toString();
+  if (response.status === 401 && !urlStr.includes('/auth/login') && !urlStr.includes('/auth/refresh')) {
+    if (!isRefreshing) {
+      isRefreshing = true;
+      try {
+        const res = await fetch(`${API_BASE_URL}/v1/auth/refresh`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const newToken = data.access_token;
+          setAuthToken(newToken);
+          isRefreshing = false;
+          onRefreshed(newToken);
+
+          const retryHeaders = new Headers(init?.headers);
+          retryHeaders.set('Authorization', `Bearer ${newToken}`);
+          return fetch(url, {
+            ...init,
+            headers: retryHeaders,
+            credentials: init?.credentials || 'include',
+          });
+        } else {
+          setAuthToken(null);
+          isRefreshing = false;
+        }
+      } catch {
+        setAuthToken(null);
+        isRefreshing = false;
+      }
+    } else {
+      return new Promise<Response>((resolve) => {
+        subscribeTokenRefresh((newToken: string) => {
+          const retryHeaders = new Headers(init?.headers);
+          retryHeaders.set('Authorization', `Bearer ${newToken}`);
+          resolve(
+            fetch(url, {
+              ...init,
+              headers: retryHeaders,
+              credentials: init?.credentials || 'include',
+            })
+          );
+        });
+      });
+    }
+  }
+
+  return response;
+}
+

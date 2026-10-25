@@ -20,7 +20,7 @@ import {
   BookmarkCheck,
 } from 'lucide-react';
 import { maskApaar } from '@/lib/masking';
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, authFetch } from '@/lib/api';
 import { CANONICAL_FIELDS, ColumnMappingItem, MappingMethod } from '../types';
 
 interface Step2MappingProps {
@@ -50,7 +50,7 @@ export const Step2Mapping: React.FC<Step2MappingProps> = ({
     setIsLoading(true);
     setLoadError(null);
 
-    fetch(`${API_BASE_URL}/v1/batches/${batchId}/mapping`)
+    authFetch(`${API_BASE_URL}/v1/batches/${batchId}/mapping`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -206,7 +206,7 @@ export const Step2Mapping: React.FC<Step2MappingProps> = ({
     setIsSubmitting(true);
 
     try {
-      await fetch(`${API_BASE_URL}/v1/batches/${batchId}/mapping`, {
+      await authFetch(`${API_BASE_URL}/v1/batches/${batchId}/mapping`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
