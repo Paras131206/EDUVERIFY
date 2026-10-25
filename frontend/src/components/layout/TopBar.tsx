@@ -11,8 +11,7 @@ export const TopBar: React.FC = () => {
 
   const isHindi = i18n.language?.startsWith('hi');
 
-  const toggleLanguage = () => {
-    const nextLang = isHindi ? 'en' : 'hi';
+  const setLang = (nextLang: 'en' | 'hi') => {
     i18n.changeLanguage(nextLang);
   };
 
@@ -28,14 +27,33 @@ export const TopBar: React.FC = () => {
           <span className="font-medium tracking-wide">{t('app.gov_portal')}</span>
         </div>
         <div className="flex items-center gap-4">
-          <button
-            onClick={toggleLanguage}
-            className="inline-flex items-center gap-1.5 hover:text-white px-2 py-0.5 rounded bg-slate-800/80 hover:bg-slate-700 transition focus:outline-none focus:ring-1 focus:ring-gov-saffron text-xs"
-            aria-label={`Switch language to ${isHindi ? 'English' : 'हिन्दी'}`}
-          >
-            <Languages className="w-3.5 h-3.5 text-gov-saffron" aria-hidden="true" />
-            <span>{isHindi ? 'English' : 'हिन्दी'}</span>
-          </button>
+          <div className="inline-flex items-center rounded bg-slate-800/90 p-0.5 border border-slate-700/80 text-xs">
+            <Languages className="w-3.5 h-3.5 text-gov-saffron ml-1.5 mr-1" aria-hidden="true" />
+            <button
+              type="button"
+              onClick={() => setLang('en')}
+              className={`px-2 py-0.5 rounded text-[11px] font-semibold transition focus:outline-none focus:ring-1 focus:ring-gov-saffron ${
+                !isHindi
+                  ? 'bg-gov-saffron text-gov-navyDark font-bold shadow-xs'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+              }`}
+              aria-pressed={!isHindi}
+            >
+              English
+            </button>
+            <button
+              type="button"
+              onClick={() => setLang('hi')}
+              className={`px-2 py-0.5 rounded text-[11px] font-semibold transition focus:outline-none focus:ring-1 focus:ring-gov-saffron ${
+                isHindi
+                  ? 'bg-gov-saffron text-gov-navyDark font-bold shadow-xs'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+              }`}
+              aria-pressed={isHindi}
+            >
+              हिन्दी
+            </button>
+          </div>
         </div>
       </div>
 

@@ -43,7 +43,11 @@
     "apaar_keyed": "APAAR Keyed",
     "apaar_secured": "All data secured via 12-digit APAAR format with hash chain audit.",
     "dark_mode": "Dark Mode",
-    "light_mode": "Light Mode"
+    "light_mode": "Light Mode",
+    "privacy_policy": "Privacy Policy (DPDP 2023)",
+    "aicte_guidelines": "AICTE Guidelines",
+    "built_with": "Built with",
+    "for_digital_india": "for Digital India"
   },
   "badges": {
     "critical": "Critical",
@@ -57,7 +61,11 @@
   "score": {
     "label": "Data Quality Score",
     "before": "Before Review",
-    "after": "After Corrections"
+    "after": "After Corrections",
+    "needs_review": "Needs Review",
+    "critical_action": "Critical Action Needed",
+    "good": "Good",
+    "excellent": "Excellent"
   },
   "common": {
     "loading": "Loading...",
